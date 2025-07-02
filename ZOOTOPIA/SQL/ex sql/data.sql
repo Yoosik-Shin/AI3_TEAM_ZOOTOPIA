@@ -31,7 +31,7 @@ VALUES ( 'user', 'ROLE_USER' );
 INSERT INTO user_auth ( username,  auth )
 VALUES ( 'admin', 'ROLE_USER' );
 
-INSERT INTO user_auth ( username,  auth )
+INSERT INTO user_auth ( email,  auth )
 VALUES ( 'admin', 'ROLE_ADMIN' );
 
 -- 사용자 

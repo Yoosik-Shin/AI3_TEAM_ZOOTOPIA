@@ -67,7 +67,7 @@ public class SecurityConfig {
 
         // ✅ 커스텀 로그인 페이지
         http.formLogin(login -> login
-                                     //.usernameParameter("id")       // 아이디 파라미터
+                                     .usernameParameter("email")       // 아이디 파라미터
                                      //.passwordParameter("pw")       // 비밀번호 파라미터
                                      .loginPage("/login")                   // 로그인 페이지 경로
                                      .loginProcessingUrl("/login") // 로그인 요청 경로
