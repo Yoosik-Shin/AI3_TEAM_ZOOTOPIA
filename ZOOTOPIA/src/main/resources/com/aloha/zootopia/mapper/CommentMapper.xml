@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aloha.zootopia.mapper.CommentMapper">
+
+  <resultMap id="CommentMap" type="com.aloha.zootopia.domain.Comment">
+    <id property="commentId" column="comment_id"/>
+    <result property="content" column="content"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="isDeleted" column="is_deleted"/>
+    <result property="userId" column="user_id"/>
+    <result property="postId" column="post_id"/>
+    <result property="nickname" column="nickname"/>
+    <result property="profileImg" column="profile_img"/>
+  </resultMap>
+
+  <!-- 댓글 목록 -->
+  <select id="findByPostId" resultMap="CommentMap">
+    SELECT c.*, u.nickname, u.profile_img
+    FROM post_comments c
+    LEFT JOIN users u ON c.user_id = u.user_id
+    WHERE c.post_id = #{postId}
+      AND c.is_deleted = FALSE
+    ORDER BY c.created_at ASC
+  </select>
+
+  <!-- 댓글 등록 -->
+  <insert id="insert" parameterType="com.aloha.zootopia.domain.Comment">
+    INSERT INTO post_comments (content, user_id, post_id, created_at)
+    VALUES (#{content}, #{userId}, #{postId}, NOW())
+  </insert>
+
+  <!-- 댓글 논리 삭제 -->
+  <update id="softDelete">
+    UPDATE post_comments
+    SET is_deleted = TRUE, updated_at = NOW()
+    WHERE comment_id = #{commentId}
+  </update>
+
+</mapper>

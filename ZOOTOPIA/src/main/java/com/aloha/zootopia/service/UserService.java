@@ -17,7 +17,7 @@ public interface UserService {
     public boolean login(Users user, HttpServletRequest request);
 
     // 회원 조회
-    public Users select(String username) throws Exception;
+    public Users select(String email) throws Exception;
 
     // 👮‍♀️ 관리자 확인
     public boolean isAdmin() throws Exception;

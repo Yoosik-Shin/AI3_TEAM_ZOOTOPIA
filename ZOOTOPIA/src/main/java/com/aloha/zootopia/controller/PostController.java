@@ -1,9 +1,8 @@
 package com.aloha.zootopia.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,134 +11,117 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.CustomUser;
-import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
 import com.aloha.zootopia.service.PostService;
 import com.github.pagehelper.PageInfo;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-
-
 
 @Slf4j
 @Controller
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
 
-    @Autowired private PostService postService;
+    private final PostService postService;
 
+    /**
+     * 게시글 목록 (자유글/질문글) + 인기 게시물
+     */
     @GetMapping("/list")
     public String list(
-        Model model,
-        // @RequestParam(name = "page", defaultValue = "1") long page,
-        // @RequestParam(name = "size", defaultValue = "10") long size,
-        // @RequestParam(name = "count", defaultValue = "10") long count
-        Pagination pagination
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "category", required = false) String category,
+            Model model
     ) throws Exception {
-        // Pagination pagination = new Pagination(page, size, count, 0);
-        List<Posts> list = postService.page(pagination);
-        model.addAttribute("pagination", pagination);
-        model.addAttribute("list", list);
 
-        // PageHelper 통한 페이징처리
-        int page = (int) pagination.getPage();
-        int size = (int)  pagination.getSize();
+        // 일반 게시글 목록 가져오기
         PageInfo<Posts> pageInfo = postService.page(page, size);
-        log.info("pageInfo : {}",pageInfo);
-        model.addAttribute("pageInfo", pageInfo);
+        List<Posts> list = pageInfo.getList();
 
-        // Uri 빌더
-        String pageUri = UriComponentsBuilder.fromPath("/posts/list")
-                                            // Pagination
-                                            //  .queryParam("size", pagination.getSize())
-                                            //  .queryParam("count", pagination.getCount())
-                                            // PageHelper
-                                             .queryParam("size", pageInfo.getSize())
-                                             .queryParam("count", pageInfo.getPageSize())
-                                             .build()
-                                             .toUriString();
-        model.addAttribute("pageUri", pageUri);
-        return "posts/list";
+        // 인기 게시물 목록 가져오기
+        List<Posts> topList = postService.getTop10PopularPosts();
 
+        // topList가 null이거나 비어있는 경우 빈 리스트로 처리
+        if (topList == null || topList.isEmpty()) {
+            System.out.println("🔥 인기글이 없습니다.");
+            topList = new ArrayList<>();
+        }
+
+        // 모델에 데이터를 추가
+        model.addAttribute("pageInfo", pageInfo);  // 페이지네이션 정보
+        model.addAttribute("list", list);  // 일반 게시글 목록
+        model.addAttribute("category", category);  // 카테고리 필터링 정보
+        model.addAttribute("topList", topList);  // 인기 게시물 목록
+
+        return "posts/list";  // 반환할 뷰
     }
 
-    // 게시글 조회
-    @PreAuthorize("isAuthenticated()")      // 인증 체크
+    /**
+     * 게시글 상세
+     */
     @GetMapping("/read/{id}")
     public String read(@PathVariable("id") String id, Model model) throws Exception {
         Posts post = postService.selectById(id);
+
+        postService.increaseViewCount(post.getPostId());
+
+        if (post.getComments() == null) {
+            post.setComments(new ArrayList<>());
+        }
+
         model.addAttribute("post", post);
         return "posts/read";
     }
 
-    // 게시글 등록
-    // @Secured("ROLE_USER")                // USER 권한 체크
-    // @PreAuthorize("hasRole('USER')")     // USER 권한 체크    
-    @PreAuthorize("isAuthenticated()")      // 인증 체크
+    /**
+     * 게시글 작성 폼
+     */
     @GetMapping("/create")
-    public String create(@ModelAttribute(value = "post") Posts post) {
+    public String createForm(Model model) {
+        model.addAttribute("post", new Posts());
         return "posts/create";
     }
-    
-    // 게시글 등록 처리
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PostMapping("create")
-    public String createPost(
-        Posts post,
-        @AuthenticationPrincipal CustomUser customUser
-    ) throws Exception {
-        // 인증된 사용자의 no 를 Posts 의 userNo 에 넣어줌
-        post.setUserNo(customUser.getUser().getNo());
-        log.info("posts : {}", post);
-        boolean result = postService.insert(post);
-        if( result )
-            return "redirect:/posts/list";
-        return "redirect:/posts/create?error=true";
-    }
-    
+
     /**
-     * 게시글 수정
-     * @param id
-     * @param model
-     * @return
-     * @throws Exception
-     * ⭐⭐⭐ #p0, #p1 로 파라미터 인덱스를 지정하여 가져올 수 있다.
-     * 여기서는 요청 파라미터로 넘어온 id ➡ #p0
-     * "@빈이름" 형태로 특정 빈의 메소드를 호출할 수 있다.
-     * ➡ @PostService.isOwner()
+     * 게시글 작성 처리
      */
-    @PreAuthorize(" (hasRole('ADMIN')) or (#p0 != null and @PostService.isOwner(#p0, authentication.principal.user.no))")                               
-    @GetMapping("/update/{id}")
-    public String update(@PathVariable("id") String id, Model model) throws Exception {
-        Posts post = postService.selectById(id);
-        model.addAttribute("post", post);
-        return "posts/update";
-    }
-    
-    // 게시글 수정 처리
-    // 👮‍♀️관리자 👩‍🏫작성자 검증
-    @PreAuthorize(" (hasRole('ADMIN')) or (#p0 != null and @PostService.isOwner(#p0, authentication.principal.user.no))")                               
-    @PostMapping("/update")
-    public String updatePost(Posts post) throws Exception {
-        boolean result = postService.updateById(post);
-        if( result )
+    @PostMapping("/create")
+    public String create(
+            @ModelAttribute Posts post,
+            @RequestParam("imageFiles") MultipartFile[] imageFiles,
+            @AuthenticationPrincipal CustomUser user,  // 로그인 사용자 정보
+            RedirectAttributes ra
+    ) throws Exception {
+        post.setUserId(user.getUser().getUserId());  // userId 수동 세팅
+        boolean result = postService.insert(post, imageFiles);
+        if (result) {
+            ra.addFlashAttribute("msg", "등록되었습니다.");
             return "redirect:/posts/list";
-        return "redirect:/posts/update?error=true";
+        }
+        ra.addFlashAttribute("error", "등록에 실패했습니다.");
+        return "redirect:/posts/create";
     }
-    
-    // 게시글 삭제 처리
+
+    /**
+     * 게시글 삭제
+     */
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable("id") String id) throws Exception {
+    public String delete(@PathVariable("id") String id, RedirectAttributes ra) throws Exception {
         boolean result = postService.deleteById(id);
-        if( result )
-            return "redirect:/posts/list";
-        return "redirect:/posts/update?error=true";
+        if (result) {
+            ra.addFlashAttribute("msg", "삭제되었습니다.");
+        } else {
+            ra.addFlashAttribute("error", "삭제에 실패했습니다.");
+        }
+        return "redirect:/posts/list";
     }
-    
-    
-    
 }
+

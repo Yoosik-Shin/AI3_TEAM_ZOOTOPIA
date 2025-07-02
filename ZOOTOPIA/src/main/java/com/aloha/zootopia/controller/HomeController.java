@@ -112,15 +112,15 @@ public class HomeController {
         Model model
     ) {
         log.info(":::::::::: 로그인 페이지 ::::::::::");
-        String username = "";
+        String email = "";
         boolean rememberId = false;
         if( cookie != null ) {
             log.info("CookieName : " + cookie.getName());
             log.info("CookieValue : " + cookie.getValue());
-            username = cookie.getValue();
+            email = cookie.getValue();
             rememberId = true;
         }
-        model.addAttribute("username", username);
+        model.addAttribute("email", email);
         model.addAttribute("rememberId", rememberId);
         return "login";
     }

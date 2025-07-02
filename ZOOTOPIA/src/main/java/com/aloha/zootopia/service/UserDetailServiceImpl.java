@@ -24,21 +24,21 @@ public class UserDetailServiceImpl implements UserDetailsService {
     private UserMapper userMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         log.info(":::::::::: UserDetailServiceImpl ::::::::::");
         log.info("- 사용자 정의 인증을 위해, 사용자 정보 조회");
-        log.info("- username : {} ", username);
+        log.info("- username : {} ", email);
 
         Users user = null;
         try {
             // 👩‍💼 사용자 정보 및 권한 조회
-            user = userMapper.select(username);
+            user = userMapper.select(email);
         } catch (Exception e) {
             log.error("사용자 정보 조회 시 에러 발생 : ", e);
             e.printStackTrace();
         }
         if( user == null ) {
-            throw new UsernameNotFoundException("사용자 정보를 찾을 수 없습니다. - " + username);
+            throw new UsernameNotFoundException("사용자 정보를 찾을 수 없습니다. - " + email);
         }
         // 🔐 Users ➡ CustomUser ➡ UserDetails
         CustomUser customUser = new CustomUser(user);

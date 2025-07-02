@@ -9,9 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @ToString
+@Slf4j
 public class CustomUser implements UserDetails {
 
     // 사용자 DTO
@@ -19,6 +21,7 @@ public class CustomUser implements UserDetails {
 
     public CustomUser(Users user) {
         this.user = user;
+        log.info("✅ CustomUser 생성됨 - 권한 리스트: {}", user.getAuthList());
     }
 
     /**
@@ -49,7 +52,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override
