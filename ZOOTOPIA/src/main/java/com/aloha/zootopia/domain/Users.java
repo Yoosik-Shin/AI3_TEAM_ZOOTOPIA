@@ -3,6 +3,7 @@ package com.aloha.zootopia.domain;
 import java.util.Date;
 import java.util.List;
 
+
 import com.aloha.zootopia.domain.UserAuth;
 
 import lombok.Data;
