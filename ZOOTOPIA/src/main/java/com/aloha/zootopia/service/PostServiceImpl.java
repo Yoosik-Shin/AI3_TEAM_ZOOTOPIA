@@ -14,6 +14,9 @@ import com.aloha.zootopia.domain.PostImage;
 import com.aloha.zootopia.domain.Posts;
 import com.aloha.zootopia.mapper.PostImageMapper;
 import com.aloha.zootopia.mapper.PostMapper;
+
+import com.aloha.zootopia.service.PostService;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
