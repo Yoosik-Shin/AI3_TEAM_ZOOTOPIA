@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div th:fragment="header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-2">
+            <div class="container">
+                <!-- Logo -->
+                <a class="navbar-brand d-flex align-items-center" href="/" style="text-decoration: none;">
+                    <img th:src="@{/assets/dist/img/zootopialogo.png}" alt="Zootopia"
+                         style="height:40px; width:auto;" 
+                         onload="this.style.display='block'"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <span style="color: #F27A7A; font-weight: bold; font-size: 1.5rem; display: none;">🐾 Zootopia</span>
+                </a>
+
+                <!-- Navbar links -->
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">홈</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">스토어</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">내 주변 찾기</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">서비스</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">커뮤니티</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Right icons -->
+                <div class="d-flex align-items-center ms-auto">
+                    <a href="#" class="text-secondary me-3">
+                        <i class="bi bi-search" style="font-size: 1.2rem;"></i>
+                    </a>
+                    <a href="#" class="text-secondary me-3">
+                        <i class="bi bi-cart" style="font-size: 1.2rem;"></i>
+                    </a>
+                    <a href="/login" class="btn btn-sm me-2" style="background-color: #F27A7A; border-color: #F27A7A; color: white;">로그인</a>
+                    <a href="/join" class="btn btn-sm" style="background-color: transparent; border: 1px solid #F27A7A; color: #F27A7A;">회원가입</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Bootstrap JS and Icons -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    </div>
+</body>
+</html>
