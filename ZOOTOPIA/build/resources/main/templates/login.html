@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
@@ -10,332 +10,366 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Custom CSS -->
+    
+    <!-- Inline Header CSS -->
     <style>
-        body {
-            background: #f5f5f5;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
+        /* Header Styles */
+        .zootopia-header {
+            background: #fff;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .container {
+        .zootopia-brand {
+            color: #ff6b6b;
+            font-weight: bold;
+            font-size: 1.05rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .zootopia-brand:hover {
+            color: #ff5252;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            color: #ff6b6b;
+            margin-right: 6px;
+            font-size: 1.05rem;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            padding: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - 200px);
-            padding: 20px;
         }
 
-        .login-container {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            padding: 40px 35px;
-            width: 350px;
-            max-width: 90vw;
+        .header-icon:hover {
+            background-color: #f8f9fa;
         }
 
-        .login-title {
-            color: #333;
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
-            text-align: center;
+        .header-icon:hover i {
+            color: #ff6b6b !important;
         }
 
-        .login-subtitle {
-            color: #888;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
-        }
-
-        .input-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #333;
-            font-weight: 500;
-            width: 100%;
-        }
-
-        .form-control {
-            border: none !important;
-            border-radius: 8px !important;
-            padding: 14px 16px;
-            font-size: 0.95rem;
-            background-color: #f0f0f0 !important;
-            width: 100%;
-            box-sizing: border-box;
-            transition: background-color 0.3s ease;
-            display: block;
-            -webkit-border-radius: 8px !important;
-            -moz-border-radius: 8px !important;
-            border-top-left-radius: 8px !important;
-            border-bottom-left-radius: 8px !important;
-            border-top-right-radius: 8px !important;
-            border-bottom-right-radius: 8px !important;
-        }
-
-        .form-control:focus {
-            background-color: #e8e8e8;
-            outline: none;
-        }
-
-        .form-control::placeholder {
-            color: #999;
-            font-size: 0.9rem;
-        }
-
-        .form-check-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0;
-        }
-
-        .form-check-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .form-check-input {
-            margin: 0;
-            width: 16px;
-            height: 16px;
-        }
-
-        .form-check-label {
+        .search-icon {
             color: #666;
-            font-size: 0.85rem;
-            margin: 0;
-            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .cart-icon {
+            color: #666;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         .btn-login {
-            background: #ff7b7b;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-weight: 600;
-            font-size: 1rem;
-            width: 100%;
-            margin: 20px 0;
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
             transition: all 0.3s ease;
-            color: white;
-            cursor: pointer;
         }
 
         .btn-login:hover {
-            background: #ff6666;
+            background: #ff6b6b;
+            color: white;
+            text-decoration: none;
         }
 
-        .social-login {
+        .btn-signup {
+            background: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signup:hover {
+            background: #ff5252;
+            border-color: #ff5252;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1.2rem;
+            padding: 8px;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+
+        .mobile-nav.active {
+            display: block;
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav a:hover {
+            background: #f8f9fa;
+            color: #ff6b6b;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .header-actions {
+                gap: 10px;
+            }
+            
+            .auth-buttons {
+                gap: 5px;
+            }
+            
+            .btn-login,
+            .btn-signup {
+                padding: 5px 12px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 60px 0;
+            margin-top: 50px;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .footer-content {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 25px 0 20px 0;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
         }
 
-        .social-btn {
-            width: 45px;
-            height: 45px;
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-section h5 {
+            color: #F27A7A;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .footer-section p,
+        .footer-links a {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            text-decoration: none;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: #F27A7A;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .social-icons a {
+            width: 36px;
+            height: 36px;
+            background-color: #555;
+            color: #ccc;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
-            color: white;
             font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .social-btn.kakao {
-            background: #FEE500;
-            color: #000;
-        }
-
-        .social-btn.naver {
-            background: #03C75A;
-            color: white;
-        }
-
-        .social-btn.facebook {
-            background: #4267B2;
-        }
-
-        .social-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 0.85rem;
-        }
-
-        .register-link a {
-            color: #ff7b7b;
             text-decoration: none;
-            font-weight: 600;
         }
 
-        .register-link a:hover {
-            text-decoration: underline;
+        .social-icons a:hover {
+            background-color: #F27A7A;
+            color: #fff;
         }
 
-        .text-center small {
-            color: #999;
+        .newsletter-form p {
+            color: #ccc;
             font-size: 0.85rem;
-            margin: 20px 0 10px 0;
-            display: block;
+            margin-bottom: 10px;
         }
 
-        /* Responsive styles */
-        @media (max-width: 650px) {
-            .navbar-brand {
-                position: absolute !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                z-index: 10 !important;
-            }
-            
-            .login-container {
-                width: 90%;
-                padding: 30px 25px;
-            }
-            
-            .navbar-toggler {
-                position: absolute !important;
-                left: 15px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                z-index: 20 !important;
-            }
-            
-            .navbar-collapse {
-                margin-top: 10px;
-            }
-            
-            .mobile-right-icons {
-                position: absolute !important;
-                right: 15px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                z-index: 20 !important;
-            }
-            
-            /* Hide desktop navigation completely on mobile */
-            #navbarNavDesktop {
-                display: none !important;
-            }
-            
-            /* Hide desktop right icons */
-            .d-none.d-md-flex {
-                display: none !important;
-            }
+        .newsletter-form .input-group input {
+            background-color: #555;
+            border: none;
+            color: #fff;
+            font-size: 0.85rem;
+        }
+
+        .newsletter-form .input-group input::placeholder {
+            color: #ccc;
+        }
+
+        .newsletter-form .input-group button {
+            background-color: #F27A7A;
+            border: none;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .newsletter-form .input-group button:hover {
+            background-color: #e06363;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 30px;
         }
     </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom" style="height: 60px; padding: 8px 0;">
-        <div class="container" style="height: 100%; position: relative;">
-            <!-- Hamburger button (Mobile only) -->
-            <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    
+    <!-- Login CSS only -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/login.css}">
 
+</head>
+<body class="login-page">
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom" style="height: 120px; padding: 10px 0;">
+        <div class="container-fluid px-4">
             <!-- Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="/" style="text-decoration: none;">
+            <a class="navbar-brand" href="/" style="text-decoration: none;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <!-- 발바닥 로고 이미지 -->
                     <img th:src="@{/assets/dist/img/zootopialogo.png}" alt="Zootopia Logo" 
                          style="width: 24px; height: 24px; object-fit: contain;">
                     <span style="color: #FF7A7A; font-weight: bold; font-size: 1.3rem;">Zootopia</span>
                 </div>
             </a>
 
-            <!-- Desktop Navigation -->
-            <div class="collapse navbar-collapse justify-content-center d-none d-md-flex" id="navbarNavDesktop">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">홈</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">스토어</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">커뮤니티</a>
-                    </li>
-                </ul>
+            <!-- Navigation - Center -->
+            <div class="navbar-nav mx-auto d-none d-lg-flex">
+                <a class="nav-link" href="#" style="padding: 8px 16px;">홈</a>
+                <a class="nav-link" href="#" style="padding: 8px 16px;">스토어</a>
+                <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
+                <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
+                <a class="nav-link" href="#" style="padding: 8px 16px;">커뮤니티</a>
             </div>
 
-            <!-- Desktop Right icons -->
-            <div class="d-flex align-items-center ms-auto d-none d-md-flex">
-                <a href="#" class="text-secondary me-3">
-                    <i class="fas fa-search" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="#" class="text-secondary">
-                    <i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i>
-                </a>
-            </div>
-
-            <!-- Mobile right icons -->
-            <div class="d-flex align-items-center d-md-none mobile-right-icons">
-                <a href="#" class="text-secondary me-2">
-                    <i class="fas fa-search" style="font-size: 1.1rem;"></i>
-                </a>
-                <a href="#" class="text-secondary">
-                    <i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i>
-                </a>
+            <!-- Right Side - Icons and Login Buttons -->
+            <div class="d-flex align-items-center" style="position: relative; z-index: 1000;">
+                <!-- Search and Cart Icons -->
+                <a href="#" class="text-secondary me-3" style="display: inline-block;"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
+                <a href="#" class="text-secondary me-4" style="display: inline-block;"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
+                
+                <!-- Login and Signup Buttons -->
+                <a href="/login" class="btn me-2" 
+                   style="background-color: #F27A7A; border: 1px solid #F27A7A; color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 60px;">로그인</a>
+                <a href="/join" class="btn" 
+                   style="background-color: transparent; border: 1px solid #F27A7A; color: #F27A7A; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 70px;">회원가입</a>
             </div>
         </div>
-        
-        <!-- Mobile menu (Collapsible) -->
-        <!-- <div class="collapse navbar-collapse d-md-none" id="navbarNav">
-            <div class="container">
-                <ul class="navbar-nav mb-2">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">홈</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">스토어</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" style="padding: 8px 16px;">커뮤니티</a>
-                    </li>
-                </ul>
-                <div class="d-flex gap-2 mb-2">
-                    <a href="/login" class="btn btn-sm flex-fill" style="background-color: #F27A7A; border-color: #F27A7A; color: white; padding: 6px 12px; font-size: 0.85rem;">로그인</a>
-                    <a href="/join" class="btn btn-sm flex-fill" style="background-color: transparent; border: 1px solid #F27A7A; color: #F27A7A; padding: 6px 12px; font-size: 0.85rem;">회원가입</a>
-                </div>
-            </div>
-        </div> -->
     </nav>
-
 
     <div class="container">
         <div class="login-container">
@@ -498,5 +532,124 @@
 
     <!-- bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Inline Header JavaScript -->
+    <script>
+        // Header JavaScript Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Search functionality
+            const searchIcon = document.querySelector('.fas.fa-search');
+            if (searchIcon) {
+                searchIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showSearchModal();
+                });
+            }
+            
+            // Cart icon click handler
+            const cartIcon = document.querySelector('.fas.fa-shopping-cart');
+            if (cartIcon) {
+                cartIcon.parentElement.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = '/cart';
+                });
+            }
+            
+            // Header visibility on scroll
+            let lastScrollTop = 0;
+            const header = document.querySelector('.navbar');
+            
+            if (header) {
+                window.addEventListener('scroll', function() {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    if (scrollTop > lastScrollTop && scrollTop > 100) {
+                        // Scrolling down - hide header
+                        header.style.transform = 'translateY(-100%)';
+                        header.style.transition = 'transform 0.3s ease-in-out';
+                    } else {
+                        // Scrolling up - show header
+                        header.style.transform = 'translateY(0)';
+                        header.style.transition = 'transform 0.3s ease-in-out';
+                    }
+                    
+                    lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+                });
+            }
+            
+            // Initialize header components
+            initializeHeaderButtons();
+            highlightCurrentPage();
+        });
+
+        // Initialize header buttons visibility
+        function initializeHeaderButtons() {
+            // Ensure login/signup buttons are visible
+            const loginBtn = document.querySelector('a[href="/login"]');
+            const signupBtn = document.querySelector('a[href="/join"]');
+            
+            if (loginBtn) {
+                loginBtn.style.display = 'inline-block';
+                loginBtn.style.visibility = 'visible';
+                console.log('Login button found and made visible');
+            } else {
+                console.warn('Login button not found');
+            }
+            
+            if (signupBtn) {
+                signupBtn.style.display = 'inline-block';
+                signupBtn.style.visibility = 'visible';
+                console.log('Signup button found and made visible');
+            } else {
+                console.warn('Signup button not found');
+            }
+            
+            // Ensure the right side container is visible
+            const rightContainer = document.querySelector('.d-flex.align-items-center');
+            if (rightContainer) {
+                rightContainer.style.display = 'flex';
+                rightContainer.style.visibility = 'visible';
+                console.log('Right container found and made visible');
+            }
+        }
+
+        // Search modal function
+        function showSearchModal() {
+            const searchTerm = prompt('검색어를 입력하세요:');
+            if (searchTerm && searchTerm.trim() !== '') {
+                window.location.href = `/search?q=${encodeURIComponent(searchTerm.trim())}`;
+            }
+        }
+
+        // Navigation highlighting
+        function highlightCurrentPage() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const linkPath = new URL(link.href).pathname;
+                if (linkPath === currentPath) {
+                    link.style.color = '#ff6b6b';
+                    link.style.fontWeight = 'bold';
+                }
+            });
+        }
+
+        // Debug function to check header elements
+        function debugHeader() {
+            console.log('=== Header Debug Info ===');
+            console.log('Login button:', document.querySelector('a[href="/login"]'));
+            console.log('Signup button:', document.querySelector('a[href="/join"]'));
+            console.log('Right container:', document.querySelector('.d-flex.align-items-center'));
+            console.log('All buttons:', document.querySelectorAll('.btn'));
+            console.log('Navbar:', document.querySelector('.navbar'));
+        }
+
+        // Call debug function after page load
+        window.addEventListener('load', function() {
+            setTimeout(debugHeader, 1000); // Wait 1 second after page load
+        });
+    </script>
 </body>
 </html>
