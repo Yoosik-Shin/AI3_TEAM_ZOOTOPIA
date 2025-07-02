@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aloha.security.mapper.UserMapper">
+
+    <resultMap id="UserMap" type="Users">
+        <id property="no" column="no"/>     <!-- PK -->
+
+        <result property="no" column="no"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="enabled" column="enabled"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <!-- JOIN 쿼리를 짜고 AuthMap 연결하는 방식 -->
+        <!-- <collection property="authList" resultMap="AuthMap"></collection> -->
+
+        <!-- 별도 SELECT 로 연결 -->
+        <collection property="authList" ofType="UserAuth"
+                    select="selectAuth"
+                    column="username"></collection>
+    </resultMap>
+
+    <resultMap id="AuthMap" type="UserAuth">
+        <result property="no" column="no" />
+        <result property="username" column="username" />
+        <result property="auth" column="auth" />
+    </resultMap>
+
+    <!-- 회원 가입 -->
+    <insert id="join">
+        INSERT INTO user ( username, password, name, email )
+        VALUES ( #{username}, #{password}, #{name}, #{email} )
+    </insert>
+
+    <!-- 회원 권한 등록 -->
+    <insert id="insertAuth">
+        INSERT INTO user_auth ( username, auth )
+        VALUES ( #{username}, #{auth} )
+    </insert>
+
+    <!-- 회원 조회 -->
+    <!-- <select id="select" resultMap="UserMap">
+        SELECT u.*
+              ,auth
+        FROM user u
+             LEFT JOIN user_auth auth ON u.username = auth.username
+        WHERE u.username = #{username}
+    </select> -->
+
+    <select id="select" resultMap="UserMap">
+        SELECT *
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectAuth" resultType="UserAuth">
+        SELECT *
+        FROM user_auth
+        WHERE username = #{username}
+    </select>
+    
+
+</mapper>
