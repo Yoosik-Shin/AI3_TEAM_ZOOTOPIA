@@ -1,8 +1,8 @@
 package com.aloha.zootopia.security;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 

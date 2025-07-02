@@ -2,8 +2,7 @@ package com.aloha.zootopia.security;
 
 import java.io.IOException;
 
-import javax.security.sasl.AuthenticationException;
-
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 

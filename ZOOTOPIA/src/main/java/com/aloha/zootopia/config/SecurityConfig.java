@@ -14,10 +14,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-import com.aloha.security.security.CustomAccessDeniedHandler;
-import com.aloha.security.security.LoginFailureHandler;
-import com.aloha.security.security.LoginSuccessHandler;
-import com.aloha.security.service.UserDetailServiceImpl;
+import com.aloha.zootopia.security.CustomAccessDeniedHandler;
+import com.aloha.zootopia.security.LoginFailureHandler;
+import com.aloha.zootopia.security.LoginSuccessHandler;
+import com.aloha.zootopia.service.UserDetailServiceImpl;
 
 import lombok.extern.slf4j.Slf4j;
 

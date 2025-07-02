@@ -1,136 +1,115 @@
 // Header JavaScript Functions
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Mobile menu toggle functionality
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const mobileNav = document.querySelector('.mobile-nav');
-    
-    if (mobileMenuToggle && mobileNav) {
-        mobileMenuToggle.addEventListener('click', function() {
-            mobileNav.classList.toggle('active');
-            
-            // Change icon based on menu state
-            const icon = this.querySelector('i');
-            if (mobileNav.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-    }
-    
     // Search functionality
-    const searchIcon = document.querySelector('.search-icon');
+    const searchIcon = document.querySelector('.fas.fa-search');
     if (searchIcon) {
-        searchIcon.addEventListener('click', function(e) {
+        searchIcon.parentElement.addEventListener('click', function(e) {
             e.preventDefault();
-            // 검색 모달 또는 검색 페이지로 이동
             showSearchModal();
         });
     }
     
     // Cart icon click handler
-    const cartIcon = document.querySelector('.cart-icon');
+    const cartIcon = document.querySelector('.fas.fa-shopping-cart');
     if (cartIcon) {
-        cartIcon.addEventListener('click', function(e) {
+        cartIcon.parentElement.addEventListener('click', function(e) {
             e.preventDefault();
-            // 장바구니 페이지로 이동
             window.location.href = '/cart';
         });
     }
     
-    // Header scroll effect
+    // Header visibility on scroll
     let lastScrollTop = 0;
-    const header = document.querySelector('.zootopia-header');
+    const header = document.querySelector('.navbar');
     
-    window.addEventListener('scroll', function() {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > lastScrollTop && scrollTop > 100) {
-            // Scrolling down
-            header.style.transform = 'translateY(-100%)';
-        } else {
-            // Scrolling up
-            header.style.transform = 'translateY(0)';
-        }
-        
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    });
-    
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (mobileNav && mobileNav.classList.contains('active')) {
-            if (!mobileNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-                mobileNav.classList.remove('active');
-                const icon = mobileMenuToggle.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
+    if (header) {
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down - hide header
+                header.style.transform = 'translateY(-100%)';
+                header.style.transition = 'transform 0.3s ease-in-out';
+            } else {
+                // Scrolling up - show header
+                header.style.transform = 'translateY(0)';
+                header.style.transition = 'transform 0.3s ease-in-out';
             }
-        }
-    });
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+    }
     
-    // Update cart badge count
-    updateCartBadge();
+    // Initialize header components
+    initializeHeaderButtons();
+    highlightCurrentPage();
 });
+
+// Initialize header buttons visibility
+function initializeHeaderButtons() {
+    // Ensure login/signup buttons are visible
+    const loginBtn = document.querySelector('a[href="/login"]');
+    const signupBtn = document.querySelector('a[href="/join"]');
+    
+    if (loginBtn) {
+        loginBtn.style.display = 'inline-block';
+        loginBtn.style.visibility = 'visible';
+        console.log('Login button found and made visible');
+    } else {
+        console.warn('Login button not found');
+    }
+    
+    if (signupBtn) {
+        signupBtn.style.display = 'inline-block';
+        signupBtn.style.visibility = 'visible';
+        console.log('Signup button found and made visible');
+    } else {
+        console.warn('Signup button not found');
+    }
+    
+    // Ensure the right side container is visible
+    const rightContainer = document.querySelector('.d-flex.align-items-center');
+    if (rightContainer) {
+        rightContainer.style.display = 'flex';
+        rightContainer.style.visibility = 'visible';
+        console.log('Right container found and made visible');
+    }
+}
 
 // Search modal function
 function showSearchModal() {
-    // 간단한 프롬프트 검색 (실제로는 모달 구현)
     const searchTerm = prompt('검색어를 입력하세요:');
     if (searchTerm && searchTerm.trim() !== '') {
-        // 검색 결과 페이지로 이동
         window.location.href = `/search?q=${encodeURIComponent(searchTerm.trim())}`;
     }
-}
-
-// Update cart badge count
-function updateCartBadge() {
-    // 로컬 스토리지 또는 서버에서 장바구니 아이템 수 가져오기
-    const cartCount = getCartItemCount();
-    const cartBadge = document.querySelector('.cart-badge');
-    
-    if (cartBadge) {
-        if (cartCount > 0) {
-            cartBadge.textContent = cartCount > 99 ? '99+' : cartCount;
-            cartBadge.style.display = 'flex';
-        } else {
-            cartBadge.style.display = 'none';
-        }
-    }
-}
-
-// Get cart item count (예시 함수)
-function getCartItemCount() {
-    // 실제로는 서버 API 호출 또는 로컬 스토리지에서 가져오기
-    const cartItems = localStorage.getItem('cartItems');
-    if (cartItems) {
-        try {
-            const items = JSON.parse(cartItems);
-            return Array.isArray(items) ? items.length : 0;
-        } catch (e) {
-            return 0;
-        }
-    }
-    return 0;
 }
 
 // Navigation highlighting
 function highlightCurrentPage() {
     const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const navLinks = document.querySelectorAll('.nav-link');
     
     navLinks.forEach(link => {
         const linkPath = new URL(link.href).pathname;
         if (linkPath === currentPath) {
             link.style.color = '#ff6b6b';
-            link.style.backgroundColor = 'rgba(255, 107, 107, 0.1)';
+            link.style.fontWeight = 'bold';
         }
     });
 }
 
-// Initialize when page loads
+// Debug function to check header elements
+function debugHeader() {
+    console.log('=== Header Debug Info ===');
+    console.log('Login button:', document.querySelector('a[href="/login"]'));
+    console.log('Signup button:', document.querySelector('a[href="/join"]'));
+    console.log('Right container:', document.querySelector('.d-flex.align-items-center'));
+    console.log('All buttons:', document.querySelectorAll('.btn'));
+    console.log('Navbar:', document.querySelector('.navbar'));
+}
+
+// Call debug function after page load
 window.addEventListener('load', function() {
-    highlightCurrentPage();
+    setTimeout(debugHeader, 1000); // Wait 1 second after page load
 });

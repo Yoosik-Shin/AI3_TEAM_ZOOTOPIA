@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.aloha.security.domain.CustomUser;
-import com.aloha.security.domain.Pagination;
-import com.aloha.security.domain.Posts;
-import com.aloha.security.service.PostService;
+import com.aloha.zootopia.domain.CustomUser;
+import com.aloha.zootopia.domain.Pagination;
+import com.aloha.zootopia.domain.Posts;
+import com.aloha.zootopia.service.PostService;
 import com.github.pagehelper.PageInfo;
 
 import lombok.extern.slf4j.Slf4j;

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.aloha.security.domain.CustomUser;
-import com.aloha.security.domain.Users;
-import com.aloha.security.service.UserService;
+import com.aloha.zootopia.domain.CustomUser;
+import com.aloha.zootopia.domain.Users;
+import com.aloha.zootopia.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
