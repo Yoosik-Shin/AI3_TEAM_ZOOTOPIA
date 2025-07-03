@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.domain.CustomUser;
 import com.aloha.zootopia.domain.Posts;
+import com.aloha.zootopia.service.CommentService;
 import com.aloha.zootopia.service.PostService;
 import com.github.pagehelper.PageInfo;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
     private final PostService postService;
+    private final CommentService commentService;
 
     /**
      * 게시글 목록 (자유글/질문글) + 인기 게시물
@@ -43,7 +48,7 @@ public class PostController {
     ) throws Exception {
 
         // 일반 게시글 목록 가져오기
-        PageInfo<Posts> pageInfo = postService.page(page, size);
+        PageInfo<Posts> pageInfo = postService.page(page, size, category);
         List<Posts> list = pageInfo.getList();
 
         // 인기 게시물 목록 가져오기
@@ -68,14 +73,24 @@ public class PostController {
      * 게시글 상세
      */
     @GetMapping("/read/{id}")
-    public String read(@PathVariable("id") String id, Model model) throws Exception {
+    public String read(@PathVariable("id") String id, Model model, HttpServletRequest request) throws Exception {
         Posts post = postService.selectById(id);
+        int postId = post.getPostId();
 
-        postService.increaseViewCount(post.getPostId());
+        HttpSession session = request.getSession();
+        String viewKey = "viewed_post_" + postId;
+        Long lastViewTime = (Long) session.getAttribute(viewKey);
 
-        if (post.getComments() == null) {
-            post.setComments(new ArrayList<>());
+        long now = System.currentTimeMillis();
+        long expireTime = 60 * 60 * 1000L;
+
+        if (lastViewTime == null || now - lastViewTime > expireTime) {
+            postService.increaseViewCount(postId);
+            session.setAttribute(viewKey, now);     
         }
+
+        List<Comment> comments = commentService.getCommentsByPostId(postId);
+        post.setComments(comments); 
 
         model.addAttribute("post", post);
         return "posts/read";

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aloha.zootopia.mapper.TagMapper">
+
+  <!-- 1. 태그 ID 조회 (이름으로) -->
+  <select id="findTagIdByName" parameterType="String" resultType="Integer">
+    SELECT tag_id FROM tags WHERE name = #{name}
+  </select>
+
+  <!-- 2. 태그 삽입 -->
+    <insert id="insertTag" parameterType="com.aloha.zootopia.domain.Tag"
+            useGeneratedKeys="true" keyProperty="tagId">
+    INSERT INTO tags (name) VALUES (#{name})
+    </insert>
+
+  <!-- 3. post_tags 연결 -->
+  <insert id="insertPostTag" parameterType="map">
+    INSERT INTO post_tags (post_id, tag_id)
+    VALUES (#{postId}, #{tagId})
+  </insert>
+
+  <!-- 4. 게시글 ID로 태그 이름 목록 불러오기 -->
+  <select id="getTagsByPostId" parameterType="int" resultType="string">
+    SELECT t.name
+    FROM post_tags pt
+    JOIN tags t ON pt.tag_id = t.tag_id
+    WHERE pt.post_id = #{postId}
+  </select>
+
+</mapper>

@@ -17,7 +17,7 @@ public interface PostService {
     List<Posts> page(Pagination pagination) throws Exception;
 
     // PageHelper 기반 페이징
-    PageInfo<Posts> page(int page, int size) throws Exception;
+    PageInfo<Posts> page(int page, int size, String category) throws Exception;
 
     // 인기글 Top N
     List<Posts> getTopN(int limit) throws Exception;
@@ -39,7 +39,10 @@ public interface PostService {
 
     void increaseViewCount(Integer postId);
 
+    void increaseCommentCount(int postId);
     
+    void decreaseCommentCount(int postId);
+
     List<Posts> getTop10PopularPosts();
     
 
