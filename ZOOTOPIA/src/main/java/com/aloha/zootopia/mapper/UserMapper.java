@@ -16,6 +16,6 @@ public interface UserMapper {
     public int insertAuth(UserAuth userAuth) throws Exception;
 
     // 회원 조회
-    public Users select(@Param("username") String username) throws Exception;
+    public Users select(@Param("email") String email) throws Exception;
     
 }

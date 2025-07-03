@@ -22,3 +22,17 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Gradle 파일 해시 관련
+fileHashes.bin
+fileHashes.lock
+
+# VSCode 설정
+.vscode/
+
+# IntelliJ IDEA 설정
+.idea/
+
+# 사용자 정의 설정 파일들
+settings.json
+launch.json

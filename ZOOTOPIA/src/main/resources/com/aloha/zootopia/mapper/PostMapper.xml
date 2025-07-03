@@ -1,100 +1,149 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!-- namespace="매퍼 인터페이스 경로" --> 
 <mapper namespace="com.aloha.zootopia.mapper.PostMapper">
 
-    <resultMap id="PostMap" type="Posts">
-        <id property="no" column="no" />
-        <result property="id" column="id" />
-        <result property="title" column="title" />
-        <result property="content" column="content" />
-        <result property="userNo" column="user_no" />
-        <result property="createdAt" column="created_at" />
-        <result property="updatedAt" column="updated_at" />
+  <resultMap id="PostMap" type="com.aloha.zootopia.domain.Posts">
+    <id property="postId" column="post_id" />
+    <result property="id" column="id" />
+    <result property="category" column="category" />
+    <result property="title" column="title" />
+    <result property="content" column="content" />
+    <result property="viewCount" column="view_count" />
+    <result property="likeCount" column="like_count" />
+    <result property="commentCount" column="comment_count" />
+    <result property="createdAt" column="created_at" />
+    <result property="updatedAt" column="updated_at" />
+    <result property="userId" column="user_id" />
+    <result property="thumbnailUrl" column="thumbnail_url" />
 
-        <association property="user" select="selectUser" column="user_no" javaType="Users"></association>        
-    </resultMap>
+    <association property="user" javaType="com.aloha.zootopia.domain.Users">
+      <id property="userId" column="user_id"/>
+      <result property="nickname" column="nickname"/>
+      <result property="profileImg" column="profile_img"/>
+    </association>
+  </resultMap>
+
+<select id="list" resultMap="PostMap">
+  SELECT 
+    p.*, 
+    u.nickname,
+    u.profile_img,
+    (
+      SELECT image_url 
+      FROM post_images 
+      WHERE post_id = p.post_id 
+      ORDER BY ordering ASC 
+      LIMIT 1
+    ) AS thumbnail_url
+  FROM posts p
+  LEFT JOIN users u ON p.user_id = u.user_id
+  ORDER BY p.post_id DESC
+</select>
+
+  <!-- 페이징 목록 -->
+  <select id="page" resultMap="PostMap">
+    SELECT 
+      p.*,
+      u.nickname,
+      u.profile_img
+    FROM posts p
+    LEFT JOIN users u ON p.user_id = u.user_id
+    <where>
+      <if test="category != null and category != ''">
+        p.category = #{category}
+      </if>
+    </where>
+    ORDER BY p.post_id DESC
+    LIMIT #{index}, #{size}
+  </select>
+
+  <!-- 전체 수 -->
+  <select id="count" resultType="long">
+    SELECT COUNT(*) FROM posts
+    <where>
+      <if test="category != null and category != ''">
+        category = #{category}
+      </if>
+    </where>
+  </select>
+
+  <!-- 인기글 TOP N -->
+  <select id="selectTopNByLikeCount" resultMap="PostMap">
+    SELECT 
+      p.*,
+      u.nickname,
+      u.profile_img
+    FROM posts p
+    LEFT JOIN users u ON p.user_id = u.user_id
+    ORDER BY p.like_count DESC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 게시글 단건 조회 -->
+  <select id="selectById" resultMap="PostMap">
+    SELECT 
+      p.*,
+      u.nickname,
+      u.profile_img
+    FROM posts p
+    LEFT JOIN users u ON p.user_id = u.user_id
+    WHERE p.post_id = #{post_id}
+  </select>
+
+  <!-- 등록 -->
+<insert id="insert" parameterType="com.aloha.zootopia.domain.Posts" useGeneratedKeys="true" keyProperty="postId">
+  INSERT INTO posts (
+    category, title, content, user_id, created_at, updated_at
+  ) VALUES (
+    #{category}, #{title}, #{content}, #{userId}, NOW(), NOW()
+  )
+</insert>
 
 
-    <!-- 목록 -->
-    <!-- <select id="list" resultType="Posts"> -->
-    <select id="list" resultMap="PostMap">
-        SELECT *
-        FROM posts
-        ORDER BY no DESC
-    </select>
+  <!-- 썸네일만 업데이트 -->
+  <update id="updateThumbnail" parameterType="com.aloha.zootopia.domain.Posts">
+    UPDATE posts
+    SET thumbnail_url = #{thumbnailUrl}
+    WHERE post_id = #{postId}
+  </update>
 
-    <!-- 페이징 목록 -->
-    <!-- <select id="page" resultType="Posts"> -->
-    <select id="page" resultMap="PostMap">
-        SELECT *
-        FROM posts
-        ORDER BY no DESC
-        LIMIT #{index}, #{size}
-    </select>
+  <!-- 수정 -->
+  <update id="updateById" parameterType="com.aloha.zootopia.domain.Posts">
+    UPDATE posts
+    SET
+      title = #{title},
+      content = #{content},
+      category = #{category},
+      updated_at = NOW()
+    WHERE post_id = #{postId}
+  </update>
 
-    <!-- 조회 -->
-    <select id="select" resultType="Posts">
-        SELECT *
-        FROM posts
-        WHERE no = #{no}
-    </select>
-
-    <!-- 조회 - id -->
-    <select id="selectById" resultType="Posts">
-        SELECT *
-        FROM posts
-        WHERE id = #{id}
-    </select>
-
-    <!-- 등록 -->
-    <insert id="insert">
-        INSERT INTO posts ( id, title, user_no, content )
-        VALUES ( #{id}, #{title}, #{userNo}, #{content} )
-    </insert>
-
-    <!-- 수정 -->
-    <update id="update">
-        UPDATE posts
-           SET title = #{title}
-              ,writer = #{writer}
-              ,content = #{content}
-        WHERE no = #{no}
-    </update>
-
-    <!-- 수정 - id -->
-    <update id="updateById">
-        UPDATE posts
-           SET title = #{title}
-              ,content = #{content}
-        WHERE id = #{id}
-    </update>
-
-    <!-- 삭제 -->
-    <delete id="delete">
-        DELETE FROM posts WHERE no = #{no}
-    </delete>
-
-    <!-- 삭제 - id -->
-    <delete id="deleteById">
-        DELETE FROM posts WHERE id = #{id}
-    </delete>
-
-    <!-- 데이터 수 -->
-    <select id="count" resultType="long">
-        SELECT COUNT(*)
-        FROM posts
-    </select>
+  <!-- 삭제 -->
+  <delete id="deleteById">
+    DELETE FROM posts WHERE post_id = #{postId}
+  </delete>
 
 
-    <!-- 회원 조회 -->
-    <select id="selectUser" resultType="Users">
-        SELECT *
-        FROM user
-        WHERE no = #{user_no}
-    </select>
+  <update id="updateViewCount" parameterType="int">
+    UPDATE posts
+    SET view_count = view_count + 1
+    WHERE post_id = #{postId}
+  </update>
+
+  <select id="selectTop10ByPopularity" resultType="com.aloha.zootopia.domain.Posts">
+    SELECT 
+      post_id,
+      title,
+      category,
+      view_count,
+      like_count,
+      comment_count
+    FROM posts
+    ORDER BY (view_count * 0.3 + like_count * 1.0 + comment_count * 0.7) DESC
+    LIMIT 10
+  </select>
 
 </mapper>

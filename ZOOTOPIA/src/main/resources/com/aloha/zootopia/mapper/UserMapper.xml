@@ -5,65 +5,55 @@
 
 <mapper namespace="com.aloha.zootopia.mapper.UserMapper">
 
-    <resultMap id="UserMap" type="Users">
-        <id property="no" column="no"/>     <!-- PK -->
+    <!-- 사용자 전체 정보 + 권한 리스트 -->
+    <resultMap id="UserMap" type="com.aloha.zootopia.domain.Users">
+        <id property="userId" column="user_id"/>   <!-- PK -->
 
-        <result property="no" column="no"/>
-        <result property="username" column="username"/>
-        <result property="password" column="password"/>
-        <result property="name" column="name"/>
         <result property="email" column="email"/>
-        <result property="enabled" column="enabled"/>
+        <result property="password" column="password"/>
+        <result property="nickname" column="nickname"/>
+        <result property="intro" column="intro"/>
+        <result property="phone" column="phone"/>
+        <result property="profileImg" column="profile_img"/>
         <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
+        <result property="enabled" column="enabled"/>
 
-        <!-- JOIN 쿼리를 짜고 AuthMap 연결하는 방식 -->
-        <!-- <collection property="authList" resultMap="AuthMap"></collection> -->
-
-        <!-- 별도 SELECT 로 연결 -->
-        <collection property="authList" ofType="UserAuth"
+        <!-- 권한 목록 (별도 SELECT 로 연결) -->
+        <collection property="authList" ofType="com.aloha.zootopia.domain.UserAuth"
                     select="selectAuth"
-                    column="username"></collection>
+                    column="email"/>
     </resultMap>
 
-    <resultMap id="AuthMap" type="UserAuth">
-        <result property="no" column="no" />
-        <result property="username" column="username" />
-        <result property="auth" column="auth" />
+    <!-- 권한 매핑 -->
+    <resultMap id="AuthMap" type="com.aloha.zootopia.domain.UserAuth">
+        <result property="email" column="email"/>
+        <result property="auth" column="auth"/>
     </resultMap>
 
     <!-- 회원 가입 -->
     <insert id="join">
-        INSERT INTO user ( username, password, name, email )
-        VALUES ( #{username}, #{password}, #{name}, #{email} )
+        INSERT INTO users ( email, password, nickname )
+        VALUES ( #{email}, #{password}, #{nickname} )
     </insert>
 
     <!-- 회원 권한 등록 -->
     <insert id="insertAuth">
-        INSERT INTO user_auth ( username, auth )
-        VALUES ( #{username}, #{auth} )
+        INSERT INTO user_auth ( email, auth )
+        VALUES ( #{email}, #{auth} )
     </insert>
 
-    <!-- 회원 조회 -->
-    <!-- <select id="select" resultMap="UserMap">
-        SELECT u.*
-              ,auth
-        FROM user u
-             LEFT JOIN user_auth auth ON u.username = auth.username
-        WHERE u.username = #{username}
-    </select> -->
-
+    <!-- 사용자 단건 조회 (by email) -->
     <select id="select" resultMap="UserMap">
         SELECT *
-        FROM user
-        WHERE username = #{username}
+        FROM users
+        WHERE email = #{email}
     </select>
 
+    <!-- 사용자 권한 목록 조회 -->
     <select id="selectAuth" resultType="UserAuth">
         SELECT *
         FROM user_auth
-        WHERE username = #{username}
+        WHERE email = #{email}
     </select>
-    
 
 </mapper>
