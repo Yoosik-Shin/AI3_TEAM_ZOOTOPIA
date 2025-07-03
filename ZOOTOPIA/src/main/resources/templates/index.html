@@ -10,6 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <!-- 헤더 -->
+    <div th:replace="fragments/header :: header"></div>
+
     <div class="container col-12 col-lg-4">
         <div class="px-4 py-5 mt-5 text-center">
             <h1 class="display-5 fw-bold text-body-emphasis">메인 화면</h1>
@@ -53,6 +56,8 @@
             </form>
         </th:block>
     </div>
+    <!-- footer -->
+    <div th:replace="fragments/footer :: footer"></div>
 
     <!-- bootstrap js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
