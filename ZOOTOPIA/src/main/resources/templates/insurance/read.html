@@ -19,26 +19,14 @@
       margin-right: 5px;
     }
     .btn1 {
-       background-color: transparent; 
-       border: 1px solid #F27A7A;
-       border-radius: 6px; 
-       color: #F27A7A;
-       height: 40px;
-    }
-    .btn2 {
-      background-color: #F27A7A; 
-      border: 1px solid #F27A7A; 
-      color: white;
-      border-radius: 6px;
-      min-width: 60px;
-      height: 35px;
+      background-color: #F27A7A;
     }
   </style>
 </head>
-<body class="bg-light">
+<body class="bg-light py-5">
   <th:block th:replace="fragments/header :: header"></th:block>
 
-  <div class="container bg-white p-4 rounded shadow-sm mt-3 mb-3" style="max-width: 900px;">
+  <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-5" style="max-width: 900px;">
     <!-- 상단 보험명 -->
     <h6 class="fs-5 fw-bold mb-4 text-center">
       <span class="highlight-circle"></span>
@@ -60,16 +48,16 @@
       <div style="max-width: 400px;">
         <div class="mb-5">
           <h6>🐶 가입 조건</h6>
-          <p class="fs-5 ps-3 mb-4 fw-bold" th:text="${product.joinCondition}"></p>
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.joinCondition}"></p>
         </div>
         <div class="mb-5">
           <h6>📌 보장 항목</h6>
-          <p class="fs-5 ps-3 mb-4 fw-bold" th:text="${product.coverageItems}">
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.coverageItems}">
           </p>
         </div>
         <div class="mb-5">
           <h6>⚠️ 유의사항</h6>
-          <p class="fs-5 ps-3 mb-4 fw-bold" th:text="${product.precautions}">
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.precautions}">
           </p>
         </div>
       </div>
@@ -127,8 +115,8 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn2" data-bs-dismiss="modal">취소</button>
-            <button class="btn2" type="submit">등록</button>
+            <button class="btn1 btn-secondary" data-bs-dismiss="modal">취소</button>
+            <button class="btn1 btn-primary" type="submit">등록</button>
           </div>
         </form>
       </div>
