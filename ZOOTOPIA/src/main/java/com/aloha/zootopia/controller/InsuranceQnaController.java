@@ -1,5 +1,6 @@
 package com.aloha.zootopia.controller;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.aloha.zootopia.domain.InsuranceQna;
+import com.aloha.zootopia.domain.InsuranceQnaResponse;
 import com.aloha.zootopia.service.InsuranceQnaService;
 
 @Controller
@@ -25,11 +27,13 @@ public class InsuranceQnaController {
     @Autowired
     private InsuranceQnaService qnaService;
 
+
     // 특정 보험상품 Q&A 목록
     @GetMapping("/{productId}")
     public String list(@PathVariable int productId, Model model) {
         model.addAttribute("qnaList", qnaService.getQnaList(productId));
         model.addAttribute("productId", productId);
+        model.addAttribute("qna", new InsuranceQna());
         return "insurance/qnaList";  // 예: qnaList.jsp
     }
 
@@ -46,10 +50,28 @@ public class InsuranceQnaController {
     @PostMapping("/register-ajax")
     @PreAuthorize("hasRole('USER')")
     @ResponseBody
-    public List<InsuranceQna> registerAjax(InsuranceQna qna, @AuthenticationPrincipal User user) {
-        qna.setUserId(Integer.parseInt(user.getUsername()));
-        qnaService.registerQuestion(qna);
-        return qnaService.getQnaList(qna.getProductId());
+    public List<InsuranceQnaResponse> registerAjax(InsuranceQna qna, @AuthenticationPrincipal User user) {
+    qna.setUserId(Integer.parseInt(user.getUsername()));
+    qnaService.registerQuestion(qna);
+
+    return qnaService.getQnaList(qna.getProductId())
+            .stream()
+            .map(e -> {
+                InsuranceQnaResponse dto = new InsuranceQnaResponse();
+                dto.setQnaId(e.getQnaId());
+                dto.setProductId(e.getProductId());
+                dto.setSpecies(e.getSpecies());
+                dto.setQuestion(e.getQuestion());
+                dto.setAnswer(e.getAnswer());
+                dto.setUserId(e.getUserId());
+                dto.setCreatedAt(
+                    e.getCreatedAt() != null 
+                        ? e.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+                        : ""
+                );
+                return dto;
+            })
+            .toList();
     }
 
 
