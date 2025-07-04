@@ -16,11 +16,6 @@ a {
   color: #888;
 }
 
-.comment-line {
-  border-bottom: 1px solid #888;
-}
-
-
 /* 🔥 인기글 */
 .hot-posts {
   max-width: 900px;
@@ -163,8 +158,6 @@ a {
   color: #007acc;
   padding: 3px 8px;
   border-radius: 10px;
-  max-width: 45px;
-  height: 25px;
 }
 
 /* 좋아요/댓글/조회 */

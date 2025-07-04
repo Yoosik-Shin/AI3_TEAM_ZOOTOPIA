@@ -13,13 +13,17 @@ import java.util.Date;
 @Builder
 public class Comment {
 
-    private int commentId;   
+    private Integer commentId;   
     private String content;      
+
     private Date createdAt;      
     private Date updatedAt;      
     private Boolean isDeleted;   
-    private Long userId;     
-    private int postId;      
+
+    private Integer userId;     
+    private Integer postId;      
+
+    
     private String nickname;     
     private String profileImg;   
 }

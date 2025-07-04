@@ -1,130 +1,97 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>글쓰기</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/create.css}">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <meta charset="UTF-8">
+    <title>글쓰기</title>
+    <link rel="stylesheet" th:href="@{/css/create.css}">
 </head>
 <body>
 
 <div class="container">
-  <form th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
+    <form th:action="@{/posts/create}" method="post" enctype="multipart/form-data">
 
-    <!-- 카테고리 -->
-    <label>카테고리</label>
-    <div class="form-group category-buttons d-flex gap-3">
-      <div class="form-check ps-0">
-        <input class="form-check-input" type="radio" id="cate2" name="category" value="자유글" checked>
-        <label class="form-check-label" for="cate2">자유게시판</label>
-      </div>
-      <div class="form-check ps-0">
-        <input class="form-check-input" type="radio" id="cate1" name="category" value="질문글">
-        <label class="form-check-label" for="cate1">질문있어요</label>
-      </div>
-    </div>
+        <!-- 카테고리 -->
+        <div class="form-group category-buttons">
+            <label>카테고리</label><br>
+            <input type="radio" id="cate1" name="category" value="질문글" checked>
+            <label for="cate1">질문있어요</label>
+            <input type="radio" id="cate2" name="category" value="자유글">
+            <label for="cate2">자유게시판</label>
+        </div>
 
-    <!-- 제목 -->
-    <div class="form-group">
-      <label for="title">글 제목</label>
-      <input type="text" id="title" name="title" placeholder="제목을 입력해 주세요" class="form-control">
-    </div>
+        <!-- 제목 -->
+        <div class="form-group">
+            <label for="title">글 제목</label>
+            <input type="text" id="title" name="title" placeholder="반려동물 자랑 제목을 입력해 주세요">
+        </div>
 
-    <!-- 내용 -->
-    <div class="form-group">
-      <label for="content">글 작성</label>
-      <textarea id="content" name="content" rows="7" placeholder="5글자 이상으로 작성해 주세요" class="form-control"></textarea>
-    </div>
+        <!-- 내용 -->
+        <div class="form-group">
+            <label for="content">글 작성</label>
+            <textarea id="content" name="content" rows="7" placeholder="5글자 이상으로 작성해 주세요"></textarea>
+        </div>
 
-    <!-- 태그 -->
-    <div class="form-group">
-      <label for="tags">#태그</label>
-      <input type="text" id="tags" name="tags" class="form-control"
-             placeholder="태그를 입력하고 Enter 또는 쉼표(,)로 구분하세요"
-             th:value="${post?.tags}"> <!-- 수정 화면에서도 사용 가능 -->
-    </div>
+        <!-- 사진 업로드 -->
+        <div class="form-group">
+            <label>사진 업로드</label>
+            <div class="upload-box">
+                <label for="image">📷 사진첨부</label>
+                <input type="file" id="image" name="imageFiles" multiple accept="image/*" onchange="previewImages(event)">
+            </div>
 
-    <!-- 사진 업로드 -->
-    <div class="form-group">
-      <label>사진 업로드</label>
-      <div class="upload-box">
-        <label for="image">📷 사진첨부</label>
-        <input type="file" id="image" name="imageFiles" multiple accept="image/*" onchange="previewImages(event)">
-      </div>
+            <!-- 썸네일 미리보기 영역 -->
+            <div id="imagePreviewContainer" class="preview-container">
+                <!-- JS로 이미지 썸네일 + 대표 이미지 선택 라디오 버튼이 들어감 -->
+            </div>
+        </div>
 
-      <div id="imagePreviewContainer" class="preview-container">
-        <!-- 썸네일 미리보기 -->
-      </div>
-    </div>
+        <!-- 동영상 업로드 -->
+        <div class="form-group">
+            <label>동영상 업로드</label>
+            <div class="upload-box">
+                <label for="video">🎬 동영상 첨부</label>
+                <input type="file" id="video" name="videoFile">
+            </div>
+        </div>
 
-    <!-- 동영상 업로드 -->
-    <div class="form-group">
-      <label>동영상 업로드</label>
-      <div class="upload-box d-flex align">
-        <label for="video">🎬 동영상 첨부</label>
-        <input type="file" id="video" name="videoFile">
-      </div>
-    </div>
+        <!-- 등록 버튼 -->
+        <div class="form-group text-right">
+            <button type="submit" class="btn-submit">글 등록</button>
+        </div>
 
-    <!-- 등록 버튼 -->
-    <div class="form-group text-right mt-3">
-      <button type="submit" class="btn btn-primary">글 등록</button>
-    </div>
-
-  </form>
+    </form>
 </div>
 
-<!-- 스크립트 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 
 <script>
-  const input = document.querySelector('#tags');
-  const tagify = new Tagify(input, {
-    originalInputValueFormat: values => values.map(tag => tag.value).join(',')
-  });
-
-  // 기존 값 있으면 태그로 변환 (중복 방지)
-  if (input.value) {
-    tagify.removeAllTags();
-    tagify.addTags(input.value.split(',').map(tag => tag.trim()));
-  }
-
-  // Enter 키로 form submit 되는 문제 방지
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault(); // 🚫 Enter로 submit 방지
-    }
-  });
-
-  // 이미지 미리보기
-  function previewImages(event) {
+function previewImages(event) {
     const container = document.getElementById('imagePreviewContainer');
-    container.innerHTML = '';
+    container.innerHTML = ''; // 초기화
+
     const files = event.target.files;
 
-    if (!files || files.length === 0) return;
+    if (files.length === 0) return;
 
     [...files].forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('preview-item');
-        wrapper.innerHTML = `
-          <img src="${e.target.result}" width="100" height="100" alt="preview">
-          <div>
-            <label>
-              <input type="radio" name="thumbnailIndex" value="${idx}" ${idx === 0 ? 'checked' : ''}>
-              대표 이미지
-            </label>
-          </div>
-        `;
-        container.appendChild(wrapper);
-      };
-      reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('preview-item');
+
+            wrapper.innerHTML = `
+                <img src="${e.target.result}" width="100" height="100" alt="preview">
+                <div>
+                    <label>
+                        <input type="radio" name="thumbnailIndex" value="${idx}" ${idx === 0 ? 'checked' : ''}>
+                        대표 이미지
+                    </label>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        };
+        reader.readAsDataURL(file);
     });
-  }
+}
 </script>
 
 </body>

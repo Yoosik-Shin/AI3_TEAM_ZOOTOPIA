@@ -3,11 +3,8 @@ package com.aloha.zootopia.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
-import com.aloha.zootopia.domain.Tag;
+import com.aloha.zootopia.domain.Pagination;
 
 @Mapper
 public interface PostMapper {
@@ -36,16 +33,8 @@ public interface PostMapper {
     // 삭제
     int deleteById(String id) throws Exception;
 
-    int updateViewCount(int postId);
-
-    int updateCommentCount(int postId);
-
-    int minusCommentCount(int postId);
+    void updateViewCount(Integer postId);
 
     List<Posts> selectTop10ByPopularity();
-
-    List<Tag> selectTagsByPostIds(@Param("list") List<Integer> postIds);
-
-    List<Posts> pageByCategory(@Param("category") String category);
 
 }

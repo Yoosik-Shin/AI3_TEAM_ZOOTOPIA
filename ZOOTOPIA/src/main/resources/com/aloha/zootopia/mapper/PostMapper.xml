@@ -24,11 +24,6 @@
       <result property="nickname" column="nickname"/>
       <result property="profileImg" column="profile_img"/>
     </association>
-
-      <collection property="tagList" ofType="com.aloha.zootopia.domain.Tag">
-          <id property="tagId" column="tag_id"/>
-          <result property="name" column="tag_name"/>
-      </collection>
   </resultMap>
 
 <select id="list" resultMap="PostMap">
@@ -36,7 +31,6 @@
     p.*, 
     u.nickname,
     u.profile_img,
-    t.tag_id, t.name AS tag_name,
     (
       SELECT image_url 
       FROM post_images 
@@ -46,8 +40,6 @@
     ) AS thumbnail_url
   FROM posts p
   LEFT JOIN users u ON p.user_id = u.user_id
-  LEFT JOIN post_tags pt ON p.post_id = pt.post_id
-  LEFT JOIN tags t ON pt.tag_id = t.tag_id
   ORDER BY p.post_id DESC
 </select>
 
@@ -66,21 +58,6 @@
     </where>
     ORDER BY p.post_id DESC
     LIMIT #{index}, #{size}
-  </select>
-
-  <select id="pageByCategory" resultMap="PostMap">
-    SELECT 
-      p.*,
-      u.nickname,
-      u.profile_img
-    FROM posts p
-    LEFT JOIN users u ON p.user_id = u.user_id
-    <where>
-      <if test="category != null and category != ''">
-        p.category = #{category}
-      </if>
-    </where>
-    ORDER BY p.post_id DESC
   </select>
 
   <!-- 전체 수 -->
@@ -149,27 +126,13 @@
     DELETE FROM posts WHERE post_id = #{postId}
   </delete>
 
-  <!-- 조회순 -->
+
   <update id="updateViewCount" parameterType="int">
     UPDATE posts
     SET view_count = view_count + 1
     WHERE post_id = #{postId}
   </update>
 
-  <!-- 댓글 수 증가-->
-  <update id="updateCommentCount" parameterType="int">
-    UPDATE posts
-    SET comment_count = comment_count + 1
-    WHERE post_id = #{postId}
-  </update>
-  <!-- 댓글 수 감소 -->
-  <update id="minusCommentCount" parameterType="int">
-    UPDATE posts
-    SET comment_count = comment_count - 1
-    WHERE post_id = #{postId}
-  </update>
-
-  <!-- 인기글 -->
   <select id="selectTop10ByPopularity" resultType="com.aloha.zootopia.domain.Posts">
     SELECT 
       post_id,
@@ -181,20 +144,6 @@
     FROM posts
     ORDER BY (view_count * 0.3 + like_count * 1.0 + comment_count * 0.7) DESC
     LIMIT 10
-  </select>
-
-  <!-- 태그 -->
-  <select id="selectTagsByPostIds" resultType="com.aloha.zootopia.domain.Tag">
-    SELECT
-      pt.post_id,
-      t.tag_id,
-      t.name
-    FROM post_tags pt
-    JOIN tags t ON pt.tag_id = t.tag_id
-    WHERE pt.post_id IN
-    <foreach item="id" collection="list" open="(" separator="," close=")">
-      #{id}
-    </foreach>
   </select>
 
 </mapper>

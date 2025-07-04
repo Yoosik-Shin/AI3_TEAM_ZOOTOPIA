@@ -3,9 +3,7 @@ package com.aloha.zootopia.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.PostImage;
 import com.aloha.zootopia.domain.Posts;
-import com.aloha.zootopia.domain.Tag;
 import com.aloha.zootopia.mapper.PostImageMapper;
 import com.aloha.zootopia.mapper.PostMapper;
-import com.aloha.zootopia.mapper.TagMapper;
+
+import com.aloha.zootopia.service.PostService;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -29,8 +28,6 @@ public class PostServiceImpl implements PostService {
 
     @Autowired private PostMapper postMapper;
     @Autowired private PostImageMapper postImageMapper;
-    @Autowired private TagMapper tagMapper;
-
 
     private final String uploadDir = "C:/upload"; // 로컬 저장경로
 
@@ -47,30 +44,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageInfo<Posts> page(int page, int size, String category) {
+    public PageInfo<Posts> page(int page, int size) throws Exception {
         PageHelper.startPage(page, size);
-        List<Posts> postList = postMapper.pageByCategory(category);
-        PageInfo<Posts> pageInfo = new PageInfo<>(postList);
-
-        if (!postList.isEmpty()) {
-            List<Integer> postIds = postList.stream()
-                    .map(Posts::getPostId)
-                    .toList();
-
-            List<Tag> tagResults = postMapper.selectTagsByPostIds(postIds);
-
-            Map<Integer, List<Tag>> tagMap = tagResults.stream()
-                    .collect(Collectors.groupingBy(Tag::getPostId));
-
-            for (Posts post : postList) {
-                List<Tag> tagList = tagMap.get(post.getPostId());
-                if (tagList != null) {
-                    post.setTagList(tagList);
-                }
-            }
-        }
-
-        return pageInfo;
+        List<Posts> list = postMapper.list();
+        return new PageInfo<>(list, 10);
     }
 
     @Override
@@ -124,25 +101,6 @@ public class PostServiceImpl implements PostService {
             postImageMapper.insert(img);
         }
 
-        String tagStr = post.getTags();  // "고양이,귀여움,햇살"
-            if (tagStr != null && !tagStr.trim().isEmpty()) {
-                String[] tagNames = tagStr.split(",");
-                for (String rawName : tagNames) {
-                    String name = rawName.trim();
-                    if (name.isEmpty()) continue;
-
-                    Integer tagId = tagMapper.findTagIdByName(name);
-                    if (tagId == null) {
-                        Tag tag = new Tag();
-                        tag.setName(name);
-                        tagMapper.insertTag(tag);
-                        tagId = tag.getTagId();  // generated key 반환됨
-                    }
-
-                    tagMapper.insertPostTag(post.getPostId(), tagId);
-            }
-        }
-
         return true;
     }
 
@@ -171,18 +129,5 @@ public class PostServiceImpl implements PostService {
     public List<Posts> getTop10PopularPosts() {
         return postMapper.selectTop10ByPopularity();
     }
-
-
-    @Override
-    public void increaseCommentCount(int postId) {
-        postMapper.updateCommentCount(postId); 
-    }
-
-    @Override
-    public void decreaseCommentCount(int postId) {
-        postMapper.minusCommentCount(postId);
-    }
-
-
 
 }

@@ -26,7 +26,7 @@ public class HomeController {
     
     @Autowired private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping("")
     // public String home(Principal principal, Model model) throws Exception {
     // public String home(Authentication authentication, Model model) throws Exception {
     public String home(@AuthenticationPrincipal CustomUser authUser, Model model) throws Exception {
