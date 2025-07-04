@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.aloha.zootopia.domain.Animal;
 import com.aloha.zootopia.domain.Hospital;
-import com.aloha.zootopia.domain.Review;
+import com.aloha.zootopia.domain.HospReview;
 import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.dto.HospitalForm;
 import com.aloha.zootopia.dto.PageInfo;
-import com.aloha.zootopia.dto.ReviewForm;
+import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.mapper.AnimalMapper;
 import com.aloha.zootopia.mapper.HospitalMapper;
-import com.aloha.zootopia.mapper.ReviewMapper;
+import com.aloha.zootopia.mapper.HospReviewMapper;
 import com.aloha.zootopia.mapper.SpecialtyMapper;
 
 @Service
@@ -22,7 +22,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Autowired HospitalMapper hospitalMapper;
     @Autowired AnimalMapper animalMapper;
     @Autowired SpecialtyMapper specialtyMapper;
-    @Autowired ReviewMapper reviewMapper;
+    @Autowired HospReviewMapper reviewMapper;
 
     @Override
     public List<Hospital> getHospitals(List<Integer> animalIds) {
@@ -57,11 +57,11 @@ public class HospitalServiceImpl implements HospitalService {
     public List<Specialty> getAllSpecialties() { return specialtyMapper.findAll(); }
 
     @Override
-    public List<Review> getReviews(Integer hospitalId) { return reviewMapper.findByHospitalId(hospitalId); }
+    public List<HospReview> getReviews(Integer hospitalId) { return reviewMapper.findByHospitalId(hospitalId); }
 
     @Override
-    public void addReview(Integer hospitalId, ReviewForm form, String nickname, Integer userId) {
-        Review review = new Review();
+    public void addReview(Integer hospitalId, HospReviewForm form, String nickname, Integer userId) {
+        HospReview review = new HospReview();
         review.setHospitalId(hospitalId);
         review.setRating(form.getRating());
         review.setContent(form.getContent());
@@ -85,6 +85,18 @@ public HospitalServiceImpl(HospitalMapper hospitalMapper) {
     @Override
     public int getHospitalCount(List<Integer> animalIds) {
         return hospitalMapper.countHospitals(animalIds);
+    }
+
+    @Override
+    public void updateReview(Integer reviewId, String content, Integer userId) {
+        HospReview review = reviewMapper.findById(reviewId);
+        if (review == null) {
+            throw new IllegalArgumentException("Review not found.");
+        }
+        if (!review.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("You are not authorized to update this review.");
+        }
+        reviewMapper.updateReview(reviewId, content, userId);
     }
 
 

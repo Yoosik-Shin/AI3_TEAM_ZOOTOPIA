@@ -67,8 +67,6 @@
       <foreach collection="animalIds" item="id" open="(" separator="," close=")">
         #{id}
       </foreach>
-      GROUP BY h.hospital_id
-      HAVING COUNT(DISTINCT ha.animal_id) = #{animalIds.size}
     </if>
     <if test="animalIds == null or animalIds.size() == 0">
       
@@ -86,8 +84,6 @@
       <foreach collection="animalIds" item="id" open="(" separator="," close=")">
         #{id}
       </foreach>
-      GROUP BY h.hospital_id
-      HAVING COUNT(DISTINCT ha.animal_id) = #{animalIds.size}
     </if>
     <if test="animalIds == null or animalIds.size() == 0">
       
