@@ -9,7 +9,8 @@
 </head>
 
 <body>
-
+  <!-- header -->
+  <div th:replace="fragments/header :: header"></div>
   <!-- 🔥 실시간 인기게시물 -->
   <section class="hot-posts">
     <h2>🔥 실시간 인기게시물</h2>
@@ -21,7 +22,8 @@
             <div class="d-flex justify-itmes-center">
               <span class="bd-no text-center fw-bold" th:text="${iterStat.count}"></span>
               <span class="bd-ca badge mx-2 text-center" th:text="${post.category}"></span>
-              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}" th:text="${post.title != null ? post.title : '제목없음'}"></a>
+              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}"
+                th:text="${post.title != null ? post.title : '제목없음'}"></a>
             </div>
           </div>
         </li>
@@ -34,7 +36,8 @@
             <div class="d-flex justify-itmes-center">
               <span class="bd-no text-start fw-bold" th:text="${iterStat.count}"></span>
               <span class="bd-ca badge mx-2" th:text="${post.category}"></span>
-              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}" th:text="${post.title != null ? post.title : '제목없음'}"></a>
+              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}"
+                th:text="${post.title != null ? post.title : '제목없음'}"></a>
             </div>
           </div>
         </li>
@@ -59,7 +62,7 @@
           <option value="latest">최신순</option>
           <option value="popular">인기순</option>
         </select>
-        <a href="/posts/create" class="btn-write">
+        <a href="/posts/create" class="btn-write" sec:authorize="isAuthenticated()">
           <img th:src="@{/img/write.png}" class="icon"> 글쓰기
         </a>
       </div>
@@ -71,41 +74,56 @@
         <img th:src="${post.thumbnailUrl != null} ? ${post.thumbnailUrl} : '/img/default-thumbnail.png'" alt="썸네일">
       </div>
       <div class="post-info">
-        <a th:href="@{/posts/read/{id}(id=${post.postId})}" class="post-title"
-          th:text="${post.title != null ? post.title : '제목없음'}">
-          게시글 제목
-        </a>
+        <div>
+          <a th:href="@{/posts/read/{id}(id=${post.postId})}" class="post-title"
+            th:text="${post.title != null ? post.title : '제목없음'}">
+            게시글 제목
+          </a>
+          <span class="category" th:text="${post.category != null ? post.category : '기타'}">카테고리</span>
+        </div>
         <div class="post-meta">
           <div class="author">
-            <img th:src="${post.user != null and post.user.profileImg != null}
-                        ? ${post.user.profileImg}
-                        : '/img/default-profile.png'" class="profile-img">
+            <img th:src="${post.user.profileImg != null} ? ${post.user.profileImg} : '/img/default-profile.png'"
+              class="profile-img">
             <span th:text="${post.user != null and post.user.nickname != null}
                          ? ${post.user.nickname}
                          : '알 수 없음'">
               작성자
             </span>
           </div>
-          <span class="category" th:text="${post.category != null ? post.category : '기타'}">카테고리</span>
         </div>
 
-        <div class="post-stats text-center d-flex align-items-center" style="font-size: 12px;">
-          <div class="d-flex align-items-center gap-1">
-            <img class="eye" width="17" th:src="@{/img/hit.svg}" style="vertical-align: middle;">
-            <div th:text="${post.viewCount != null ? post.viewCount : 0}">0</div>
+        <div class="d-flex justify-content-between">
+          <div class="tag-list">
+            <span th:each="tag : ${post.tagList}" class="badge bg-secondary me-1">
+              <span th:text="'#' + ${tag.name}">#태그명</span>
+            </span>
           </div>
-          <span class="">&middot;</span>
-          <div class="d-flex align-items-center gap-1">
-            <img width="15" th:src="@{/img/comment.png}" style="vertical-align: middle;">
-            <div th:text="${post.commentCount != null ? post.commentCount : 0}">0</div>
-          </div>
-          <span class="">&middot;</span>
-          <div class="d-flex align-items-center gap-1">
-            <img width="15" th:src="@{/img/pinkheart.png}" style="vertical-align: middle;">
-            <div th:text="${post.likeCount != null ? post.likeCount : 0}">0</div>
+          <div class="post-stats text-center d-flex align-items-center" style="font-size: 12px;">
+            <div class="d-flex align-items-center gap-1">
+              <img class="eye" width="17" th:src="@{/img/hit.svg}" style="vertical-align: middle;">
+              <div th:text="${post.viewCount != null ? post.viewCount : 0}">0</div>
+            </div>
+            <span class="">&middot;</span>
+            <div class="d-flex align-items-center gap-1">
+              <img width="15" th:src="@{/img/comment.png}" style="vertical-align: middle;">
+              <div th:text="${post.commentCount != null ? post.commentCount : 0}">0</div>
+            </div>
+            <span class="">&middot;</span>
+            <div class="d-flex align-items-center gap-1">
+              <img width="15" th:src="@{/img/pinkheart.png}" style="vertical-align: middle;">
+              <div th:text="${post.likeCount != null ? post.likeCount : 0}">0</div>
+            </div>
           </div>
         </div>
+
       </div>
+    </div>
+
+
+    <!-- 하단 광고 -->
+    <div class="banner">
+      <img th:src="@{/img/ppl2.jpg}" alt="광고배너2">
     </div>
 
     <!-- 📄 페이지네이션 -->
@@ -120,10 +138,8 @@
     </div>
   </section>
 
-  <!-- 하단 광고 -->
-  <div class="banner">
-    <img th:src="@{/img/ad-banner-bellfor.png}" alt="광고배너2">
-  </div>
+  <!-- footer -->
+  <div th:replace="fragments/footer :: footer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

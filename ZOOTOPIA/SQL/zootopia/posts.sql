@@ -146,3 +146,23 @@ ALTER TABLE `user_pets`
 
 
 ALTER TABLE posts ADD COLUMN thumbnail_url VARCHAR(255);
+<<<<<<< HEAD
+
+
+
+CREATE TABLE tags (
+  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE
+) COMMENT='태그 목록';
+
+
+
+CREATE TABLE post_tags (
+  post_id INT NOT NULL,
+  tag_id INT NOT NULL,
+  PRIMARY KEY (post_id, tag_id),
+  FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
+) COMMENT='게시글-태그 연결';
+
+

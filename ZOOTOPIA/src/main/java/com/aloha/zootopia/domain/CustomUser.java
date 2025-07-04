@@ -60,6 +60,16 @@ public class CustomUser implements UserDetails {
         return user.getEnabled() == 1 ? true : false;
     }
 
-    
+
+    public Users getUser() {
+        return user;
+    }
+
+   
+    public Long getUserId() {
+        return user.getUserId();
+    }
+
+ 
     
 }
