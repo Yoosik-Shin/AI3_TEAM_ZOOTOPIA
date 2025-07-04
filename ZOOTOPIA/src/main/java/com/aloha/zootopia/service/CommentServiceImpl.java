@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.mapper.CommentMapper;
 
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentMapper commentMapper;
-    private final PostService postService;
-   
 
     @Override
     public List<Comment> getCommentsByPostId(Integer postId) {
@@ -26,7 +23,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void addComment(Comment comment) {
         commentMapper.insert(comment);
-        postService.increaseCommentCount(comment.getPostId());
     }
 
     @Override

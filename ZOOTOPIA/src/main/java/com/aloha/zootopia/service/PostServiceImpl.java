@@ -1,17 +1,27 @@
 package com.aloha.zootopia.service;
 
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Map;
 import java.util.stream.Collectors;
+=======
+import java.util.UUID;
+>>>>>>> main
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
+<<<<<<< HEAD
 import com.aloha.zootopia.domain.Tag;
+=======
+import com.aloha.zootopia.mapper.PostImageMapper;
+>>>>>>> main
 import com.aloha.zootopia.mapper.PostMapper;
-import com.aloha.zootopia.mapper.TagMapper;
+
+import com.aloha.zootopia.service.PostService;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -22,9 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PostServiceImpl implements PostService {
 
     @Autowired private PostMapper postMapper;
+<<<<<<< HEAD
     
     @Autowired private TagMapper tagMapper;
 
+=======
+    @Autowired private PostImageMapper postImageMapper;
+>>>>>>> main
 
     @Override
     public List<Posts> list() throws Exception {
@@ -39,30 +53,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageInfo<Posts> page(int page, int size, String category) {
+    public PageInfo<Posts> page(int page, int size) throws Exception {
         PageHelper.startPage(page, size);
-        List<Posts> postList = postMapper.pageByCategory(category);
-        PageInfo<Posts> pageInfo = new PageInfo<>(postList);
-
-        if (!postList.isEmpty()) {
-            List<Integer> postIds = postList.stream()
-                    .map(Posts::getPostId)
-                    .toList();
-
-            List<Tag> tagResults = postMapper.selectTagsByPostIds(postIds);
-
-            Map<Integer, List<Tag>> tagMap = tagResults.stream()
-                    .collect(Collectors.groupingBy(Tag::getPostId));
-
-            for (Posts post : postList) {
-                List<Tag> tagList = tagMap.get(post.getPostId());
-                if (tagList != null) {
-                    post.setTagList(tagList);
-                }
-            }
-        }
-
-        return pageInfo;
+        List<Posts> list = postMapper.list();
+        return new PageInfo<>(list, 10);
     }
 
     @Override
@@ -101,6 +95,7 @@ public class PostServiceImpl implements PostService {
                 String name = rawName.trim();
                 if (name.isEmpty()) continue;
 
+<<<<<<< HEAD
                 Integer tagId = tagMapper.findTagIdByName(name);
                 if (tagId == null) {
                     Tag tag = new Tag();
@@ -113,6 +108,8 @@ public class PostServiceImpl implements PostService {
             }
         }
 
+=======
+>>>>>>> main
         return true;
     }
 
@@ -174,6 +171,7 @@ public class PostServiceImpl implements PostService {
         return postMapper.selectTop10ByPopularity();
     }
 
+<<<<<<< HEAD
 
     @Override
     public void increaseCommentCount(int postId) {
@@ -189,4 +187,6 @@ public class PostServiceImpl implements PostService {
 
 
 
+=======
+>>>>>>> main
 }

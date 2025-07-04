@@ -20,15 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.domain.CustomUser;
 import com.aloha.zootopia.domain.Posts;
-import com.aloha.zootopia.service.CommentService;
 import com.aloha.zootopia.service.PostService;
 import com.github.pagehelper.PageInfo;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
     private final PostService postService;
-    private final CommentService commentService;
 
     /**
      * 게시글 목록 (자유글/질문글) + 인기 게시물
@@ -53,7 +48,7 @@ public class PostController {
     ) throws Exception {
 
         // 일반 게시글 목록 가져오기
-        PageInfo<Posts> pageInfo = postService.page(page, size, category);
+        PageInfo<Posts> pageInfo = postService.page(page, size);
         List<Posts> list = pageInfo.getList();
 
         // 인기 게시물 목록 가져오기
@@ -78,6 +73,7 @@ public class PostController {
      * 게시글 상세
      */
     @GetMapping("/read/{id}")
+<<<<<<< HEAD
     public String read(
         @PathVariable("id") String id,
         Model model,
@@ -105,6 +101,17 @@ public class PostController {
         post.setComments(comments);
         
 
+=======
+    public String read(@PathVariable("id") String id, Model model) throws Exception {
+        Posts post = postService.selectById(id);
+
+        postService.increaseViewCount(post.getPostId());
+
+        if (post.getComments() == null) {
+            post.setComments(new ArrayList<>());
+        }
+
+>>>>>>> main
         model.addAttribute("post", post);
         model.addAttribute("isOwner", isOwner);
 

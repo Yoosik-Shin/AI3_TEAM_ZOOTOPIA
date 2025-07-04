@@ -146,6 +146,7 @@ ALTER TABLE `user_pets`
 
 
 ALTER TABLE posts ADD COLUMN thumbnail_url VARCHAR(255);
+<<<<<<< HEAD
 
 
 
@@ -164,3 +165,5 @@ CREATE TABLE post_tags (
   FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
 ) COMMENT='게시글-태그 연';
 
+=======
+>>>>>>> main

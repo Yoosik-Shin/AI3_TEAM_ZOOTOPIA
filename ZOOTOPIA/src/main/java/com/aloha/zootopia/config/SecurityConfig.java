@@ -56,8 +56,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
-                                .requestMatchers("/comments/add").authenticated() 
-                                .requestMatchers("/images/**", "/**").permitAll()
+                                .requestMatchers("/**").permitAll()
                                 .anyRequest().permitAll()
                                 );
 
@@ -89,7 +88,7 @@ public class SecurityConfig {
         // 👩‍💼 사용자 정의 인증
         http.userDetailsService(userDetailServiceImpl);
 
-        // 🔄 자동 로그인
+        //  자동 로그인
         http.rememberMe(me -> me
                 .key("aloha")
                 .tokenRepository(tokenRepository())

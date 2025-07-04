@@ -58,23 +58,11 @@ a {
 }
 
 .btn-share {
-  /* background: #f0f0f0; */
-  border: 1px solid black;
-  min-width: 150px;
-  height: 40px;
-}
-.btn-share:hover {
-  background: #e0e0e0;
+  background: #f0f0f0;
 }
 
 .btn-like {
   background: #ffbbbb;
-  color: white;
-  min-width: 150px;
-  height: 40px;
-}
-.btn-like:hover {
-  background: #ff9999;  
   color: white;
 }
 
@@ -98,14 +86,4 @@ a {
 
 .content {
   min-height: 220px;
-}
-
-.comment-b {
-  background-color: #ff9999;
-  color: white;
-}
-
-.comment-b:hover {
-  background: #ffbbbb; 
-  color: white;
 }
