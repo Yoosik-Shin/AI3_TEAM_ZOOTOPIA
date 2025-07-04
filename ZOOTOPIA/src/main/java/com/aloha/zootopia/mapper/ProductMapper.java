@@ -40,6 +40,9 @@ public interface ProductMapper {
     // 좋아요 수 증가
     int updateLikes(@Param("no") int no);
     
+    // 싫어요 수 증가
+    int updateDislikes(@Param("no") int no);
+    
     // 검색 (상품명)
     List<Product> selectByNameAndPage(@Param("name") String name, 
                                      @Param("offset") int offset, 

@@ -1,6 +1,5 @@
 -- 관리자 계정 생성 (super@admin.com)
 -- 비밀번호: admin123 (BCrypt 암호화)
--- 현재, 비밀번호: 123456
 
 -- users 테이블에 관리자 추가
 INSERT INTO users (user_id, user_pw, name, email, enabled) 

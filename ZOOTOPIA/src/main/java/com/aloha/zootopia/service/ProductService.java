@@ -67,6 +67,11 @@ public class ProductService {
         return productMapper.updateLikes(no);
     }
     
+    // 싫어요 수 증가
+    public int updateDislikes(int no) {
+        return productMapper.updateDislikes(no);
+    }
+    
     // 검색
     public List<Product> searchByName(String name, int page, int size) {
         int offset = (page - 1) * size;

@@ -90,24 +90,28 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    border: 1px solid #f0f0f0;
 }
 
 .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: #ff7b7b;
 }
 
 .product-image {
     position: relative;
     width: 100%;
-    height: 200px;
+    height: 220px;
     overflow: hidden;
+    border-radius: 15px 15px 0 0;
 }
 
 .product-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 30%;
     transition: transform 0.3s ease;
 }
 
@@ -151,12 +155,21 @@
     text-decoration: none;
 }
 
-.btn-heart {
-    background: #ff6b9d;
+.btn-like {
+    background: #28a745;
 }
 
-.btn-heart:hover {
-    background: #ff5a8a;
+.btn-like:hover {
+    background: #218838;
+    color: white;
+}
+
+.btn-dislike {
+    background: #dc3545;
+}
+
+.btn-dislike:hover {
+    background: #c82333;
     color: white;
 }
 
@@ -233,6 +246,14 @@
 
 .stat-item i {
     font-size: 0.7rem;
+}
+
+.stat-like {
+    color: #28a745 !important;
+}
+
+.stat-dislike {
+    color: #dc3545 !important;
 }
 
 /* No Products */
@@ -366,4 +387,72 @@
         padding: 5px 12px;
         font-size: 0.75rem;
     }
+    
+    .product-image {
+        height: 180px;
+    }
+}
+
+/* 고해상도 디스플레이를 위한 추가 스타일 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .product-image img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* 특별한 이미지 포지셔닝 (동물별 특성 고려) */
+/* .product-image img[src*="cat"] {
+    object-position: center 20%;
+}
+
+.product-image img[src*="dog"] {
+    object-position: center 25%;
+}
+
+.product-image img[src*="rabbit"] {
+    object-position: center 15%;
+}
+
+.product-image img[src*="hamster"] {
+    object-position: center 30%;
+}
+
+.product-image img[src*="bird"] {
+    object-position: center 25%;
+}
+
+.product-image img[src*="parrot"] {
+    object-position: center 20%;
+}
+
+.product-image img[src*="perrot"] {
+    object-position: center 15%;
+}
+
+.product-image img[src*="BichonFrise"] {
+    object-position: center 40%;
+}
+
+.product-image img[src*="bichon"] {
+    object-position: center 35%;
+}
+
+.product-image img[src*="white"] {
+    object-position: center 35%;
+}
+
+.product-image img[src*="fish"] {
+    object-position: center center;
+} */
+
+/* 이미지 로딩 에러 시 대체 스타일 */
+.product-image img:not([src]),
+.product-image img[src=""] {
+    background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }

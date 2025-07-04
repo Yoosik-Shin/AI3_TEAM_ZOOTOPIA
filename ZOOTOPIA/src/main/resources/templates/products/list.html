@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>ZOOTOPIA - 상품 목록</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/products.css">
 </head>
 <body>
@@ -62,42 +65,48 @@
         <!-- 상품 카드 그리드 -->
         <div class="row" th:if="${productList != null and !productList.isEmpty()}">
             <div class="col-lg-4 col-md-6 mb-4" th:each="product : ${productList}">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img th:src="${product.imageUrl}" th:alt="${product.name}" 
-                             onerror="this.src='/img/default-thumbnail.png'">
-                        <div class="product-overlay">
-                            <div class="product-actions">
-                                <button class="btn btn-action btn-heart" th:onclick="'likeProduct(' + ${product.no} + ')'">
-                                    <i class="fas fa-heart"></i>
-                                </button>
-                                <a th:href="@{/products/detail(no=${product.no})}" class="btn btn-action btn-view">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                <div class="product-card" th:data-product-no="${product.no}">
+                    <a th:href="@{'/products/detail/' + ${product.no}}" class="text-decoration-none text-dark">
+                        <div class="product-image">
+                            <img th:src="${product.imageUrl}" th:alt="${product.name}" 
+                                 onerror="this.src='/img/default-thumbnail.png'">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="btn btn-action btn-like" th:onclick="'toggleLike(' + ${product.no} + ', \'like\')'">
+                                        <i class="fas fa-thumbs-up"></i>
+                                    </button>
+                                    <button class="btn btn-action btn-dislike" th:onclick="'toggleLike(' + ${product.no} + ', \'dislike\')'">
+                                        <i class="fas fa-thumbs-down"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="product-info">
-                        <div class="product-category" th:text="${product.category}">카테고리</div>
-                        <h5 class="product-name" th:text="${product.name}">상품명</h5>
-                        <p class="product-description" th:text="${product.description}">상품 설명</p>
-                        <div class="product-meta">
-                            <div class="product-price" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">
-                                가격
-                            </div>
-                            <div class="product-stats">
-                                <span class="stat-item">
-                                    <i class="fas fa-eye"></i>
-                                    <span th:text="${product.views}">0</span>
-                                </span>
-                                <span class="stat-item">
-                                    <i class="fas fa-heart"></i>
-                                    <span th:text="${product.likes}">0</span>
-                                </span>
+                        
+                        <div class="product-info">
+                            <div class="product-category" th:text="${product.category}">카테고리</div>
+                            <h5 class="product-name" th:text="${product.name}">상품명</h5>
+                            <p class="product-description" th:text="${product.description}">상품 설명</p>
+                            <div class="product-meta">
+                                <div class="product-price" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">
+                                    가격
+                                </div>
+                                <div class="product-stats">
+                                    <span class="stat-item">
+                                        <i class="fas fa-eye"></i>
+                                        <span th:text="${product.views}">0</span>
+                                    </span>
+                                    <span class="stat-item stat-like">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span th:text="${product.likes}">0</span>
+                                    </span>
+                                    <span class="stat-item stat-dislike">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span th:text="${product.dislikes}">0</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>

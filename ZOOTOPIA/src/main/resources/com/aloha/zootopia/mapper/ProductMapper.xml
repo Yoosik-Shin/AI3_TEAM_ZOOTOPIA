@@ -95,6 +95,11 @@
         UPDATE products SET likes = likes + 1 WHERE no = #{no}
     </update>
 
+    <!-- 싫어요 수 증가 -->
+    <update id="updateDislikes">
+        UPDATE products SET dislikes = dislikes + 1 WHERE no = #{no}
+    </update>
+
     <!-- 검색 (상품명) -->
     <select id="selectByNameAndPage" resultMap="productMap">
         SELECT no, name, category, description, price, image_url, status, 

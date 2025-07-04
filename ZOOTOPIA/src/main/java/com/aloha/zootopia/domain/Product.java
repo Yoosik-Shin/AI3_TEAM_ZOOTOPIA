@@ -14,7 +14,10 @@ public class Product {
     private Date updDate;         // 수정일
     private int views;            // 조회수
     private int likes;            // 좋아요 수
+    private int dislikes;         // 싫어요 수
     private int stock;            // 재고
+    private double rating;        // 평균 평점
+    private int reviewCount;      // 리뷰 개수
 
     // 생성자
     public Product() {}
@@ -122,12 +125,36 @@ public class Product {
         this.likes = likes;
     }
 
+    public int getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
+    }
+
     public int getStock() {
         return stock;
     }
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public int getReviewCount() {
+        return reviewCount;
+    }
+
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
     }
 
     @Override
@@ -144,7 +171,10 @@ public class Product {
                 ", updDate=" + updDate +
                 ", views=" + views +
                 ", likes=" + likes +
+                ", dislikes=" + dislikes +
                 ", stock=" + stock +
+                ", rating=" + rating +
+                ", reviewCount=" + reviewCount +
                 '}';
     }
 }
