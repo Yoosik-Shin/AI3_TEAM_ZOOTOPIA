@@ -24,6 +24,6 @@
   <select id="findAvgRating" parameterType="int" resultType="double">
     SELECT AVG(rating) FROM hospital_review WHERE hospital_id = #{hospitalId}
   </select>
-
+  <!--  -->
 
 </mapper>
