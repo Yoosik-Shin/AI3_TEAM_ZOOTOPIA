@@ -22,7 +22,7 @@
     <!-- 제목 -->
     <div class="post-header" th:text="${post.title}">제목</div>
 
-    <!-- 작성자/시간/조회수 -->
+    
     <div class="post-meta">
       <div class="d-flex justify-content-start">
         <img th:src="${post.user.profileImg != null} ? ${post.user.profileImg} : '/img/default-profile.png'"  width="50" height="50" class="profile-img">
@@ -42,16 +42,11 @@
 
     <!-- 본문 -->
     <div class="content">
-      <div class="post-content" th:utext="${post.content}">
+      <div class="post-content toastui-editor-contents " th:utext="${post.content}">
         게시글 본문
       </div>
     </div>
-    <!-- 이미지 목록 -->
-    <div class="post-images" th:if="${post.images != null}">
-      <div th:each="img : ${post.images}">
-        <img th:src="@{${img.imageUrl}}" alt="첨부 이미지" />
-      </div>
-    </div>
+
 
     <!-- 버튼 영역 -->
     <div class="post-actions d-flex justify-content-center">

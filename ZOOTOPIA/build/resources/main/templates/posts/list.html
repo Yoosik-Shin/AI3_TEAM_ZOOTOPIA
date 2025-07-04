@@ -74,12 +74,12 @@
         <img th:src="${post.thumbnailUrl != null} ? ${post.thumbnailUrl} : '/img/default-thumbnail.png'" alt="썸네일">
       </div>
       <div class="post-info">
-        <div>
+        <div class="title-category d-flex align-items-center">
           <a th:href="@{/posts/read/{id}(id=${post.postId})}" class="post-title"
             th:text="${post.title != null ? post.title : '제목없음'}">
             게시글 제목
           </a>
-          <span class="category" th:text="${post.category != null ? post.category : '기타'}">카테고리</span>
+          <span class="category ms-2" th:text="${post.category != null ? post.category : '기타'}">카테고리</span>
         </div>
         <div class="post-meta">
           <div class="author">

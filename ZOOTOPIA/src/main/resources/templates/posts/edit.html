@@ -6,12 +6,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/create.css}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-  <form th:action="@{'/posts/edit/' + ${post.postId}}" method="post" enctype="multipart/form-data"  onsubmit="return validateForm()">
-    <!-- postId hidden -->
+  <form th:action="@{'/posts/edit/' + ${post.postId}}" method="post" onsubmit="return onSubmit()">
     <input type="hidden" name="postId" th:value="${post.postId}" />
 
     <!-- 카테고리 -->
@@ -35,10 +36,11 @@
       <input type="text" id="title" name="title" class="form-control" th:value="${post.title}">
     </div>
 
-    <!-- 내용 -->
-    <div class="form-group">
-      <label for="content">글 작성</label>
-      <textarea id="content" name="content" rows="7" class="form-control" th:text="${post.content}"></textarea>
+    <!-- 본문 -->
+    <div class="form-group mt-3">
+      <label>글 작성</label>
+      <div id="editor"></div>
+      <input type="hidden" name="content" id="content">
     </div>
 
     <!-- 태그 -->
@@ -49,31 +51,23 @@
              th:value="${post.tags}">
     </div>
 
-    <!-- 이미지 업로드 -->
-    <div class="form-group">
-      <label>이미지 추가</label>
-      <div class="upload-box">
-        <label for="image">📷 사진첨부</label>
-        <input type="file" id="image" name="imageFiles" multiple accept="image/*" onchange="previewImages(event)">
-      </div>
-      <div id="imagePreviewContainer" class="preview-container">
-        <!-- 새로 선택된 이미지 미리보기만 표시 -->
-      </div>
-    </div>
-
     <!-- 등록 버튼 -->
     <div class="form-group text-right mt-3">
       <button type="submit" class="btn btn-primary">수정 완료</button>
     </div>
-
   </form>
 </div>
 
-<!-- 스크립트 -->
+<!-- ✅ Thymeleaf 변수를 JS 안에서 사용 가능하도록 설정 -->
+<script th:inline="javascript">
+  const initialContent = [[${post.content}]];
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 
 <script>
+  // 태그 처리
   const input = document.querySelector('#tags');
   const tagify = new Tagify(input, {
     originalInputValueFormat: values => values.map(tag => tag.value).join(',')
@@ -85,41 +79,34 @@
   }
 
   input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault();
+    if (e.key === 'Enter' && !e.isComposing) e.preventDefault();
+  });
+
+  // ✅ Toast UI Editor 초기화
+  const editor = new toastui.Editor({
+    el: document.querySelector('#editor'),
+    height: '500px',
+    initialEditType: 'wysiwyg',
+    previewStyle: 'vertical',
+    initialValue: initialContent,
+    hooks: {
+      addImageBlobHook: async (blob, callback) => {
+        const formData = new FormData();
+        formData.append('image', blob);
+        const res = await fetch('/upload/image', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        callback(result.imageUrl);
+      }
     }
   });
 
-  function previewImages(event) {
-    const container = document.getElementById('imagePreviewContainer');
-    container.innerHTML = '';
-    const files = event.target.files;
-
-    if (!files || files.length === 0) return;
-
-    [...files].forEach((file, idx) => {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('preview-item');
-        wrapper.innerHTML = `
-          <img src="${e.target.result}" width="100" height="100" alt="preview">
-          <div>
-            <label>
-              <input type="radio" name="thumbnailIndex" value="${idx}" ${idx === 0 ? 'checked' : ''}>
-              대표 이미지
-            </label>
-          </div>
-        `;
-        container.appendChild(wrapper);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function validateForm() {
+  // ✅ 전송 전 에디터 내용 hidden input에 반영
+  function onSubmit() {
     const title = document.getElementById("title").value.trim();
-    const content = document.getElementById("content").value.trim();
+    const content = editor.getHTML();
 
     if (title.length < 1) {
       alert("제목을 1자 이상 입력해주세요.");
@@ -127,12 +114,12 @@
       return false;
     }
 
-    if (content.length < 5) {
+    if (content.replace(/<[^>]*>/g, '').trim().length < 5) {
       alert("본문을 5자 이상 입력해주세요.");
-      document.getElementById("content").focus();
       return false;
     }
 
+    document.getElementById("content").value = content;
     return true;
   }
 </script>

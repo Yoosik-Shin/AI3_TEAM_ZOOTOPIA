@@ -81,12 +81,14 @@
       addImageBlobHook: async (blob, callback) => {
         const formData = new FormData();
         formData.append('image', blob);
-        const res = await fetch('/upload/image', {
+        const res = await fetch('/posts/upload/image', {
           method: 'POST',
           body: formData
         });
         const result = await res.json();
         callback(result.imageUrl);
+        const editorInstance = editor.getInstance();
+        editorInstance.insertText('\n\n'); 
       }
     }
   });

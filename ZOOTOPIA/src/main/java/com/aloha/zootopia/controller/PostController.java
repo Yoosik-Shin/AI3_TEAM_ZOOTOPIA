@@ -157,6 +157,12 @@ public class PostController {
     public Map<String, Object> uploadImage(@RequestParam("image") MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         try {
+
+            File uploadFolder = new File("C:/upload");
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdirs();  
+            }
+
             String uuid = UUID.randomUUID().toString();
             String fileName = uuid + "_" + file.getOriginalFilename();
             String savePath = "C:/upload/" + fileName;
@@ -164,7 +170,7 @@ public class PostController {
             file.transferTo(new File(savePath));
 
             result.put("success", 1);
-            result.put("imageUrl", "/upload/" + fileName); // 👈 에디터에 삽입될 이미지 URL
+            result.put("imageUrl", "/upload/" + fileName); 
         } catch (Exception e) {
             result.put("success", 0);
             result.put("message", "업로드 실패");
