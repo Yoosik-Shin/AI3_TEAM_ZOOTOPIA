@@ -163,7 +163,6 @@ CREATE TABLE post_tags (
   PRIMARY KEY (post_id, tag_id),
   FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
   FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
-) COMMENT='게시글-태그 연';
+) COMMENT='게시글-태그 연결';
 
-=======
->>>>>>> main
+

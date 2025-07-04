@@ -36,3 +36,5 @@ fileHashes.lock
 # 사용자 정의 설정 파일들
 settings.json
 launch.json
+
+.gradle
