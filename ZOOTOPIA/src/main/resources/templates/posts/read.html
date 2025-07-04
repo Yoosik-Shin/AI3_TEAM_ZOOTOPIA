@@ -61,6 +61,15 @@
       </form>
     </div>
 
+    <div th:if="${isOwner}" class="d-flex justify-content-end mt-4">
+      <a th:href="@{'/posts/edit/' + ${post.postId}}" class="btn btn-danger me-2">수정</a>
+
+      <form th:action="@{'/posts/delete/' + ${post.postId}}" method="post"
+            onsubmit="return confirm('정말 삭제하시겠습니까?');">
+        <button type="submit" class="btn btn-danger">삭제</button>
+      </form>
+    </div>
+
     <!-- 댓글 갯수 -->
     <div class="comment-box mt-5">
       <span class="fw-bold">💬 댓글 <span th:text="${#lists.size(post.comments)}">0</span></span>

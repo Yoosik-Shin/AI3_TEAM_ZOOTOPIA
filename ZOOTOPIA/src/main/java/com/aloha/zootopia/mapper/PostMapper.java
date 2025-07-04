@@ -48,4 +48,6 @@ public interface PostMapper {
 
     List<Posts> pageByCategory(@Param("category") String category);
 
+    int updateThumbnail(Posts post) throws Exception;
+
 }

@@ -30,4 +30,8 @@
     WHERE pt.post_id = #{postId}
   </select>
 
+  <delete id="deletePostTagsByPostId" parameterType="int">
+    DELETE FROM post_tags WHERE post_id = #{postId}
+  </delete>
+
 </mapper>

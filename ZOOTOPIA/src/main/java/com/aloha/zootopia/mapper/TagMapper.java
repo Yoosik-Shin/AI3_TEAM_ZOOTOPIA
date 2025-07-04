@@ -13,5 +13,7 @@ public interface TagMapper {
     int insertTag(Tag tag); 
     int insertPostTag(@Param("postId") int postId, @Param("tagId") int tagId);
     List<String> getTagsByPostId(int postId);
+
+    void deletePostTagsByPostId(int postId);
 }
 
