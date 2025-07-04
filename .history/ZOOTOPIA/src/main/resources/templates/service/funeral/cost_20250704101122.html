@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장례 및 기타비용</title>
+</head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box;}
+    a { text-decoration: none; color: black; }  
+
+    body {
+        background-image: url('/ZOOTOPIA/src/main/resources/static/img/background/funeral_background.jpg'); /* 이미지 경로 */
+        background-size: 1920px 2500px;  /* 화면에 꽉 차게 */
+        background-repeat: no-repeat; /* 반복 안 함 */
+        height: 1500px;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 350px;
+    }
+    .main-content {
+        position: absolute;
+        top: 350px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
+        background-color: rgba(0, 0, 0, 0.04);
+        /* justify-content: center; */
+        align-items: center;
+        padding-left: 25px;
+        padding-right: 25px;
+        width: 730px;
+        height: 1250px;
+        user-select: none;
+    }
+    .headline {
+        position: relative;
+        top: -70px;
+    }
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+    .content div {
+        padding-top: 30px;
+    }
+    .c6 {
+        padding-top: 30px;
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+    .side {
+        position: relative;
+        left: -480px;
+        top: 0px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
+        background-color: rgba(0, 0, 0, 0.04);
+        width: 130px;
+        height: 150px;
+    }
+    .side span {
+        text-align: center;
+        width: 130px;
+        height: 50px;
+    } 
+    .s1 {
+        font-size: 15px;
+        border-radius: 0 0 0 20px;
+        background-color: rgba(255, 242, 147, 0.3);
+    }
+    .s2, .s3 {
+        line-height: 50px;
+        font-size: 15px;
+    }
+    .s3 {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+</style>
+<body>
+    <div tj></div>
+    <th:block th:replace="~{/fragments/header :: header}"></th:block>
+    <div class="container">
+        <div class="main-content">
+            <div class="side">
+                    <span class="s1">Crossing the<br>Rainbow bridge</span>
+                    <span class="s2"><a th:href="@{/service/funeral/procedure}">장례 절차</a></span>
+                    <span class="s3"><a th:href="@{/service/funeral/cost}">장례 및 기타비용</a></span>
+            </div>
+            <span class="headline"><h1>장례 및 기타비용</h1></span>
+            <div class="content">
+                <div>
+                    <span>
+                        <h3>– 이별을 준비하는 마음으로, 장례비용과 절차를 정리합니다 –</h3><br>
+                        사랑하던 반려동물과의 이별은 많은 분들께 깊은 슬픔을 안깁니다. 짧지 않은 시간을 함께하며 가족처럼 지낸 존재이기에, 마지막을 잘 보내주고 싶은 마음은 모두 같을 것입니다.<br>
+                        이 글은 그런 분들을 위해, 반려동물 장례 비용과 용품별 가격, 지역별 평균 비용, 그리고 예산 계획에 도움이 될 수 있는 정보를 정리한 안내서입니다.<br>
+                    </span>
+                </div>
+                <div class="c1">
+                    <span><h3>📌 장례 기본 비용 : 평균 약 30만 원 내외</h3></span>
+                    <span>
+                        5kg 이하의 소형 반려동물을 기준으로 한 기본 화장 비용은 다음과 같습니다.<br>
+                        예상 비용 최저가     약 ₩200,000<br>
+                        일반적인 경우         약 ₩250,000<br>
+                        고급 옵션 포함        약 ₩300,000 이상
+                    </span>
+                </div>
+                <div class="c2">
+                    <span><h3>⚱️ 장례용품별 가격 정리</h3></span>
+                    <span>
+                        장례에는 화장 외에도 다양한 용품과 서비스가 포함될 수 있습니다.<br>
+                        다음은 주요 장례용품의 대략적인 가격대입니다. 
+                    </span>
+                </div>
+                <div class="c3">
+                    <span><h3>의식</h3></span>
+                    <span>
+                        유골함 (납골함)20,000 ~ 150,000 <br>
+                        수의/관50,000 ~ 210,000<br>
+                        메모리얼 스톤200,000 ~ 400,000<br>
+                        수목장·봉안당 보관료100,000 ~ 500,000<br>
+                        (1년)운구 서비스50,000 ~ 100,000
+                    </span>
+                    <span>
+                        이 외에도 생화 추모장식, 납골당 장기 보관, 추모영상 제작 등 여러 선택 옵션이 있으며, 선택에 따라 총 비용은 크게 달라질 수 있습니다.
+                    </span>
+                </div>
+                <div class="c4">
+                    <span><h3>추모</h3></span>
+                    <span>
+                        장례식 동안 추도문을 전달하거나, 반려동물의 추억을 공유하는 시간을 가집니다.
+                    </span>
+                </div>
+                <div class="c5">
+                    <span><h3>💸 예산 예시 – 실제 장례비용 합산</h3></span>
+                    <span>
+                        기본 화장비                     ₩250,000
+                        유골함                           ₩50,000
+                        수의 + 관                       ₩100,000
+                        운구 서비스                      ₩50,000
+                        봉안당 보관료(1년)               ₩200,000
+                        총합                             ₩650,000
+                    </span>
+                    <span>
+                        옵션이 많아질수록 100만 원 이상이 드는 경우도 적지 않으며, 특히 수도권의 경우 평균적으로 더 높은 비용이 발생합니다.
+                    </span>
+                </div>
+            </div>
+            <div class="c6">
+                <span>
+                    마무리하며 <br>
+                    이별은 준비되지 않은 채 다가오곤 합니다. <br>
+                    그러나 마지막까지 따뜻하게 보내주기 위한 마음을 담아, 조용히 정리해두는 것도 한 가지 방법일 것입니다.
+                </span>
+            </div>
+        </div>
+    </div>
+    <th:block th:replace="~{/fragments/footer :: footer}"></th:block>
+</body>
+</html>
