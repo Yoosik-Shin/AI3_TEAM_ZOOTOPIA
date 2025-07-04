@@ -551,6 +551,7 @@ body {
     flex-direction: column;
     gap: 15px;
     max-height: 400px;
+    overflow-y: auto;
 }
 
 .review-update-container {
