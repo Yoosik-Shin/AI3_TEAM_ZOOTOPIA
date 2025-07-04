@@ -1,5 +1,6 @@
 package com.aloha.zootopia.domain;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +19,5 @@ public class Review {
     private Integer userId;
     private String nickname;
     // getter/setter
+
 }

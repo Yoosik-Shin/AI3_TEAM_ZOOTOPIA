@@ -12,4 +12,5 @@ public interface ReviewMapper {
     List<Review> findByHospitalId(@Param("hospitalId") Integer hospitalId);
     void insertReview(Review review);
     Double findAvgRating(@Param("hospitalId") Integer hospitalId);
+
 }

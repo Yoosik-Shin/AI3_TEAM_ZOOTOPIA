@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
@@ -23,5 +24,8 @@
   <select id="findAvgRating" parameterType="int" resultType="double">
     SELECT AVG(rating) FROM hospital_review WHERE hospital_id = #{hospitalId}
   </select>
+  <!-- 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="int">
+        DELETE FROM hospital_review WHERE review_id = #{reviewId}
 
 </mapper>
