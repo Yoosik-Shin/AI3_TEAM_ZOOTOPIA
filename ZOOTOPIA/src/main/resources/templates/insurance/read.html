@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <title>KB 펫보험 상세</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    .highlight-circle {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: gold;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .btn1 {
+      background-color: #F27A7A;
+    }
+  </style>
+</head>
+<body class="bg-light py-5">
+  <th:block th:replace="fragments/header :: header"></th:block>
+
+  <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-5" style="max-width: 900px;">
+    <!-- 상단 보험명 -->
+    <h6 class="fs-5 fw-bold mb-4 text-center">
+      <span class="highlight-circle"></span>
+      <span th:text="${product.name}">보험상품명</span>
+    </h6>
+
+    <!-- 상세 영역 -->
+    <div class="d-flex justify-content-center align-items-start my-5 flex-wrap" style="gap: 60px;">
+      <!-- 왼쪽: 로고 + 요약 -->
+      <div class="text-center">
+        <img th:src="@{/image/logo.png}" alt="보험 로고" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
+        <ul class="list-unstyled small text-start mt-4 mx-auto" style="max-width: 250px;">
+          <li>✅ 보장 비율: <span th:text="${product.coveragePercent}">70</span>%</li>
+          <li>💰 월 보험료: <span th:text="${product.monthlyFeeRange}">15,000 ~ 40,000원</span></li>
+          <li>💎 월 최대 보장 한도: <span th:text="${product.maxCoverage}">150</span>만 원</li>
+        </ul>
+      </div>
+      <!-- 오른쪽: 상세 -->
+      <div style="max-width: 400px;">
+        <div class="mb-5">
+          <h6>🐶 가입 조건</h6>
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.joinCondition}"></p>
+        </div>
+        <div class="mb-5">
+          <h6>📌 보장 항목</h6>
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.coverageItems}">
+          </p>
+        </div>
+        <div class="mb-5">
+          <h6>⚠️ 유의사항</h6>
+          <p class="fs-4 ps-3 mb-4 fw-bold" th:text="${product.precautions}">
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결제 버튼 -->
+    <div class="text-center mb-4">
+      <button class="btn btn-outline-dark px-4">결제하기</button>
+    </div>
+
+    <!-- Q&A -->
+    <div class="border-top pt-4 mt-4">
+      <h6 class="mb-3 d-flex justify-content-between align-items-center">
+        💬 펫 보험 Q&A
+        <button class="btn1 btn-sm" data-bs-toggle="modal" data-bs-target="#qnaModal">
+         질문 등록
+        </button>
+      </h6>
+
+      <!-- QnA 목록 -->
+      <div th:if="${#lists.isEmpty(qnaList)}" class="text-center text-muted small">
+        등록된 질문이 없습니다.
+      </div>
+      <div th:each="qna : ${qnaList}" class="border p-3 rounded bg-light mb-3">
+        <span class="badge text-bg-warning mb-2" th:text="${qna.species}"></span>
+        <p class="mb-1 small" th:text="${qna.question}">
+        </p>
+        <div class="small text-end text-muted">
+          <span th:text="${qna.answer != null ? '1' : '0'}"></span>
+          | <span th:text="${qna.userId}"></span>
+          | <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}"></span>
+        </div>
+        <div class="mt-2">
+          <span class="badge bg-secondary">#펫보험</span>
+        </div>
+      </div>
+
+    <!-- 질문 등록 모달 -->
+    <div class="modal fade" id="qnaModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="qnaForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Q&A 질문 등록</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="productId" th:value="${product.productId}">
+            <div class="mb-3">
+              <label class="form-label">종(강아지/고양이)</label>
+              <input name="species" class="form-control" placeholder="예: 강아지" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">질문 내용</label>
+              <textarea name="question" class="form-control" rows="4" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn1 btn-secondary" data-bs-dismiss="modal">취소</button>
+            <button class="btn1 btn-primary" type="submit">등록</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    </div>
+  </div>
+
+
+  <th:block th:replace="fragments/footer :: footer"></th:block>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+  >
+
+    document.addEventListener("DOMContentLoaded", function() {
+    const qnaForm = document.getElementById("qnaForm");
+
+    qnaForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(qnaForm);
+
+      fetch('/insurance/qna/register-ajax', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        renderQnaList(data);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('qnaModal'));
+        modal.hide();
+        qnaForm.reset();
+      })
+      .catch(err => console.error(err));
+    });
+
+    function renderQnaList(qnaList) {
+      const container = document.querySelector(".border-top .mb-3").parentElement;
+      let html = `
+        <h6 class="mb-3 d-flex justify-content-between align-items-center">
+          💬 펫 보험 Q&A
+          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#qnaModal">질문 등록</button>
+        </h6>
+      `;
+
+      if (qnaList.length === 0) {
+        html += `<div class="text-center text-muted small">등록된 질문이 없습니다.</div>`;
+      } else {
+        qnaList.forEach(qna => {
+          html += `
+          <div class="border p-3 rounded bg-light mb-3">
+            <span class="badge text-bg-warning mb-2">${qna.species}</span>
+            <p class="mb-1 small">${qna.question}</p>
+            <div class="small text-end text-muted">
+              ${qna.answer ? '1' : '0'}
+              | ${qna.userId}
+              | ${qna.createdAt?.substring(0,10) || ''}
+            </div>
+            <div class="mt-2">
+              <span class="badge bg-secondary">#펫보험</span>
+            </div>
+          </div>`;
+        });
+      }
+      container.innerHTML = html;
+    }
+  });
+
+</script>
+</body>
+</html>
