@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>글 수정</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/create.css}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+</head>
+<body>
+
+<div class="container">
+  <form th:action="@{'/posts/edit/' + ${post.postId}}" method="post" enctype="multipart/form-data"  onsubmit="return validateForm()">
+    <!-- postId hidden -->
+    <input type="hidden" name="postId" th:value="${post.postId}" />
+
+    <!-- 카테고리 -->
+    <label>카테고리</label>
+    <div class="form-group category-buttons d-flex gap-3">
+      <div class="form-check ps-0">
+        <input class="form-check-input" type="radio" id="cate1" name="category" value="자유글"
+               th:checked="${post.category == '자유글'}">
+        <label class="form-check-label" for="cate1">자유게시판</label>
+      </div>
+      <div class="form-check ps-0">
+        <input class="form-check-input" type="radio" id="cate2" name="category" value="질문글"
+               th:checked="${post.category == '질문글'}">
+        <label class="form-check-label" for="cate2">질문있어요</label>
+      </div>
+    </div>
+
+    <!-- 제목 -->
+    <div class="form-group">
+      <label for="title">글 제목</label>
+      <input type="text" id="title" name="title" class="form-control" th:value="${post.title}">
+    </div>
+
+    <!-- 내용 -->
+    <div class="form-group">
+      <label for="content">글 작성</label>
+      <textarea id="content" name="content" rows="7" class="form-control" th:text="${post.content}"></textarea>
+    </div>
+
+    <!-- 태그 -->
+    <div class="form-group">
+      <label for="tags">#태그</label>
+      <input type="text" id="tags" name="tags" class="form-control"
+             placeholder="태그를 입력하고 Enter 또는 쉼표(,)로 구분하세요"
+             th:value="${post.tags}">
+    </div>
+
+    <!-- 이미지 업로드 -->
+    <div class="form-group">
+      <label>이미지 추가</label>
+      <div class="upload-box">
+        <label for="image">📷 사진첨부</label>
+        <input type="file" id="image" name="imageFiles" multiple accept="image/*" onchange="previewImages(event)">
+      </div>
+      <div id="imagePreviewContainer" class="preview-container">
+        <!-- 새로 선택된 이미지 미리보기만 표시 -->
+      </div>
+    </div>
+
+    <!-- 등록 버튼 -->
+    <div class="form-group text-right mt-3">
+      <button type="submit" class="btn btn-primary">수정 완료</button>
+    </div>
+
+  </form>
+</div>
+
+<!-- 스크립트 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+
+<script>
+  const input = document.querySelector('#tags');
+  const tagify = new Tagify(input, {
+    originalInputValueFormat: values => values.map(tag => tag.value).join(',')
+  });
+
+  if (input.value) {
+    tagify.removeAllTags();
+    tagify.addTags(input.value.split(',').map(tag => tag.trim()));
+  }
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.isComposing) {
+      e.preventDefault();
+    }
+  });
+
+  function previewImages(event) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+    const files = event.target.files;
+
+    if (!files || files.length === 0) return;
+
+    [...files].forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('preview-item');
+        wrapper.innerHTML = `
+          <img src="${e.target.result}" width="100" height="100" alt="preview">
+          <div>
+            <label>
+              <input type="radio" name="thumbnailIndex" value="${idx}" ${idx === 0 ? 'checked' : ''}>
+              대표 이미지
+            </label>
+          </div>
+        `;
+        container.appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function validateForm() {
+    const title = document.getElementById("title").value.trim();
+    const content = document.getElementById("content").value.trim();
+
+    if (title.length < 1) {
+      alert("제목을 1자 이상 입력해주세요.");
+      document.getElementById("title").focus();
+      return false;
+    }
+
+    if (content.length < 5) {
+      alert("본문을 5자 이상 입력해주세요.");
+      document.getElementById("content").focus();
+      return false;
+    }
+
+    return true;
+  }
+</script>
+
+</body>
+</html>

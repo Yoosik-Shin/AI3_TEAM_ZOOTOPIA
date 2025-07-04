@@ -17,15 +17,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Posts {
 
-    private Integer postId;            // auto_increment
+    private int postId;            // auto_increment
     private String id;                 // UUID
     private String category;          
     private String title;             
     private String content;           
 
-    private Integer viewCount;        
-    private Integer likeCount;        
-    private Integer commentCount;     
+    private int viewCount;        
+    private int likeCount;        
+    private int commentCount;     
 
     private Date createdAt;           
     private Date updatedAt;           
@@ -37,5 +37,9 @@ public class Posts {
 
     private List<PostImage> images;   // 글에 첨부된 전체 이미지 목록 (선택적으로 Lazy 로딩)
 
-     private List<Comment> comments;
+    private List<Comment> comments;
+
+    private String tags;
+
+    private List<Tag> tagList;
 }

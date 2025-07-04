@@ -48,6 +48,10 @@ textarea {
     margin-right: 10px;
     cursor: pointer;
     font-size: 14px;
+    max-width: 100px;
+    align-items: center;
+    text-align: center;
+    
 }
 
 .category-buttons input[type="radio"]:checked + label {
