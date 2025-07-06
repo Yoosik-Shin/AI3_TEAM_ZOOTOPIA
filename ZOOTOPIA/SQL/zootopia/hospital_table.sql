@@ -18,6 +18,7 @@ CREATE TABLE `hospital_info` (
     `homepage` VARCHAR(128),
     `phone` VARCHAR(64) NOT NULL,
     `email` VARCHAR(64),
+    `thumbnail_image_url` VARCHAR(255), -- 추가될 컬럼
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

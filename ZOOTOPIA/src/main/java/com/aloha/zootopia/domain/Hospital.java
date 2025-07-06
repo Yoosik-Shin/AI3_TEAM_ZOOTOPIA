@@ -16,6 +16,7 @@ public class Hospital {
     private String homepage;
     private String phone;
     private String email;
+    private String thumbnailImageUrl; // 추가될 필드
     private List<Animal> animals;
     private List<Specialty> specialties;
     private Double avgRating;

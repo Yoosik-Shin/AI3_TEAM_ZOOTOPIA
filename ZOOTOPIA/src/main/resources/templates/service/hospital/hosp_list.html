@@ -62,15 +62,15 @@
 
             <!-- 병원 카드 리스트 -->
             <div class="hospital-grid">
-                <div th:if="${#lists.isEmpty(hospitalList)}" class="no-hospitals">                                                       
-                    <p>표시할 병원이 없습니다.</p>                                                                 
-                </div>                                                                                             
-                    <!-- <div th:each="hospital : ${hospitals}" class="hospital-card"                                       
+                <div th:if="${#lists.isEmpty(hospitalList)}" class="no-hospitals">
+                    <p>표시할 병원이 없습니다.</p>
+                </div>
+                    <!-- <div th:each="hospital : ${hospitals}" class="hospital-card"
                         th:onclick="|location.href='@{/hospitals/{id}(id=${hospital.hospitalId})}'|">                    -->
-                    <div th:each="hospital : ${hospitalList}" class="hospital-card"                                 
+                    <div th:each="hospital : ${hospitalList}" class="hospital-card"
                         th:onclick="|location.href='@{/hospitals/detail/{id}(id=${hospital.hospitalId})}'|">
                     <div class="hospital-image">
-                        <img src="hospital-building.jpg" alt="병원 이미지" class="card-image">
+                        <img th:src="${hospital.thumbnailImageUrl != null and hospital.thumbnailImageUrl != '' ? hospital.thumbnailImageUrl : '/img/default-hospital.png'}" alt="병원 이미지" class="card-image">
                     </div>
                     <div class="hospital-info">
                         <h3 class="hospital-name" th:text="${hospital.name}">아크리스 특수 동물 병원</h3>
@@ -130,7 +130,11 @@
                     </div>
                 </div>
             </div> -->
-            
+<<<<<<< Updated upstream
+
+=======
+
+>>>>>>> Stashed changes
         </div>
         <!-- 페이지네이션 -->
         <div class="pagination-container">

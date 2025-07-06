@@ -41,6 +41,7 @@ public class HospitalServiceImpl implements HospitalService {
         hospital.setHomepage(form.getHomepage());
         hospital.setPhone(form.getPhone());
         hospital.setEmail(form.getEmail());
+        hospital.setThumbnailImageUrl(form.getThumbnailImageUrl()); // 추가될 코드
         hospitalMapper.insertHospital(hospital);
         for(Integer animalId : form.getAnimalIds()) {
             hospitalMapper.insertHospitalAnimal(hospital.getHospitalId(), animalId);

@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+<<<<<<< Updated upstream
+=======
+import org.springframework.web.multipart.MultipartFile;
+>>>>>>> Stashed changes
 
 import com.aloha.zootopia.domain.Hospital;
 import com.aloha.zootopia.dto.HospReviewForm;
@@ -22,18 +26,30 @@ import com.aloha.zootopia.mapper.UserMapper;
 import com.aloha.zootopia.service.AnimalService;
 import com.aloha.zootopia.service.HospitalService;
 // import com.github.pagehelper.PageInfo;
+<<<<<<< Updated upstream
+=======
+import com.aloha.zootopia.service.hospital.HospitalImageUploader;
+>>>>>>> Stashed changes
 
 @Controller
 public class HospitalController {
     @Autowired HospitalService hospitalService;
     @Autowired AnimalService animalService;
     @Autowired UserMapper userMapper;
+<<<<<<< Updated upstream
+=======
+    @Autowired HospitalImageUploader hospitalImageUploader;
+>>>>>>> Stashed changes
 
     public HospitalController(HospitalService hospitalService, AnimalService animalService, com.aloha.zootopia.mapper.UserMapper userMapper) {
         this.hospitalService = hospitalService;
         this.animalService = animalService;
     }
-    
+<<<<<<< Updated upstream
+
+=======
+
+>>>>>>> Stashed changes
     // @GetMapping("/hospitals")
     // public String list(@RequestParam(required = false) List<Integer> animal, Model model) {
     //     model.addAttribute("animalList", hospitalService.getAllAnimals());
@@ -44,8 +60,13 @@ public class HospitalController {
 
     @GetMapping("/hospitals")
     public String list(
-        @RequestParam(required = false) List<Integer> animal, 
-        @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, 
+<<<<<<< Updated upstream
+        @RequestParam(required = false) List<Integer> animal,
+        @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+=======
+        @RequestParam(required = false) List<Integer> animal,
+        @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+>>>>>>> Stashed changes
         Model model) {
 
         int pageSize = 6;
@@ -105,7 +126,11 @@ public class HospitalController {
 
     // @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/hospitals")
-    public String create(@ModelAttribute HospitalForm form) {
+    public String create(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
+        if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
+            String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
+            form.setThumbnailImageUrl(imageUrl);
+        }
         hospitalService.createHospital(form);
         return "redirect:/hospitals";
     }

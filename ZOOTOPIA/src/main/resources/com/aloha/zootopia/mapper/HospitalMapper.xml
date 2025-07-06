@@ -12,7 +12,7 @@
     <result property="phone" column="phone"/>
     <result property="email" column="email"/>
     <result property="avgRating" column="avg_rating"/>
-    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal" 
+    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal"
                 select="com.aloha.zootopia.mapper.AnimalMapper.findByHospitalId" column="hospital_id"/>
     <collection property="specialties" ofType="Specialty"
                 select="com.aloha.zootopia.mapper.SpecialtyMapper.findByHospitalId" column="hospital_id"/>
@@ -24,8 +24,8 @@
   </select>
 
   <select id="findByAnimalIds" parameterType="list" resultMap="HospitalResultMap">
-    SELECT DISTINCT h.*, (SELECT AVG(rating) 
-                            FROM hospital_review r 
+    SELECT DISTINCT h.*, (SELECT AVG(rating)
+                            FROM hospital_review r
                             WHERE r.hospital_id = h.hospital_id) AS avg_rating
     FROM hospital_info h
     JOIN hospital_animal ha ON h.hospital_id = ha.hospital_id
@@ -44,8 +44,8 @@
   </select>
 
   <insert id="insertHospital" useGeneratedKeys="true" keyProperty="hospitalId">
-    INSERT INTO hospital_info (name, address, homepage, phone, email)
-    VALUES (#{name}, #{address}, #{homepage}, #{phone}, #{email})
+    INSERT INTO hospital_info (name, address, homepage, phone, email, thumbnail_image_url)
+    VALUES (#{name}, #{address}, #{homepage}, #{phone}, #{email}, #{thumbnailImageUrl})
   </insert>
 
   <insert id="insertHospitalAnimal">
@@ -69,7 +69,7 @@
       </foreach>
     </if>
     <if test="animalIds == null or animalIds.size() == 0">
-      
+
     </if>
     ORDER BY h.hospital_id DESC
     LIMIT #{limit} OFFSET #{offset}
@@ -86,7 +86,7 @@
       </foreach>
     </if>
     <if test="animalIds == null or animalIds.size() == 0">
-      
+
     </if>
   </select>
 

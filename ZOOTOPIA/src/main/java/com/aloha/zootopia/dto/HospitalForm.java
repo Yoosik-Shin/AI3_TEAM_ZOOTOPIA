@@ -17,6 +17,7 @@ public class HospitalForm {
     private String homepage;
     private String phone;
     private String email;
+    private String thumbnailImageUrl; // 추가될 필드
     private List<Integer> specialtyIds;
     private List<Integer> animalIds;
     // getter/setter
