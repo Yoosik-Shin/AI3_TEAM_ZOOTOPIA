@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.domain.CustomUser;
@@ -32,6 +33,20 @@ public class CommentController {
 
         return "redirect:/posts/read/" + comment.getPostId(); 
     }
+    
+    @PostMapping("/update")
+    public String updateComment(@ModelAttribute Comment comment,
+                                @AuthenticationPrincipal CustomUser user,
+                                RedirectAttributes ra) throws Exception {
+        Comment original = commentService.findById(comment.getCommentId());
+        if (!original.getUserId().equals(user.getUser().getUserId())) {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        commentService.updateCommentContent(comment);
+        return "redirect:/posts/read/" + comment.getPostId();
+    }
+
 
     @PostMapping("/delete/{id}")
     public String deleteComment(@PathVariable("id") Integer commentId,

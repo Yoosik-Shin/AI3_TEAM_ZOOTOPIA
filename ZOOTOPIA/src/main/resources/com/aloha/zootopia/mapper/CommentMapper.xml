@@ -40,4 +40,22 @@
     WHERE comment_id = #{commentId}
   </update>
 
+
+  <!-- 댓글 수정 -->
+<update id="updateContent">
+  UPDATE post_comments
+  SET content = #{content},
+      updated_at = NOW()
+  WHERE comment_id = #{commentId}
+</update>
+
+<!-- 댓글 1개 조회 -->
+<select id="findById" resultMap="CommentMap">
+  SELECT c.*, u.nickname, u.profile_img
+  FROM post_comments c
+  LEFT JOIN users u ON c.user_id = u.user_id
+  WHERE comment_id = #{commentId}
+</select>
+
+
 </mapper>

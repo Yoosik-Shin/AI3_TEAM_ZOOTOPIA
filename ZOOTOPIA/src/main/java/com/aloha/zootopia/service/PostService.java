@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
-import com.github.pagehelper.PageInfo;
 
 public interface PostService {
 
@@ -14,8 +13,8 @@ public interface PostService {
     // 페이징 목록
     List<Posts> page(Pagination pagination) throws Exception;
 
-    // PageHelper 기반 페이징
-    PageInfo<Posts> page(int page, int size, String category) throws Exception;
+    // // PageHelper 기반 페이징
+    // PageInfo<Posts> page(int page, int size, String category) throws Exception;
 
     // 인기글 Top N
     List<Posts> getTopN(int limit) throws Exception;
@@ -42,7 +41,13 @@ public interface PostService {
     void decreaseCommentCount(int postId);
 
     List<Posts> getTop10PopularPosts();
-    
+
+    List<Posts> pageBySearch(String type, String keyword, Pagination pagination) throws Exception;
+
+    long countBySearch(String type, String keyword) throws Exception;
+
+    List<Posts> pageByPopularity(Pagination pagination) throws Exception;
+
 
 
 }

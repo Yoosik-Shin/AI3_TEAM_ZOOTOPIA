@@ -115,3 +115,25 @@ a {
   display: block;
   margin: 1rem auto;
 }
+.icon-heart {
+  color: white;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  transition: all 0.2s ease;
+}
+
+.icon-heart.selected {
+  color: red;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+.comment-update {
+  background-color: #ff9999;
+}
+

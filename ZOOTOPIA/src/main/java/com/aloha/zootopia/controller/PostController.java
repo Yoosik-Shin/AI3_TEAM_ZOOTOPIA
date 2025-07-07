@@ -22,10 +22,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.domain.CustomUser;
+import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
 import com.aloha.zootopia.service.CommentService;
+import com.aloha.zootopia.service.PostLikeService;
 import com.aloha.zootopia.service.PostService;
-import com.github.pagehelper.PageInfo;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -40,6 +41,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록 (자유글/질문글) + 인기 게시물
@@ -49,67 +51,104 @@ public class PostController {
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "type", required = false) String type,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "sort", defaultValue = "latest") String sort, 
             Model model
     ) throws Exception {
 
-        // 일반 게시글 목록 가져오기
-        PageInfo<Posts> pageInfo = postService.page(page, size, category);
-        List<Posts> list = pageInfo.getList();
+        List<Posts> list;
+        Pagination pagination = new Pagination();
+        pagination.setPage(page);
+        pagination.setSize(size);
+        pagination.setCount(10); // 보여줄 페이지 번호 수 (예: 1 2 3 ... 10)
+        pagination.setOffset((page - 1) * size);
+        pagination.setCategory(category); // 카테고리도 페이징 객체에 포함
 
-        // 인기 게시물 목록 가져오기
-        List<Posts> topList = postService.getTop10PopularPosts();
-
-        // topList가 null이거나 비어있는 경우 빈 리스트로 처리
-        if (topList == null || topList.isEmpty()) {
-            System.out.println("🔥 인기글이 없습니다.");
-            topList = new ArrayList<>();
+        if (type != null && keyword != null && !keyword.isBlank()) {
+            // 🔍 검색 결과
+            list = postService.pageBySearch(type, keyword, pagination);
+            long totalCount = postService.countBySearch(type, keyword);
+            pagination.setTotal(totalCount);
+        } else {
+            if ("popular".equals(sort)) {
+            list = postService.pageByPopularity(pagination);
+            } else {
+                list = postService.page(pagination);
+            }
         }
 
-        // 모델에 데이터를 추가
-        model.addAttribute("pageInfo", pageInfo);  // 페이지네이션 정보
-        model.addAttribute("list", list);  // 일반 게시글 목록
-        model.addAttribute("category", category);  // 카테고리 필터링 정보
-        model.addAttribute("topList", topList);  // 인기 게시물 목록
+        // 인기글
+        List<Posts> topList = postService.getTop10PopularPosts();
+        if (topList == null) topList = new ArrayList<>();
 
-        return "posts/list";  // 반환할 뷰
+        // 검색 파라미터 전달 (검색 유지용)
+        Map<String, String> paramMap = new HashMap<>();
+        if (type != null) paramMap.put("type", type);
+        if (keyword != null) paramMap.put("keyword", keyword);
+        paramMap.put("sort", sort);
+
+        // 모델 속성 주입
+        model.addAttribute("list", list);
+        model.addAttribute("pageInfo", pagination); // ✅ 템플릿에 동일 변수로 전달
+        model.addAttribute("category", category);
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("param", paramMap);
+        model.addAttribute("topList", topList);
+        model.addAttribute("sort", sort);
+
+        return "posts/list";
     }
+
+
 
     /**
      * 게시글 상세
      */
-    @GetMapping("/read/{id}")
+   @GetMapping("/read/{id}")
     public String read(
         @PathVariable("id") String id,
         Model model,
         HttpServletRequest request,
-        @AuthenticationPrincipal CustomUser user  
+        @RequestParam(value = "editId", required = false) Integer editId,
+        @AuthenticationPrincipal CustomUser user
     ) throws Exception {
         Posts post = postService.selectById(id);
-
-
         int postId = post.getPostId();
+
+        // 조회수 관련 코드
         HttpSession session = request.getSession();
         String viewKey = "viewed_post_" + postId;
         Long lastViewTime = (Long) session.getAttribute(viewKey);
         long now = System.currentTimeMillis();
         long expireTime = 60 * 60 * 1000L;
+
         if (lastViewTime == null || now - lastViewTime > expireTime) {
             postService.increaseViewCount(postId);
-            session.setAttribute(viewKey, now);     
+            session.setAttribute(viewKey, now);
         }
 
-        boolean isOwner = user != null && post.getUserId().equals(user.getUser().getUserId());
+        boolean isOwner = user != null && post.getUserId().equals(user.getUserId());
 
-    
         List<Comment> comments = commentService.getCommentsByPostId(postId);
         post.setComments(comments);
-        
+
+        boolean liked = false;
+        if (user != null) {
+            liked = postLikeService.isLiked(postId, user.getUserId());
+        }
 
         model.addAttribute("post", post);
         model.addAttribute("isOwner", isOwner);
+        model.addAttribute("editId", editId); 
+        model.addAttribute("loginUserId", user != null ? user.getUser().getUserId() : null);
+        model.addAttribute("liked", liked); 
 
         return "posts/read";
     }
+
+
 
     /**
      * 게시글 작성 폼
@@ -221,14 +260,12 @@ public class PostController {
         RedirectAttributes ra
     ) throws Exception {
 
-        // 🔐 글쓴이 검증
         boolean isOwner = postService.isOwner(id, user.getUserId());
         if (!isOwner) {
             ra.addFlashAttribute("error", "수정 권한이 없습니다.");
             return "redirect:/posts/list";
         }
 
-        // ✅ 통과: 수정 폼에 데이터 전달
         Posts post = postService.selectById(id);
         model.addAttribute("post", post);
         return "posts/edit";  // edit.html로 이동
@@ -239,21 +276,9 @@ public class PostController {
     public String update(
         @PathVariable("id") String id,
         @ModelAttribute Posts post,
-        @RequestParam("imageFiles") MultipartFile[] imageFiles,
         @AuthenticationPrincipal CustomUser user,
         RedirectAttributes ra
     ) throws Exception {
-
-        if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
-            ra.addFlashAttribute("error", "제목은 1자 이상 입력해주세요.");
-            return "redirect:/posts/edit/" + post.getId();
-        }
-
-        if (post.getContent() == null || post.getContent().trim().length() < 5) {
-            ra.addFlashAttribute("error", "본문은 5자 이상 입력해주세요.");
-            return "redirect:/posts/edit/" + post.getId();
-        }
-
 
         // 🔒 글쓴이 확인
         if (!postService.isOwner(id, user.getUserId())) {
@@ -261,11 +286,22 @@ public class PostController {
             return "redirect:/posts/list";
         }
 
-        // postId는 path variable로 받았지만, @ModelAttribute에 자동 매핑 안 될 수 있으므로 수동 설정
+        // ✅ 유효성 검사
+        if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
+            ra.addFlashAttribute("error", "제목은 1자 이상 입력해주세요.");
+            return "redirect:/posts/edit/" + id;
+        }
+
+        if (post.getContent() == null || post.getContent().replaceAll("<[^>]*>", "").trim().length() < 5) {
+            ra.addFlashAttribute("error", "본문은 5자 이상 입력해주세요.");
+            return "redirect:/posts/edit/" + id;
+        }
+
+        // 수동 설정
         post.setId(id);
         post.setUserId(user.getUserId());
 
-        boolean result = postService.updateById(post); // 이미지 업데이트 제외
+        boolean result = postService.updateById(post); // 이미지 따로 안 다루는 경우
 
         if (result) {
             ra.addFlashAttribute("msg", "글이 수정되었습니다.");
@@ -274,6 +310,27 @@ public class PostController {
             ra.addFlashAttribute("error", "글 수정에 실패했습니다.");
             return "redirect:/posts/edit/" + id;
         }
+    }
+
+
+    @PostMapping("/like/{id}")
+    public String toggleLike(
+            @PathVariable("id") int postId,
+            @AuthenticationPrincipal CustomUser user,
+            RedirectAttributes ra
+    ) {
+        if (user == null) {
+            ra.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+            return "redirect:/login";
+        }
+
+        boolean liked = postLikeService.toggleLike(postId, user.getUserId());
+        if (liked) {
+            ra.addFlashAttribute("msg", "좋아요를 눌렀습니다.");
+        } else {
+            ra.addFlashAttribute("msg", "좋아요를 취소했습니다.");
+        }
+        return "redirect:/posts/read/" + postId;
     }
 
 

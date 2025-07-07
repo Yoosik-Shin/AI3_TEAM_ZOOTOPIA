@@ -90,7 +90,7 @@ a {
   gap: 10px;
 }
 
-.community-controls select,
+
 .btn-write {
   padding: 6px 13px;
   border: 1px solid #ccc;
@@ -232,4 +232,17 @@ a {
   max-width: 55px;
   height: 25px;
   font-size: small;
+}
+
+.search {
+  width: 70%;
+}
+
+.btn-search {
+  background-color: #FF5E5E;
+  color: white;
+}
+.btn-search:hover {
+  background-color: #FF5E5E;
+  color: white;
 }

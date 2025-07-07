@@ -58,11 +58,11 @@
   </form>
 </div>
 
-<!-- ✅ Thymeleaf 변수를 JS 안에서 사용 가능하도록 설정 -->
 <script th:inline="javascript">
-  const initialContent = [[${post.content}]];
+  const initialContent = /*[[${post.content}]]*/ "";
 </script>
 
+<!-- 스크립트 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 
@@ -82,28 +82,28 @@
     if (e.key === 'Enter' && !e.isComposing) e.preventDefault();
   });
 
-  // ✅ Toast UI Editor 초기화
-  const editor = new toastui.Editor({
+ const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '500px',
     initialEditType: 'wysiwyg',
     previewStyle: 'vertical',
-    initialValue: initialContent,
     hooks: {
       addImageBlobHook: async (blob, callback) => {
         const formData = new FormData();
         formData.append('image', blob);
-        const res = await fetch('/upload/image', {
+        const res = await fetch('/posts/upload/image', {
           method: 'POST',
           body: formData
         });
         const result = await res.json();
         callback(result.imageUrl);
+        const editorInstance = editor.getInstance();
+        editorInstance.insertText('\n\n'); 
       }
     }
   });
 
-  // ✅ 전송 전 에디터 내용 hidden input에 반영
+  // 전송 시 editor 내용 반영
   function onSubmit() {
     const title = document.getElementById("title").value.trim();
     const content = editor.getHTML();
