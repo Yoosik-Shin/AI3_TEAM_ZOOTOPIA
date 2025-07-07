@@ -23,19 +23,30 @@ import com.aloha.zootopia.mapper.UserMapper;
 import com.aloha.zootopia.service.AnimalService;
 import com.aloha.zootopia.service.HospitalService;
 // import com.github.pagehelper.PageInfo;
+<<<<<<< Updated upstream
+=======
 import com.aloha.zootopia.service.hospital.HospitalImageUploader;
+>>>>>>> Stashed changes
 
 @Controller
 public class HospitalController {
     @Autowired HospitalService hospitalService;
     @Autowired AnimalService animalService;
     @Autowired UserMapper userMapper;
+<<<<<<< Updated upstream
+=======
     @Autowired HospitalImageUploader hospitalImageUploader;
+>>>>>>> Stashed changes
 
     public HospitalController(HospitalService hospitalService, AnimalService animalService, com.aloha.zootopia.mapper.UserMapper userMapper) {
         this.hospitalService = hospitalService;
         this.animalService = animalService;
     }
+<<<<<<< Updated upstream
+
+=======
+
+>>>>>>> Stashed changes
     // @GetMapping("/hospitals")
     // public String list(@RequestParam(required = false) List<Integer> animal, Model model) {
     //     model.addAttribute("animalList", hospitalService.getAllAnimals());
@@ -46,8 +57,13 @@ public class HospitalController {
 
     @GetMapping("/hospitals")
     public String list(
+<<<<<<< Updated upstream
         @RequestParam(required = false) List<Integer> animal,
         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+=======
+        @RequestParam(required = false) List<Integer> animal,
+        @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+>>>>>>> Stashed changes
         Model model) {
 
         int pageSize = 6;
