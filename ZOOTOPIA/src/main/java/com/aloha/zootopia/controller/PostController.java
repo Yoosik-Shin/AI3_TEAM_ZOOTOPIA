@@ -65,6 +65,7 @@ public class PostController {
         pagination.setOffset((page - 1) * size);
         pagination.setCategory(category); // 카테고리도 페이징 객체에 포함
 
+        
         if (type != null && keyword != null && !keyword.isBlank()) {
             // 🔍 검색 결과
             list = postService.pageBySearch(type, keyword, pagination);

@@ -62,7 +62,8 @@ public interface PostMapper {
         @Param("type") String type,
         @Param("keyword") String keyword
     );
-
+ 
+    
     List<Posts> pageByPopularity(Pagination pagination) throws Exception;
 
 }

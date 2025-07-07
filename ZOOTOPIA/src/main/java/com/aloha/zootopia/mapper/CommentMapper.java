@@ -13,5 +13,6 @@ public interface CommentMapper {
     void softDelete(Integer commentId);
     void updateContent(Comment comment);
     Comment findById(Integer commentId);
+    
 
 }

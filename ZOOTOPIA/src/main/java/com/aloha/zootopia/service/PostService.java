@@ -47,6 +47,7 @@ public interface PostService {
     long countBySearch(String type, String keyword) throws Exception;
 
     List<Posts> pageByPopularity(Pagination pagination) throws Exception;
+    
 
 
 

@@ -19,6 +19,7 @@ import lombok.Data;
  * - 다음 페이지            : next
  * - OFFSET 값              : offset
  */
+
 @Data
 public class Pagination {
     // 기본값

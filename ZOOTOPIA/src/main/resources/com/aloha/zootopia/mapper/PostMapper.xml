@@ -250,6 +250,7 @@
   </where>
   ORDER BY (p.view_count * 0.3 + p.like_count * 1.0 + p.comment_count * 0.7) DESC
   LIMIT #{offset}, #{size}
+  
 </select>
 
 

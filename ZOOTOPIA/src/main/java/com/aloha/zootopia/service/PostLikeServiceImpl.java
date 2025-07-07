@@ -24,6 +24,7 @@ public class PostLikeServiceImpl implements PostLikeService {
             return true; // 좋아요 등록됨
         }
     }
+    
 
     @Override
     public boolean isLiked(int postId, long userId) {
