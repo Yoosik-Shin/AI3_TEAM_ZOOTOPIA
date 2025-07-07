@@ -1,22 +1,17 @@
 package com.aloha.zootopia.service;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.aloha.zootopia.domain.Pagination;
-import com.aloha.zootopia.domain.PostImage;
 import com.aloha.zootopia.domain.Posts;
-import com.aloha.zootopia.mapper.PostImageMapper;
+import com.aloha.zootopia.domain.Tag;
 import com.aloha.zootopia.mapper.PostMapper;
-
-import com.aloha.zootopia.service.PostService;
-
+import com.aloha.zootopia.mapper.TagMapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -27,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PostServiceImpl implements PostService {
 
     @Autowired private PostMapper postMapper;
-    @Autowired private PostImageMapper postImageMapper;
+    
+    @Autowired private TagMapper tagMapper;
 
-    private final String uploadDir = "C:/upload"; // 로컬 저장경로
 
     @Override
     public List<Posts> list() throws Exception {
@@ -44,10 +39,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PageInfo<Posts> page(int page, int size) throws Exception {
+    public PageInfo<Posts> page(int page, int size, String category) {
         PageHelper.startPage(page, size);
-        List<Posts> list = postMapper.list();
-        return new PageInfo<>(list, 10);
+        List<Posts> postList = postMapper.pageByCategory(category);
+        PageInfo<Posts> pageInfo = new PageInfo<>(postList);
+
+        if (!postList.isEmpty()) {
+            List<Integer> postIds = postList.stream()
+                    .map(Posts::getPostId)
+                    .toList();
+
+            List<Tag> tagResults = postMapper.selectTagsByPostIds(postIds);
+
+            Map<Integer, List<Tag>> tagMap = tagResults.stream()
+                    .collect(Collectors.groupingBy(Tag::getPostId));
+
+            for (Posts post : postList) {
+                List<Tag> tagList = tagMap.get(post.getPostId());
+                if (tagList != null) {
+                    post.setTagList(tagList);
+                }
+            }
+        }
+
+        return pageInfo;
     }
 
     @Override
@@ -61,52 +76,81 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean insert(Posts post, MultipartFile[] imageFiles) throws Exception {
-        // 게시글 DB 등록
+    public boolean insert(Posts post) throws Exception {
+        // 게시글 저장
         boolean success = postMapper.insert(post) > 0;
         if (!success) return false;
 
-        List<PostImage> imageList = new ArrayList<>();
-        int ordering = 1;
-
-        for (MultipartFile file : imageFiles) {
-            if (file != null && !file.isEmpty()) {
-                String originalName = file.getOriginalFilename();
-                String uuid = UUID.randomUUID().toString();
-                String savedName = uuid + "_" + originalName;
-                String savePath = uploadDir + File.separator + savedName;
-
-                // 실제 파일 저장
-                file.transferTo(new File(savePath));
-
-                // 썸네일용 첫 이미지 URL 설정
-                if (ordering == 1) {
-                    post.setThumbnailUrl("/upload/" + savedName);
-                    postMapper.updateById(post); // 썸네일 경로 업데이트
-                }
-
-                // 이미지 객체 구성
-                PostImage image = PostImage.builder()
-                    .postId(post.getPostId())
-                    .imageUrl("/upload/" + savedName)
-                    .ordering(ordering++)
-                    .build();
-
-                imageList.add(image);
+        // ✅ 썸네일 자동 추출: 본문(content)에서 첫 <img src="..."> 태그 파싱
+        String content = post.getContent();
+        if (content != null) {
+            // 정규표현식으로 첫 번째 이미지 src 추출
+            java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?").matcher(content);
+            if (matcher.find()) {
+                String firstImgSrc = matcher.group(1); // ex) /upload/abc.jpg
+                post.setThumbnailUrl(firstImgSrc);
+                postMapper.updateThumbnail(post); // 썸네일 반영
             }
         }
 
-        // 이미지 목록 insert
-        for (PostImage img : imageList) {
-            postImageMapper.insert(img);
+        // ✅ 태그 처리 (기존 유지)
+        String tagStr = post.getTags();  // 예: "고양이,귀여움,햇살"
+        if (tagStr != null && !tagStr.trim().isEmpty()) {
+            String[] tagNames = tagStr.split(",");
+            for (String rawName : tagNames) {
+                String name = rawName.trim();
+                if (name.isEmpty()) continue;
+
+                Integer tagId = tagMapper.findTagIdByName(name);
+                if (tagId == null) {
+                    Tag tag = new Tag();
+                    tag.setName(name);
+                    tagMapper.insertTag(tag);
+                    tagId = tag.getTagId();  // generated key 반환됨
+                }
+
+                tagMapper.insertPostTag(post.getPostId(), tagId);
+            }
         }
 
         return true;
     }
 
+
+
     @Override
     public boolean updateById(Posts post) throws Exception {
-        return postMapper.updateById(post) > 0;
+        // 1. 게시글 본문, 제목, 카테고리 등 업데이트
+        boolean success = postMapper.updateById(post) > 0;
+        if (!success) return false;
+
+        // 2. 기존 태그 연결 삭제
+        tagMapper.deletePostTagsByPostId(post.getPostId());
+
+        // 3. 새 태그 문자열 파싱 및 등록
+        String tagStr = post.getTags();  // 예: "고양이, 햇살, 귀여움"
+        if (tagStr != null && !tagStr.trim().isEmpty()) {
+            String[] tagNames = tagStr.split(",");
+            for (String rawName : tagNames) {
+                String name = rawName.trim();
+                if (name.isEmpty()) continue;
+
+                // DB에 존재하는 태그인지 확인
+                Integer tagId = tagMapper.findTagIdByName(name);
+                if (tagId == null) {
+                    // 없으면 새로 등록
+                    Tag tag = new Tag();
+                    tag.setName(name);
+                    tagMapper.insertTag(tag);
+                    tagId = tag.getTagId(); // 생성된 태그 ID
+                }
+
+                // post_tags 관계 테이블에 연결
+                tagMapper.insertPostTag(post.getPostId(), tagId);
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -115,7 +159,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public boolean isOwner(String id, Integer userId) throws Exception {
+    public boolean isOwner(String id, Long userId) throws Exception {
         Posts post = postMapper.selectById(id);
         return post != null && post.getUserId().equals(userId);
     }
@@ -129,5 +173,20 @@ public class PostServiceImpl implements PostService {
     public List<Posts> getTop10PopularPosts() {
         return postMapper.selectTop10ByPopularity();
     }
+
+
+    @Override
+    public void increaseCommentCount(int postId) {
+        postMapper.updateCommentCount(postId); 
+    }
+
+    @Override
+    public void decreaseCommentCount(int postId) {
+        postMapper.minusCommentCount(postId);
+    }
+
+
+
+
 
 }

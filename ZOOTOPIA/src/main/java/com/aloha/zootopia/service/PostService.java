@@ -2,8 +2,6 @@ package com.aloha.zootopia.service;
 
 import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import com.aloha.zootopia.domain.Pagination;
 import com.aloha.zootopia.domain.Posts;
 import com.github.pagehelper.PageInfo;
@@ -17,7 +15,7 @@ public interface PostService {
     List<Posts> page(Pagination pagination) throws Exception;
 
     // PageHelper 기반 페이징
-    PageInfo<Posts> page(int page, int size) throws Exception;
+    PageInfo<Posts> page(int page, int size, String category) throws Exception;
 
     // 인기글 Top N
     List<Posts> getTopN(int limit) throws Exception;
@@ -25,8 +23,8 @@ public interface PostService {
     // 단건 조회
     Posts selectById(String id) throws Exception;
 
-    // 등록 (이미지 업로드 포함)
-    boolean insert(Posts post, MultipartFile[] imageFiles) throws Exception;
+    // 등록 
+    boolean insert(Posts post) throws Exception;
 
     // 수정
     boolean updateById(Posts post) throws Exception;
@@ -35,11 +33,14 @@ public interface PostService {
     boolean deleteById(String id) throws Exception;
 
     // 소유자 검증
-    boolean isOwner(String id, Integer userId) throws Exception;
+    boolean isOwner(String id, Long userId) throws Exception;
 
     void increaseViewCount(Integer postId);
 
+    void increaseCommentCount(int postId);
     
+    void decreaseCommentCount(int postId);
+
     List<Posts> getTop10PopularPosts();
     
 

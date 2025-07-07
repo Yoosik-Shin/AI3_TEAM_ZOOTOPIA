@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <title>KB 펫보험 상세</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    .highlight-circle {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: gold;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .btn1 {
+      border: 1px solid #F27A7A;
+      background-color: #F27A7A;
+      color: white;
+      border-radius: 6px;
+      height: 35px;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <th:block th:replace="~{fragments/header :: header}"></th:block>
+
+  <div class="container bg-white p-4 rounded shadow-sm mt-3 mb-3" style="max-width: 900px;">
+    <!-- 상단 보험명 -->
+    <h6 class="fs-5 fw-bold mb-4 text-center">
+      <span class="highlight-circle"></span>
+      <span th:text="${product.name}">보험상품명</span>
+    </h6>
+
+    <!-- 상세 영역 -->
+    <div class="d-flex justify-content-center align-items-start my-5 flex-wrap" style="gap: 60px;">
+      <!-- 왼쪽: 로고 + 요약 -->
+      <div class="text-center">
+        <img th:src="@{/image/logo.png}" alt="보험 로고" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
+        <ul class="list-unstyled small text-start mt-4 mx-auto" style="max-width: 250px;">
+          <li>✅ 보장 비율: <span th:text="${product.coveragePercent}">70</span>%</li>
+          <li>💰 월 보험료: <span th:text="${product.monthlyFeeRange}">15,000 ~ 40,000원</span></li>
+          <li>💎 월 최대 보장 한도: <span th:text="${product.maxCoverage}">150</span>만 원</li>
+        </ul>
+      </div>
+      <!-- 오른쪽: 상세 -->
+      <div style="max-width: 400px;">
+        <div class="mb-5">
+          <h6 class="fw-bold fs-4">🐶 가입 조건</h6>
+          <p class="fs-6 ps-3 mb-4" th:text="${product.joinCondition}"></p>
+        </div>
+        <div class="mb-5">
+          <h6 class="fw-bold fs-4">📌 보장 항목</h6>
+          <p class="fs-6 ps-3 mb-4" th:text="${product.coverageItems}">
+          </p>
+        </div>
+        <div class="mb-5">
+          <h6 class="fw-bold fs-4">⚠️ 유의사항</h6>
+          <p class="fs-6 ps-3 mb-4" th:text="${product.precautions}">
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결제 버튼 -->
+    <div class="text-center mb-4">
+      <button class="btn btn-outline-dark px-4">결제하기</button>
+    </div>
+
+      <!-- Q&A -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-chat-dots fs-4"></i>
+          <h5 class="mb-0 fw-bold">펫 보험 Q&A</h5>
+        </div>
+        <button class="btn1 btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#qnaModal">
+          질문 등록
+        </button>
+      </div>
+
+      <!-- QnA 목록 -->
+      <div id="qnaListArea">
+        <div th:if="${#lists.isEmpty(qnaList)}" class="text-center text-muted small py-3 border rounded">
+          등록된 질문이 없습니다.
+        </div>
+        <div th:each="qna : ${qnaList}" class="border rounded p-3 mb-3 bg-light">
+          <div class="mb-2">
+            <span class="badge bg-warning me-2" th:text="${qna.species}">강아지</span>
+            <strong th:text="${qna.question}">질문 내용</strong>
+          </div>
+          <div class="small text-muted mt-1 ms-1" th:if="${qna.answer}">
+            <div th:text="${qna.answer}">답변 내용</div>
+          </div>
+          <div class="small text-muted mt-2">
+            답변 :
+            <span th:text="${qna.answer != null ? '1' : '0'}">0</span> |
+            <span th:text="${qna.userId}">작성자</span> |
+            <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}">2025.07.04</span>
+          </div>
+          <div class="mt-2">
+            <span class="badge bg-secondary">#펫보험</span>
+          </div>
+        </div>
+      </div>
+
+    <!-- 질문 등록 모달 -->
+    <div class="modal fade" id="qnaModal" tabindex="-1">
+      <div class="modal-dialog">
+        <form id="qnaForm" class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Q&A 질문 등록</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="productId" th:value="${product.productId}">
+            <div class="mb-3">
+              <label class="form-label">종(강아지/고양이)</label>
+              <input name="species" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">질문 내용</label>
+              <textarea name="question" class="form-control" rows="4" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn1" data-bs-dismiss="modal">취소</button>
+            <button type="submit" class="btn1">등록</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    </div>
+
+
+  
+  <th:block th:replace="fragments/footer :: footer"></th:block>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('qnaForm');
+
+  // csrf
+  const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    fetch('/insurance/qna/register-ajax', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        [csrfHeader]: csrfToken
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const qnaListArea = document.getElementById('qnaListArea');
+      qnaListArea.innerHTML = '';
+      if (data.length === 0) {
+        qnaListArea.innerHTML = `<div class="text-center text-muted small">등록된 질문이 없습니다.</div>`;
+      } else {
+        data.forEach(qna => {
+          qnaListArea.innerHTML += `
+            <div class="border p-3 rounded bg-light mb-3">
+              <span class="badge bg-warning mb-2">${qna.species}</span>
+              <p class="mb-1 small">${qna.question}</p>
+              <div class="small text-end text-muted">
+                ${qna.answer ? '1' : '0'} | ${qna.userId} | ${qna.createdAt}
+              </div>
+            </div>
+          `;
+        });
+      }
+      bootstrap.Modal.getInstance(document.getElementById('qnaModal')).hide();
+      form.reset();
+    })
+    .catch(err => {
+      console.error(err);
+      alert('등록 실패');
+    });
+  });
+});
+  </script>
+</body>
+</html>

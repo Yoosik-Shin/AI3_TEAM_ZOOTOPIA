@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aloha.zootopia.mapper.ParttimeJobApplicantMapper">
+
+  <!-- 지원 등록 -->
+  <insert id="insertApplicant">
+    INSERT INTO parttime_job_applicant
+    (job_id, user_id, introduction)
+    VALUES
+    (#{jobId}, #{userId}, #{introduction})
+  </insert>
+
+  <!-- 특정 알바의 지원자 조회 -->
+  <select id="selectApplicantsByJobId" resultType="com.aloha.zootopia.domain.ParttimeJobApplicant">
+    SELECT * FROM parttime_job_applicant
+    WHERE job_id = #{jobId}
+    ORDER BY created_at DESC
+  </select>
+
+  <!-- 지원 취소 -->
+  <delete id="deleteApplicant">
+    DELETE FROM parttime_job_applicant
+    WHERE applicant_id = #{applicantId}
+  </delete>
+
+  <!-- (선택) 지원자 소개글/평점 수정 -->
+  <update id="updateApplicant">
+    UPDATE parttime_job_applicant
+    SET introduction = #{introduction},
+        rating = #{rating},
+        review_count = #{reviewCount}
+    WHERE applicant_id = #{applicantId}
+  </update>
+
+</mapper>
