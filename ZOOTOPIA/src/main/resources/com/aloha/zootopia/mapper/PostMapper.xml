@@ -65,23 +65,9 @@
       </if>
     </where>
     ORDER BY p.post_id DESC
-    LIMIT #{index}, #{size}
+    LIMIT #{offset}, #{size}
   </select>
 
-  <select id="pageByCategory" resultMap="PostMap">
-    SELECT 
-      p.*,
-      u.nickname,
-      u.profile_img
-    FROM posts p
-    LEFT JOIN users u ON p.user_id = u.user_id
-    <where>
-      <if test="category != null and category != ''">
-        p.category = #{category}
-      </if>
-    </where>
-    ORDER BY p.post_id DESC
-  </select>
 
   <!-- 전체 수 -->
   <select id="count" resultType="long">
@@ -117,13 +103,13 @@
   </select>
 
   <!-- 등록 -->
-<insert id="insert" parameterType="com.aloha.zootopia.domain.Posts" useGeneratedKeys="true" keyProperty="postId">
-  INSERT INTO posts (
-    category, title, content, user_id, created_at, updated_at
-  ) VALUES (
-    #{category}, #{title}, #{content}, #{userId}, NOW(), NOW()
-  )
-</insert>
+  <insert id="insert" parameterType="com.aloha.zootopia.domain.Posts" useGeneratedKeys="true" keyProperty="postId">
+    INSERT INTO posts (
+      category, title, content, user_id, created_at, updated_at
+    ) VALUES (
+      #{category}, #{title}, #{content}, #{userId}, NOW(), NOW()
+    )
+  </insert>
 
 
   <!-- 썸네일만 업데이트 -->
@@ -196,5 +182,78 @@
       #{id}
     </foreach>
   </select>
+
+
+<!-- 게시글 검색 + 페이징 -->
+<select id="pageBySearch" resultMap="PostMap">
+  SELECT 
+    p.*,
+    u.nickname,
+    u.profile_img,
+    t.tag_id,
+    t.name AS tag_name
+  FROM posts p
+  LEFT JOIN users u ON p.user_id = u.user_id
+  LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+  LEFT JOIN tags t ON pt.tag_id = t.tag_id
+  <where>
+    <if test="type == 'title'">
+      p.title LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    <if test="type == 'titleContent'">
+      (p.title LIKE CONCAT('%', #{keyword}, '%') OR p.content LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    <if test="type == 'tag'">
+      p.post_id IN (
+        SELECT pt.post_id
+        FROM post_tags pt
+        JOIN tags t ON pt.tag_id = t.tag_id
+        WHERE t.name LIKE CONCAT('%', #{keyword}, '%')
+      )
+    </if>
+  </where>
+  ORDER BY p.post_id DESC
+  LIMIT #{pagination.offset}, #{pagination.limit}
+</select>
+
+<select id="countBySearch" resultType="long">
+  SELECT COUNT(*) FROM posts
+  <where>
+    <if test="type == 'title'">
+      title LIKE CONCAT('%', #{keyword}, '%')
+    </if>
+    <if test="type == 'titleContent'">
+      (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+    </if>
+    <if test="type == 'tag'">
+      post_id IN (
+        SELECT pt.post_id
+        FROM post_tags pt
+        JOIN tags t ON pt.tag_id = t.tag_id
+        WHERE t.name LIKE CONCAT('%', #{keyword}, '%')
+      )
+    </if>
+  </where>
+</select>
+
+<select id="pageByPopularity" resultMap="PostMap">
+  SELECT 
+    p.*,
+    u.nickname,
+    u.profile_img
+  FROM posts p
+  LEFT JOIN users u ON p.user_id = u.user_id
+  <where>
+    <if test="category != null and category != ''">
+      p.category = #{category}
+    </if>
+  </where>
+  ORDER BY (p.view_count * 0.3 + p.like_count * 1.0 + p.comment_count * 0.7) DESC
+  LIMIT #{offset}, #{size}
+  
+</select>
+
+
+
 
 </mapper>

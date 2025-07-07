@@ -33,4 +33,16 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Integer commentId) {
         commentMapper.softDelete(commentId);
     }
+    
+    @Override
+    public void updateCommentContent(Comment comment) {
+        commentMapper.updateContent(comment);
+    }
+
+    @Override
+    public Comment findById(Integer commentId) {
+        return commentMapper.findById(commentId);
+    }
+    
+
 }
