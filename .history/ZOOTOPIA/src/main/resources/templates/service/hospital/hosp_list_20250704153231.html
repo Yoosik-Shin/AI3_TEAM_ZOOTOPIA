@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병원 리스트</title>
+    <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
+</head>
+<body>
+    <th:block th:replace="~{/fragments/header :: header}"></th:block>
+    <div class="container">
+        <!-- 상단 로고 -->
+        <div class="logo-container">
+            <div class="logo">
+                <img th:src="@{/img/hosp_logo.png}" alt="병원 아이콘" class="logo-icon">
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="main-content">
+            <!-- 필터 섹션 -->
+            <div class="filter-section">
+                <div class="filter-tags">
+                    <span class="filter-tag active">#파충류</span>
+                    <span class="filter-tag">#조류</span>
+                    <span class="filter-tag">#포유류</span>
+                    <span class="filter-tag">#설치류</span>
+                    <span class="filter-tag">#절지류</span>
+                </div>
+            </div>
+
+            <!-- 검색 폼 (숨겨진 상태로 백엔드와 연결) -->
+            <!-- <form th:action="@{/hospitals}" method="get">
+                <div th:each="animal : ${animalList}">
+                    <input type="checkbox" name="animal" th:value="${animal.animalId}" th:checked="${selectedAnimals.contains(animal.animalId)}">
+                    <label th:text="${animal.species}"></label>
+                </div>
+                <button type="submit">검색</button>
+            </form> -->
+
+            <form th:action="@{/hospitals}" method="get" class="search-con">
+                <div th:each="animal : ${animalList}" >
+                    <input
+                    type="checkbox"
+                    th:id="'animal-' + ${animal.animalId}"
+                    name="animal"
+                    th:value="${animal.animalId}"
+                    th:checked="${selectedAnimals != null and selectedAnimals.contains(animal.animalId)}"
+                    class="pill-checkbox"
+                    onchange="this.form.submit()"
+                    />
+                    <label
+                    th:for="'animal-' + ${animal.animalId}"
+                    th:text="${animal.species}"
+                    class="pill-label"
+                    ></label>
+                </div>
+                <button type="submit" style="display:none;">검색</button>
+            </form>
+
+
+
+            <!-- 병원 카드 리스트 -->
+            <div class="hospital-grid">
+                <div th:if="${#lists.isEmpty(hospitalList)}" class="no-hospitals">                                                       
+                    <p>표시할 병원이 없습니다.</p>                                                                 
+                </div>                                                                                             
+                    <!-- <div th:each="hospital : ${hospitals}" class="hospital-card"                                       
+                        th:onclick="|location.href='@{/hospitals/{id}(id=${hospital.hospitalId})}'|">                    -->
+                    <div th:each="hospital : ${hospitalList}" class="hospital-card"                                 
+                        th:onclick="|location.href='@{/hospitals/{id}(id=${hospital.hospitalId})}'|">
+                    <div class="hospital-image">
+                        <img src="hospital-building.jpg" alt="병원 이미지" class="card-image">
+                    </div>
+                    <div class="hospital-info">
+                        <h3 class="hospital-name" th:text="${hospital.name}">아크리스 특수 동물 병원</h3>
+                        <p class="hospital-location" th:text="${hospital.address}">서울 강남구</p>
+                        <div class="hospital-tags">
+                            <span th:each="animal : ${hospital.animals}" class="hospital-tag" th:text="'#' + ${animal.species}">#파충류 #조류 #포유류 #설치류</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 더미 카드들 (이미지 스타일 참조용)
+                <div class="hospital-card">
+                    <div class="hospital-image">
+                        <img src="hospital-building.jpg" alt="병원 이미지" class="card-image">
+                    </div>
+                    <div class="hospital-info">
+                        <h3 class="hospital-name">아크리스 특수 동물 병원</h3>
+                        <p class="hospital-location">서울 강남구</p>
+                        <div class="hospital-tags">
+                            <span class="hospital-tag">#파충류</span>
+                            <span class="hospital-tag">#조류</span>
+                            <span class="hospital-tag">#포유류</span>
+                            <span class="hospital-tag">#설치류</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hospital-card">
+                    <div class="hospital-image">
+                        <img src="hospital-building.jpg" alt="병원 이미지" class="card-image">
+                    </div>
+                    <div class="hospital-info">
+                        <h3 class="hospital-name">아크리스 특수 동물 병원</h3>
+                        <p class="hospital-location">서울 강남구</p>
+                        <div class="hospital-tags">
+                            <span class="hospital-tag">#파충류</span>
+                            <span class="hospital-tag">#조류</span>
+                            <span class="hospital-tag">#포유류</span>
+                            <span class="hospital-tag">#설치류</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hospital-card">
+                    <div class="hospital-image">
+                        <img src="hospital-building.jpg" alt="병원 이미지" class="card-image">
+                    </div>
+                    <div class="hospital-info">
+                        <h3 class="hospital-name">아크리스 특수 동물 병원</h3>
+                        <p class="hospital-location">서울 강남구</p>
+                        <div class="hospital-tags">
+                            <span class="hospital-tag">#파충류</span>
+                            <span class="hospital-tag">#조류</span>
+                            <span class="hospital-tag">#포유류</span>
+                            <span class="hospital-tag">#설치류</span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            
+            
+            
+            <!-- 페이지네이션 -->
+            <div class="pagination">
+                <!-- 맨앞으로 -->
+                <a th:if="${pageInfo.pageNum > 1}" th:href="@{/hospitals(pageNum=1, animal=${selectedAnimals})}" class="page-link">&laquo;</a>
+                <!-- 이전 -->
+                <a th:if="${pageInfo.hasPreviousPage}" th:href="@{/hospitals(pageNum=${pageInfo.pageNum - 1}, animal=${selectedAnimals})}" class="page-link">&lt;</a>
+                <!-- 페이지 번호 -->
+                <span th:each="i : ${#numbers.sequence(pageInfo.startPage, pageInfo.endPage)}">
+                    <a th:href="@{/hospitals(pageNum=${i}, animal=${selectedAnimals})}"
+                       th:class="'page-link' + (${i} == ${pageInfo.pageNum} ? ' active' : '')"
+                       th:text="${i}">1</a>
+                </span>
+                <!-- 다음 -->
+                <a th:if="${pageInfo.hasNextPage}" th:href="@{/hospitals(pageNum=${pageInfo.pageNum + 1}, animal=${selectedAnimals})}" class="page-link">&gt;</a>
+                <!-- 맨뒤로 -->
+                <a th:if="${pageInfo.hasLastPage}" th:href="@{/hospitals(pageNum=${pageInfo.pages}, animal=${selectedAnimals})}" class="page-link">&raquo;</a>
+            </div>
+
+        </div>
+    </div>
+    <th:block th:replace="~{/fragments/footer :: footer}"></th:block>
+</body>
+</html>
