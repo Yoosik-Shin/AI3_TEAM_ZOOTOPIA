@@ -82,11 +82,12 @@
     if (e.key === 'Enter' && !e.isComposing) e.preventDefault();
   });
 
- const editor = new toastui.Editor({
+  const editor = new toastui.Editor({
     el: document.querySelector('#editor'),
     height: '500px',
     initialEditType: 'wysiwyg',
     previewStyle: 'vertical',
+    initialValue: initialContent,   // ← 이 부분 추가해야 기존 이미지 포함 글이 표시됨
     hooks: {
       addImageBlobHook: async (blob, callback) => {
         const formData = new FormData();
@@ -98,10 +99,11 @@
         const result = await res.json();
         callback(result.imageUrl);
         const editorInstance = editor.getInstance();
-        editorInstance.insertText('\n\n'); 
+        editorInstance.insertText('\n\n');
       }
     }
   });
+
 
   // 전송 시 editor 내용 반영
   function onSubmit() {
