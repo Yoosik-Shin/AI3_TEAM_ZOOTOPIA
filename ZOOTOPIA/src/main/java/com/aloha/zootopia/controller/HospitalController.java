@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aloha.zootopia.domain.Hospital;
@@ -44,6 +45,28 @@ public class HospitalController {
     //     model.addAttribute("hospitals", hospitalService.getHospitals(animal));
     //     return "service/hospital/hosp_list";
     // }
+
+    @GetMapping("/auth-test")
+     @ResponseBody // 페이지 이동 없이 응답을 바로 확인하기 위함
+    public String authTest() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser"
+    )) {
+            return "로그인되지 않은 사용자입니다.";
+    }
+
+        String username = auth.getName();
+        java.util.Collection<? extends org.springframework.security.core.GrantedAuthority>
+        authorities = auth.getAuthorities();
+
+        System.out.println("--- 권한 테스트 ---");
+        System.out.println("사용자: " + username);
+        System.out.println("권한: " + authorities);
+        System.out.println("-------------------");
+
+        return "사용자: " + username + " / 권한: " + authorities;
+    }
 
     @GetMapping("/hospitals")
     public String list(
@@ -97,23 +120,23 @@ public class HospitalController {
         return "service/hospital/details";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/hospitals/new")
     public String createForm(Model model) {
 
         // 인증 객체에서 권한 정보 로그 출력
-        org.springframework.security.core.Authentication auth = 
+        org.springframework.security.core.Authentication auth =
             org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         System.out.println("현재 로그인 사용자: " + auth.getName());
         System.out.println("권한 목록: " + auth.getAuthorities());
-        
+
         model.addAttribute("hospitalForm", new HospitalForm());
         model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
         model.addAttribute("animalList", hospitalService.getAllAnimals());
         return "service/hospital/create_hospital";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/hospitals/new")
     public String create(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
         if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
@@ -137,7 +160,7 @@ public class HospitalController {
         hospitalForm.setPhone(hospital.getPhone());
         hospitalForm.setEmail(hospital.getEmail());
         hospitalForm.setThumbnailImageUrl(hospital.getThumbnailImageUrl());
-        
+
         // 진료 과목 및 진료 가능 동물 ID 리스트 설정
         if (hospital.getSpecialties() != null) {
             hospitalForm.setSpecialtyIds(hospital.getSpecialties().stream()
