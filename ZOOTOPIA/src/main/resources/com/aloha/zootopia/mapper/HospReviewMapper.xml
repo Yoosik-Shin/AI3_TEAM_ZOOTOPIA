@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aloha.zootopia.mapper.HospReviewMapper">
+
+  <!-- 특정 병원의 리뷰 리스트 조회 -->
+  <select id="findByHospitalId" parameterType="int" resultType="com.aloha.zootopia.domain.HospReview">
+    SELECT r.review_id, r.rating, r.content, r.created_at, r.hospital_id, r.user_id, u.nickname
+    FROM hospital_review r
+    JOIN users u ON r.user_id = u.user_id
+    WHERE r.hospital_id = #{hospitalId}
+    ORDER BY r.created_at DESC
+  </select>
+
+  <!-- 리뷰 등록 -->
+  <insert id="insertReview" parameterType="com.aloha.zootopia.domain.HospReview" useGeneratedKeys="true" keyProperty="reviewId">
+    INSERT INTO hospital_review (rating, content, hospital_id, user_id)
+    VALUES (#{rating}, #{content}, #{hospitalId}, #{userId})
+  </insert>
+
+  <!-- 평균 별점 조회 -->
+  <select id="findAvgRating" parameterType="int" resultType="double">
+    SELECT AVG(rating) FROM hospital_review WHERE hospital_id = #{hospitalId}
+  </select>
+    <!-- 리뷰 개수 조회 -->
+    <select id="findReviewCount" parameterType="int" resultType="int">
+    SELECT COUNT(*) FROM hospital_review WHERE hospital_id = #{hospitalId}
+    </select>
+    <!-- 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="int">
+    DELETE FROM hospital_review WHERE review_id = #{reviewId}
+    </delete>
+    <!-- 리뷰 수정 -->
+    <update id="updateReview">
+        UPDATE hospital_review
+        SET content = #{content}, updated_at = NOW()
+        WHERE review_id = #{reviewId} AND user_id = #{userId}
+    </update>
+
+    <!-- 리뷰 단건 조회 -->
+    <select id="findById" parameterType="int" resultType="com.aloha.zootopia.domain.HospReview">
+        SELECT review_id, rating, content, created_at, hospital_id, user_id
+        FROM hospital_review
+        WHERE review_id = #{reviewId}
+    </select>
+    
+</mapper>

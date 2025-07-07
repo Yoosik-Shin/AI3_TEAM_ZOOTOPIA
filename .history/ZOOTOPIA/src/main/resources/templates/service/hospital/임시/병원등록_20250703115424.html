@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>병원 등록</title>
+  <link rel="stylesheet" href="/ZOOTOPIA/src/main/resources/static/" />
+</head>
+<body>
+  <header>
+    <img src="/images/hospital-icon.png" alt="병원 아이콘" class="header-icon" />
+  </header>
+
+  <main class="container">
+    <div class="form-box">
+      <div class="form-content">
+        <div class="image-upload">
+          <div class="image-placeholder"></div>
+        </div>
+
+        <div class="form-fields">
+          <div class="form-row"><label>병원 이름</label><input type="text" placeholder="병원 이름을 작성하세요"></div>
+          <div class="form-row"><label>진료 과목</label><input type="text" placeholder="취급 진료 과목을 작성하세요"></div>
+          <div class="form-row"><label>진료 가능 동물</label><input type="text" placeholder="취급 동물을 작성하세요"></div>
+          <div class="form-row"><label>병원 주소</label><input type="text" placeholder="주소를 입력해 주세요"></div>
+          <div class="form-row"><label>홈페이지</label><input type="text" placeholder="홈페이지 주소를 입력해 주세요"></div>
+          <div class="form-row"><label>대표번호</label><input type="text" placeholder="병원 전화번호를 입력하세요"></div>
+          <div class="form-row"><label>이메일</label><input type="email" placeholder="이메일 주소를 입력하세요"></div>
+        </div>
+      </div>
+
+      <div class="category-section">
+        <p>카테고리</p>
+        <div class="checkbox-group">
+          <label><input type="checkbox"> 포유류</label>
+          <label><input type="checkbox"> 파충류</label>
+          <label><input type="checkbox"> 조류</label>
+          <label><input type="checkbox"> 양서류</label>
+          <label><input type="checkbox"> 설치류</label>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button class="submit-btn">게시하기</button>
+        <button class="cancel-btn">돌아가기</button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
