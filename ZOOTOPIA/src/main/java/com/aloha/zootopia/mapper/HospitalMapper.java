@@ -15,6 +15,10 @@ public interface HospitalMapper {
     void insertHospital(Hospital hospital);
     void insertHospitalAnimal(@Param("hospitalId") Integer hospitalId, @Param("animalId") Integer animalId);
     void insertHospitalSpecialty(@Param("hospitalId") Integer hospitalId, @Param("specialtyId") Integer specialtyId);
+    void updateHospital(Hospital hospital);
+    void deleteHospitalAnimals(@Param("hospitalId") Integer hospitalId);
+    void deleteHospitalSpecialties(@Param("hospitalId") Integer hospitalId);
     List<Hospital> selectHospitals(@Param("offset") int offset, @Param("limit") int limit, @Param("animalIds") List<Integer> animalIds);
     int countHospitals(@Param("animalIds") List<Integer> animalIds);
+    void deleteHospital(@Param("hospitalId") Integer hospitalId);
 }

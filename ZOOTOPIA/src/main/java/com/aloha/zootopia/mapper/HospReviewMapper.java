@@ -15,5 +15,6 @@ public interface HospReviewMapper {
     int findReviewCount(@Param("hospitalId") Integer hospitalId);
     int deleteReview(@Param("reviewId") Integer reviewId, @Param("userId") Integer userId);
     void updateReview(@Param("reviewId") Integer reviewId, @Param("content") String content, @Param("userId") Integer userId);
+    void deleteReviewsByHospitalId(@Param("hospitalId") Integer hospitalId);
     HospReview findById(@Param("reviewId") Integer reviewId);
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,23 +97,80 @@ public class HospitalController {
         return "service/hospital/details";
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/hospitals/new")
     public String createForm(Model model) {
+
+        // 인증 객체에서 권한 정보 로그 출력
+        org.springframework.security.core.Authentication auth = 
+            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("현재 로그인 사용자: " + auth.getName());
+        System.out.println("권한 목록: " + auth.getAuthorities());
+        
         model.addAttribute("hospitalForm", new HospitalForm());
         model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
         model.addAttribute("animalList", hospitalService.getAllAnimals());
         return "service/hospital/create_hospital";
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/hospitals")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/hospitals/new")
     public String create(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
         if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
             String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
             form.setThumbnailImageUrl(imageUrl);
         }
         hospitalService.createHospital(form);
+        return "redirect:/hospitals";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/hospitals/edit/{id}")
+    public String editForm(@PathVariable Integer id, Model model) {
+        Hospital hospital = hospitalService.getHospital(id);
+        HospitalForm hospitalForm = new HospitalForm();
+        // Hospital 객체의 데이터를 HospitalForm으로 복사
+        hospitalForm.setHospitalId(hospital.getHospitalId());
+        hospitalForm.setName(hospital.getName());
+        hospitalForm.setAddress(hospital.getAddress());
+        hospitalForm.setHomepage(hospital.getHomepage());
+        hospitalForm.setPhone(hospital.getPhone());
+        hospitalForm.setEmail(hospital.getEmail());
+        hospitalForm.setThumbnailImageUrl(hospital.getThumbnailImageUrl());
+        
+        // 진료 과목 및 진료 가능 동물 ID 리스트 설정
+        if (hospital.getSpecialties() != null) {
+            hospitalForm.setSpecialtyIds(hospital.getSpecialties().stream()
+                                                .map(s -> s.getSpecialtyId())
+                                                .collect(Collectors.toList()));
+        }
+        if (hospital.getAnimals() != null) {
+            hospitalForm.setAnimalIds(hospital.getAnimals().stream()
+                                            .map(a -> a.getAnimalId())
+                                            .collect(Collectors.toList()));
+        }
+
+        model.addAttribute("hospitalForm", hospitalForm);
+        model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+        model.addAttribute("animalList", hospitalService.getAllAnimals());
+        return "service/hospital/create_hospital"; // create_hospital.html 재사용
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/hospitals/edit")
+    public String update(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
+        if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
+            String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
+            form.setThumbnailImageUrl(imageUrl);
+        }
+        hospitalService.updateHospital(form); // HospitalService에 updateHospital 메서드 필요
+        return "redirect:/hospitals/detail/" + form.getHospitalId();
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/hospitals/delete/{id}")
+    public String delete(@PathVariable Integer id) {
+        hospitalService.deleteHospital(id); // HospitalService에 deleteHospital 메서드 필요
         return "redirect:/hospitals";
     }
 

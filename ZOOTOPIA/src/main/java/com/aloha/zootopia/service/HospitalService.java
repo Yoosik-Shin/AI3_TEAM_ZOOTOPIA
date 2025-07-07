@@ -23,4 +23,6 @@ public interface HospitalService {
     List<Hospital> getHospitalList(List<Integer> animalIds, int pageNum, int pageSize);
     int getHospitalCount(List<Integer> animalIds);
     void updateReview(Integer reviewId, String content, Integer userId);
+    void updateHospital(HospitalForm form);
+    void deleteHospital(Integer id);
 }

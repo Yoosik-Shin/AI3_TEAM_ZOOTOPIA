@@ -100,5 +100,46 @@ public HospitalServiceImpl(HospitalMapper hospitalMapper) {
         reviewMapper.updateReview(reviewId, content, userId);
     }
 
+    @Override
+    public void updateHospital(HospitalForm form) {
+        Hospital hospital = new Hospital();
+        hospital.setHospitalId(form.getHospitalId()); // ID 설정
+        hospital.setName(form.getName());
+        hospital.setAddress(form.getAddress());
+        hospital.setHomepage(form.getHomepage());
+        hospital.setPhone(form.getPhone());
+        hospital.setEmail(form.getEmail());
+        hospital.setThumbnailImageUrl(form.getThumbnailImageUrl());
+
+        hospitalMapper.updateHospital(hospital); // 병원 기본 정보 업데이트
+
+        // 기존 동물 및 진료 과목 연결 삭제 후 새로 추가
+        hospitalMapper.deleteHospitalAnimals(hospital.getHospitalId());
+        hospitalMapper.deleteHospitalSpecialties(hospital.getHospitalId());
+
+        if (form.getAnimalIds() != null) {
+            for(Integer animalId : form.getAnimalIds()) {
+                hospitalMapper.insertHospitalAnimal(hospital.getHospitalId(), animalId);
+            }
+        }
+        if (form.getSpecialtyIds() != null) {
+            for(Integer specialtyId : form.getSpecialtyIds()) {
+                hospitalMapper.insertHospitalSpecialty(hospital.getHospitalId(), specialtyId);
+            }
+        }
+    }
+
+    @Override
+    public void deleteHospital(Integer id) {
+        // 관련 리뷰 삭제
+        reviewMapper.deleteReviewsByHospitalId(id); // HospReviewMapper에 deleteReviewsByHospitalId 메서드 필요
+        // 관련 동물 연결 삭제
+        hospitalMapper.deleteHospitalAnimals(id);
+        // 관련 진료 과목 연결 삭제
+        hospitalMapper.deleteHospitalSpecialties(id);
+        // 병원 정보 삭제
+        hospitalMapper.deleteHospital(id); // HospitalMapper에 deleteHospital 메서드 필요
+    }
+
 
 }

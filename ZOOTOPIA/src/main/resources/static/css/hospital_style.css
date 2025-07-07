@@ -12,7 +12,7 @@ body {
     line-height: 1.6;
 }
 
-.container {
+.hospital-main-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
@@ -133,7 +133,7 @@ body {
 /* 체크박스 검색 컨테이너 */
 .search-con {
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */ /* 이 부분을 주석 처리하거나 flex-start로 변경 */
     align-items: center;
 }
 
@@ -262,6 +262,11 @@ body {
 }
 
 /* 병원 리스트 페이징 */
+.pagination-container {
+    display: flex;
+    justify-content: center; /* 자식 요소를 가로 방향으로 가운데 정렬 */
+    width: 100%; /* 부모 컨테이너가 전체 너비를 차지하도록 보장 */
+}
 .pagination {
     margin-top: 30px;
     text-align: center;

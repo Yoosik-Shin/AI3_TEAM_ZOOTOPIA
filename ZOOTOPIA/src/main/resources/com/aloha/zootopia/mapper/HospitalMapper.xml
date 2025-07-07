@@ -58,6 +58,28 @@
     VALUES (#{hospitalId}, #{specialtyId})
   </insert>
 
+  <update id="updateHospital" parameterType="Hospital">
+    UPDATE hospital_info
+    SET
+      name = #{name},
+      address = #{address},
+      homepage = #{homepage},
+      phone = #{phone},
+      email = #{email},
+      thumbnail_image_url = #{thumbnailImageUrl}
+    WHERE hospital_id = #{hospitalId}
+  </update>
+
+  <delete id="deleteHospitalAnimals" parameterType="int">
+    DELETE FROM hospital_animal
+    WHERE hospital_id = #{hospitalId}
+  </delete>
+
+  <delete id="deleteHospitalSpecialties" parameterType="int">
+    DELETE FROM hospital_specialty
+    WHERE hospital_id = #{hospitalId}
+  </delete>
+
   <select id="selectHospitals" resultMap="HospitalResultMap">
     SELECT h.*, (SELECT AVG(rating) FROM hospital_review r WHERE r.hospital_id = h.hospital_id) AS avg_rating
     FROM hospital_info h
@@ -89,5 +111,11 @@
 
     </if>
   </select>
+
+  <!-- 병원 삭제 -->
+  <delete id="deleteHospital" parameterType="int">
+    DELETE FROM hospital_info
+    WHERE hospital_id = #{hospitalId}
+  </delete>
 
 </mapper>
