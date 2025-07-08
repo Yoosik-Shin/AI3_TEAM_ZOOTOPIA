@@ -28,20 +28,26 @@ CREATE TABLE `lost_animal_videos` (
 DROP TABLE IF EXISTS `lost_animals`;
 
 CREATE TABLE `lost_animals` (
-  `post_id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `post_id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(200) NOT NULL,
-  `description` TEXT,
+  `content` TEXT NOT NULL,            
   `lost_location` VARCHAR(255),
   `lost_time` DATETIME,
   `contact_phone` VARCHAR(30),
+
   `view_count` INT DEFAULT 0,
   `like_count` INT DEFAULT 0,
   `comment_count` INT DEFAULT 0,
-  `created_at` DATETIME DEFAULT NOW(),
-  `updated_at` DATETIME DEFAULT NOW() ON UPDATE NOW(),
-  `is_deleted` BOOLEAN DEFAULT FALSE,
-  `user_id` INT
-);
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_id` INT DEFAULT NULL,
+  `thumbnail_url` VARCHAR(255) DEFAULT NULL,
+
+  PRIMARY KEY (`post_id`),
+  KEY `FK_users_TO_lost_animals` (`user_id`),
+  CONSTRAINT `FK_users_TO_lost_animals` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 DROP TABLE IF EXISTS `posts`;
 
@@ -165,4 +171,32 @@ CREATE TABLE post_tags (
   FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
 ) COMMENT='게시글-태그 연결';
 
+CREATE TABLE lost_animal_tags (
+  post_id INT NOT NULL,
+  tag_id INT NOT NULL,
+  PRIMARY KEY (post_id, tag_id),
+  FOREIGN KEY (post_id) REFERENCES lost_animals(post_id) ON DELETE CASCADE,
+  FOREIGN KEY (tag_id) REFERENCES tags(tag_id) ON DELETE CASCADE
+) COMMENT='유실동물 게시글-태그 연결';
+
+
+CREATE TABLE `lost_animal_comments` (
+  `comment_id` INT NOT NULL AUTO_INCREMENT,
+  `content` TEXT NOT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_deleted` TINYINT(1) DEFAULT 0,
+  `user_id` INT DEFAULT NULL,
+  `post_id` INT DEFAULT NULL,
+  `secret` TINYINT(1) DEFAULT 0, 
+
+  PRIMARY KEY (`comment_id`),
+  KEY `FK_users_TO_lost_animal_comments` (`user_id`),
+  KEY `FK_lost_post_TO_lost_animal_comments` (`post_id`),
+
+  CONSTRAINT `FK_lost_post_TO_lost_animal_comments` 
+    FOREIGN KEY (`post_id`) REFERENCES `lost_animals` (`post_id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_users_TO_lost_animal_comments` 
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='유실동물 게시판 댓글';
 

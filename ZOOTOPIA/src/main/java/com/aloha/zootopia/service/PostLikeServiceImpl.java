@@ -30,6 +30,9 @@ public class PostLikeServiceImpl implements PostLikeService {
     public boolean isLiked(int postId, long userId) {
         return postLikeMapper.isLiked(postId, userId);
     }
+
+
+    
     
 }
 

@@ -334,6 +334,4 @@ public class PostController {
         return "redirect:/posts/read/" + postId;
     }
 
-
-
 }

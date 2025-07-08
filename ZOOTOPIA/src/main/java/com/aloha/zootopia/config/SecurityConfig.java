@@ -58,11 +58,13 @@ public class SecurityConfig {
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/comments/add").authenticated() 
                                 .requestMatchers("/posts/upload/image").permitAll()
+                                .requestMatchers("/lost/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
                                 .anyRequest().permitAll()
                                 );
         http.csrf(csrf -> csrf
             .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
+            .ignoringRequestMatchers("/lost/upload/image") // ✅ CSRF 무시 설정
         );
 
                         

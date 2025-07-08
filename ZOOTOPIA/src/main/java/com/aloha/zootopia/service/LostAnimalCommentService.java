@@ -1,12 +1,10 @@
 package com.aloha.zootopia.service;
 
+import com.aloha.zootopia.domain.Comment;
 import java.util.List;
 
-import com.aloha.zootopia.domain.Comment;
+public interface LostAnimalCommentService {
 
-public interface CommentService {
-
-    // 커뮤니티 댓글
     List<Comment> getCommentsByPostId(Integer postId);
     void addComment(Comment comment);
     void deleteComment(Integer commentId);
@@ -14,4 +12,3 @@ public interface CommentService {
     Comment findById(Integer commentId);
 
 }
-
