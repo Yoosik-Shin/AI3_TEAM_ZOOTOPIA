@@ -1,0 +1,18 @@
+{
+    "sourceFile": "ZOOTOPIA/src/main/java/com/aloha/zootopia/service/UserDetailServiceImpl.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1751901515833,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1751901515833,
+            "name": "Commit-0",
+            "content": "package com.aloha.zootopia.service;\r\n\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.security.core.userdetails.UserDetails;\r\nimport org.springframework.security.core.userdetails.UserDetailsService;\r\nimport org.springframework.security.core.userdetails.UsernameNotFoundException;\r\nimport org.springframework.stereotype.Service;\r\n\r\nimport com.aloha.zootopia.domain.CustomUser;\r\nimport com.aloha.zootopia.domain.Users;\r\nimport com.aloha.zootopia.mapper.UserMapper;\r\n\r\nimport lombok.extern.slf4j.Slf4j;\r\n\r\n/**\r\n * 🔐 UserDetailsService : 사용자 정보 불러오는 인터페이스\r\n * ✅ 이 인터페이스를 구현하여, 사용자 정보를 로드하는 방법을 정의할 수 있다.\r\n */\r\n@Slf4j\r\n@Service\r\npublic class UserDetailServiceImpl implements UserDetailsService {\r\n\r\n    @Autowired\r\n    private UserMapper userMapper;\r\n\r\n    @Override\r\n    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {\r\n        log.info(\":::::::::: UserDetailServiceImpl ::::::::::\");\r\n        log.info(\"- 사용자 정의 인증을 위해, 사용자 정보 조회\");\r\n        log.info(\"- username : {} \", email);\r\n\r\n        Users user = null;\r\n        try {\r\n            // 👩‍💼 사용자 정보 및 권한 조회\r\n            user = userMapper.select(email);\r\n        } catch (Exception e) {\r\n            log.error(\"사용자 정보 조회 시 에러 발생 : \", e);\r\n            e.printStackTrace();\r\n        }\r\n        if( user == null ) {\r\n            throw new UsernameNotFoundException(\"사용자 정보를 찾을 수 없습니다. - \" + email);\r\n        }\r\n        // 🔐 Users ➡ CustomUser ➡ UserDetails\r\n        CustomUser customUser = new CustomUser(user);\r\n        return customUser;\r\n    }\r\n\r\n}\r\n"
+        }
+    ]
+}

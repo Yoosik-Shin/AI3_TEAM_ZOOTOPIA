@@ -32,19 +32,19 @@ public class SecurityConfig {
     @Autowired
     private DataSource dataSource;
 
-    // @Autowired 
+    // @Autowired
     // private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserDetailServiceImpl userDetailServiceImpl;
 
-    @Autowired 
+    @Autowired
     private LoginSuccessHandler loginSuccessHandler;
 
-    @Autowired 
+    @Autowired
     private LoginFailureHandler loginFailureHandler;
 
-    @Autowired 
+    @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
 
 
@@ -52,15 +52,17 @@ public class SecurityConfig {
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        http.csrf(csrf -> csrf
+                                .ignoringRequestMatchers("/hospitals/new", "/hospitals/edit")
+        );
+
         // ✅ 인가 설정
         
         http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
-                                .requestMatchers("/comments/add").authenticated() 
+                                .requestMatchers("/comments/add").authenticated()
                                 .requestMatchers("/images/**").permitAll()
-                                .requestMatchers("/hospitals/new").hasAuthority("ROLE_ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/hospitals").hasAuthority("ROLE_ADMIN")
                                 .requestMatchers("/hospitals", "/hospitals/detail/**").permitAll()
                                 .anyRequest().permitAll()
                                 );
@@ -80,7 +82,7 @@ public class SecurityConfig {
                                      // .defaultSuccessUrl("/?=true") // 로그인 성공 경로
                                      .successHandler(loginSuccessHandler)      // 로그인 성공 핸들러 설정
                                      .failureHandler(loginFailureHandler)      // 로그인 실패 핸들러 설정
-        
+
                         );
 
         http.exceptionHandling( exception -> exception
@@ -89,7 +91,7 @@ public class SecurityConfig {
                                             // 접근 거부 핸들러 설정
                                             .accessDeniedHandler(customAccessDeniedHandler)
 
-                                );                           
+                                );
 
         // 👩‍💼 사용자 정의 인증
         http.userDetailsService(userDetailServiceImpl);
@@ -116,7 +118,7 @@ public class SecurityConfig {
     @Bean
     public PersistentTokenRepository tokenRepository() {
         // JdbcTokenRepositoryImpl : 토큰 저장 데이터 베이스를 등록하는 객체
-        JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl(); 
+        JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl();
         // 토큰 저장소를 사용하는 데이터 소스 지정
         repositoryImpl.setDataSource(dataSource);
         // persistent_logins 테이블 자동 생성
@@ -158,7 +160,7 @@ public class SecurityConfig {
      */
     // @Bean
     // public UserDetailsService userDetailsService() {
-    //     JdbcUserDetailsManager userDetailsManager 
+    //     JdbcUserDetailsManager userDetailsManager
     //             = new JdbcUserDetailsManager(dataSource);
 
     //     // 사용자 인증 쿼리
@@ -184,10 +186,10 @@ public class SecurityConfig {
      * @throws Exception
     */
     @Bean
-    public AuthenticationManager authenticationManager( 
+    public AuthenticationManager authenticationManager(
                                     AuthenticationConfiguration authenticationConfiguration ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    
+
 }
