@@ -57,9 +57,15 @@ public class SecurityConfig {
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/comments/add").authenticated() 
+                                .requestMatchers("/posts/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
                                 .anyRequest().permitAll()
                                 );
+        http.csrf(csrf -> csrf
+            .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
+        );
+
+                        
 
 
 

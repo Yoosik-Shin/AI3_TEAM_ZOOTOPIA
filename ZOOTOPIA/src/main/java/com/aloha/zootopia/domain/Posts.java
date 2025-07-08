@@ -42,4 +42,5 @@ public class Posts {
     private String tags;
 
     private List<Tag> tagList;
+    
 }

@@ -37,4 +37,4 @@ fileHashes.lock
 settings.json
 launch.json
 
-.gradle
+.gradle/

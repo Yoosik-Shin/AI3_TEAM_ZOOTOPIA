@@ -22,4 +22,5 @@ public class Comment {
     private int postId;      
     private String nickname;     
     private String profileImg;   
+    
 }
