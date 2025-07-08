@@ -31,6 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
         // 파트 최대 개수 설정 (기본값 1024)
         // FileCountLimitExceededException 해결을 위해 넉넉하게 설정
         factory.setMaxRequestParts(2048);
+        factory.setMaxRequestParts(2048);
         factory.setMaxFileSize(DataSize.ofMegabytes(10));
         factory.setMaxRequestSize(DataSize.ofMegabytes(100));
         return factory.createMultipartConfig();
