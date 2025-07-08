@@ -27,7 +27,7 @@
                     </div>
 
                 <div class="form-section">
-  
+
                         <div class="form-group">
                             <label for="name">병원 이름</label>
                             <input type="text" id="name" th:field="*{name}" placeholder="병원 이름을 작성하세요" required>
@@ -108,6 +108,36 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+
+            <!-- 삭제 form -->
+            <div sec:authorize="hasAuthority('ROLE_ADMIN')" th:if="${hospitalForm.hospitalId != null}">
+                <form id="deleteForm" th:action="@{/hospitals/delete/{id}(id=${hospitalForm.hospitalId})}" method="post" style="display: none;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                </form>
+            </div>
+
+            <!-- 버튼 그룹 -->
+            <div class="button-group" style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn btn-cancel" onclick="history.back()">취소하기</button>
+                <button type="button" id="submitAllBtn" class="btn btn-submit" th:text="${hospitalForm.hospitalId != null ? '수정하기' : '등록하기'}"></button>
+                <button sec:authorize="hasAuthority('ROLE_ADMIN')" th:if="${hospitalForm.hospitalId != null}" type="button" id="deleteBtn" class="btn btn-danger">삭제하기</button>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>

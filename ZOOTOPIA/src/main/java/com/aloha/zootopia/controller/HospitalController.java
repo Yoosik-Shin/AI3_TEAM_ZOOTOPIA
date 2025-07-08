@@ -52,6 +52,10 @@ public class HospitalController {
     //     return "service/hospital/hosp_list";
     // }
 
+    /**
+     * 인증 테스트용 메서드
+     * @return
+     */
     @GetMapping("/auth-test")
      @ResponseBody // 페이지 이동 없이 응답을 바로 확인하기 위함
     public String authTest() {
@@ -73,6 +77,8 @@ public class HospitalController {
 
         return "사용자: " + username + " / 권한: " + authorities;
     }
+
+
 
     @GetMapping("/hospitals")
     public String list(
