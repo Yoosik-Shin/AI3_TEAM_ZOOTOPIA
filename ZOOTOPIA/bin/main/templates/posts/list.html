@@ -1,225 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시판</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <meta charset="UTF-8">
+  <title>커뮤니티 목록</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/list.css}">
 </head>
+
 <body>
-    <div class="container">
-        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom"> 
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-                <img class="d-block mx-auto" src="/assets/brand/bootstrap-logo.svg" alt="" width="40" height="32">
-                <span class="fs-4">Simple header</span> </a>
-            <ul class="nav nav-pills">
-                <li class="nav-item"><a href="/posts/list" class="nav-link active" aria-current="page">게시판</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">Pricing</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">FAQs</a></li>
-                <li class="nav-item"><a href="#" class="nav-link">About</a></li>
-            </ul>
-        </header>
+  <!-- header -->
+  <div th:replace="fragments/header :: header"></div>
+  <!-- 🔥 실시간 인기게시물 -->
+  <section class="hot-posts">
+    <h2>🔥 실시간 인기게시물</h2>
+    <div class="hot-posts-columns d-flex flex-row gap-5">
+      <!-- 왼쪽 5개 -->
+      <ol class="list-unstyled">
+        <li th:each="post, iterStat : ${topList}">
+          <div class="mb-1" th:if="${iterStat.count <= 5}">
+            <div class="d-flex justify-itmes-center">
+              <span class="bd-no text-center fw-bold" th:text="${iterStat.count}"></span>
+              <span class="bd-ca badge mx-2 text-center" th:text="${post.category}"></span>
+              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}"
+                th:text="${post.title != null ? post.title : '제목없음'}"></a>
+            </div>
+          </div>
+        </li>
+      </ol>
+
+      <!-- 오른쪽 5개 -->
+      <ol class="list-unstyled">
+        <li th:each="post, iterStat : ${topList}">
+          <div class="mb-1" th:if="${iterStat.count > 5}">
+            <div class="d-flex justify-itmes-center">
+              <span class="bd-no text-start fw-bold" th:text="${iterStat.count}"></span>
+              <span class="bd-ca badge mx-2" th:text="${post.category}"></span>
+              <a class="hot-title" th:href="@{'/posts/read/' + ${post.postId}}"
+                th:text="${post.title != null ? post.title : '제목없음'}"></a>
+            </div>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 광고 배너 -->
+  <div class="banner">
+    <img th:src="@{/img/catppl.jpg}" alt="광고배너">
+  </div>
+
+  <!-- 📋 커뮤니티 목록 -->
+  <section class="community-list">
+    <div class="community-header">
+      <div class="title-with-icon">
+        <img th:src="@{/img/chat.png}" class="icon">
+        <h2 class="fs-3 mb-0">커뮤니티</h2>
+      </div>
+      <div class="community-controls">
+        <form method="get" th:action="@{/posts/list}" class="d-flex align-items-center">
+          <select name="sort" class="form-select w-auto me-2" onchange="this.form.submit()">
+            <option value="latest" th:selected="${sort == 'latest'}">최신순</option>
+            <option value="popular" th:selected="${sort == 'popular'}">인기순</option>
+          </select>
+        </form>
+        <a href="/posts/create" class="btn-write" sec:authorize="isAuthenticated()">
+          <img th:src="@{/img/write.png}" class="icon"> 글쓰기
+        </a>
+      </div>
     </div>
 
-    <!-- PageHelper 게시글 목록 -->
-    <div class="container my-5 py-5">
-        <h1 class="text-center">PageHelper</h1>
-        <div class="d-flex justify-content-between align-items-center my-3">
-            <div>
-                <a href="/posts/create" class="btn btn-primary">글쓰기</a>
-            </div>
-
-            <div>
-                <select class="form-select" aria-label="Default select example"
-                    th:field="${pagination.size}"
-                    onchange="location.href = '/posts/list?page=1&size=' + this.value"
-                    >
-                    <option value="5" >5 개씩 보기</option>
-                    <option value="10" >10 개씩 보기</option>
-                    <option value="30" >30 개씩 보기</option>
-                    <option value="50" >50 개씩 보기</option>
-                    <option value="100" >100 개씩 보기</option>
-                </select>
-            </div>
+    <!-- 게시글 리스트 (일반 게시글) -->
+    <div class="post-card" th:each="post : ${list}">
+      <div class="post-thumbnail">
+        <img th:src="${post.thumbnailUrl != null} ? ${post.thumbnailUrl} : '/img/default-thumbnail.png'" alt="썸네일">
+      </div>
+      <div class="post-info">
+        <div class="title-category d-flex align-items-center">
+          <a th:href="@{/posts/read/{id}(id=${post.postId})}" class="post-title"
+            th:text="${post.title != null ? post.title : '제목없음'}">
+            게시글 제목
+          </a>
+          <span class="category ms-2" th:text="${post.category != null ? post.category : '기타'}">카테고리</span>
+        </div>
+        <div class="post-meta">
+          <div class="author">
+            <img th:src="${post.user.profileImg != null} ? ${post.user.profileImg} : '/img/default-profile.png'"
+              class="profile-img">
+            <span th:text="${post.user != null and post.user.nickname != null}
+                         ? ${post.user.nickname}
+                         : '알 수 없음'">
+              작성자
+            </span>
+          </div>
         </div>
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>등록일자</th>
-                    <th>수정일자</th>
-                </tr>
-            </thead>
-            <tbody>
-                <th:block th:if="${ list == null || list.isEmpty() }">
-                    <tr>
-                        <td colspan="5" class="text-center">조회된 데이터가 없습니다.</td>
-                    </tr>
-                </th:block>
-                <th:block th:each="post : ${pageInfo.list}">
-                    <tr>
-                        <td><th:block th:text="${post.no}"></th:block></td>
-                        <td>
-                            <a th:href="@{ /posts/read/{id}(id=${post.id})}">
-                                <th:block th:text="${post.title}"></th:block>
-                            </a>
-                        </td>
-                        <td><th:block th:text="${post.user.name}"></th:block></td>
-                        <td><th:block th:text="${ #dates.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss') }"></th:block></td>
-                        <td><th:block th:text="${ #dates.format(post.updatedAt, 'yyyy-MM-dd HH:mm:ss') }"></th:block></td>
-                    </tr>
-                </th:block>
-            </tbody>
-        </table>
-
-        <!-- 페이지 번호 -->
-        <nav aria-label="Page navigation" class="d-flex justify-content-center">
-            <ul class="pagination">
-                <!-- [첫] -->
-                <li class="page-item">
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=1' }" aria-label="First">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <!-- [이전] -->
-                <li class="page-item" th:if="${ pagination.page != pagination.first }">
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + ${pageInfo.prePage} }" aria-label="Previous">
-                        <span aria-hidden="true">&lsaquo;</span>
-                    </a>
-                </li>
-                <!-- [번호] -->
-                <th:block th:each="page : ${ #numbers.sequence( pageInfo.navigateFirstPage, pageInfo.navigateLastPage )}">          
-                    <li class="page-item" th:classappend="${ pagination.page == page } ? 'active' : '' ">
-                        <a class="page-link" th:href="@{ ${pageUri} + '&page=' + ${page} }" th:text="${page}">1</a>           
-                    </li>
-                </th:block>
-                <!-- [다음] -->
-                <li class="page-item" th:if="${ pagination.page != pagination.last }">
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + ${pageInfo.nextPage} }" aria-label="Next">
-                        <span aria-hidden="true">&rsaquo;</span>
-                    </a>
-                </li>
-                <!-- [마지막] -->
-                <li class="page-item">
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + ${pageInfo.pages} }" aria-label="Last">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <hr>
-
-    <!-- 게시글 목록-->
-    <div class="container my-5 py-5">
-        <h1 class="text-center">Pagination</h1>
-        <div class="d-flex justify-content-between align-items-center my-3">
-            <div></div>
-
-            <div>
-                <!-- <select class="form-select" aria-label="Default select example"
-                    onchange="location.href = '/posts/list?page=1&size=' + this.value">
-                    <option value="5" th:selected="${ pagination.size == 5 }">5 개씩 보기</option>
-                    <option value="10" th:selected="${ pagination.size == 10 }">10 개씩 보기</option>
-                    <option value="30" th:selected="${ pagination.size == 30 }">30 개씩 보기</option>
-                    <option value="50" th:selected="${ pagination.size == 50 }">50 개씩 보기</option>
-                    <option value="100" th:selected="${ pagination.size == 100 }" >100 개씩 보기</option>
-                </select> -->
-                <select class="form-select" aria-label="Default select example"
-                    th:field="${pagination.size}"
-                    onchange="location.href = '/posts/list?page=1&size=' + this.value"
-                    >
-                    <option value="5" >5 개씩 보기</option>
-                    <option value="10" >10 개씩 보기</option>
-                    <option value="30" >30 개씩 보기</option>
-                    <option value="50" >50 개씩 보기</option>
-                    <option value="100" >100 개씩 보기</option>
-                </select>
+        <div class="d-flex justify-content-between">
+          <div class="tag-list">
+            <span th:each="tag : ${post.tagList}" class="badge bg-secondary me-1">
+              <span th:text="'#' + ${tag.name}">#태그명</span>
+            </span>
+          </div>
+          <div class="post-stats text-center d-flex align-items-center" style="font-size: 12px;">
+            <div class="d-flex align-items-center gap-1">
+              <img class="eye" width="17" th:src="@{/img/hit.svg}" style="vertical-align: middle;">
+              <div th:text="${post.viewCount != null ? post.viewCount : 0}">0</div>
             </div>
+            <span class="">&middot;</span>
+            <div class="d-flex align-items-center gap-1">
+              <img width="15" th:src="@{/img/comment.png}" style="vertical-align: middle;">
+              <div th:text="${post.commentCount != null ? post.commentCount : 0}">0</div>
+            </div>
+            <span class="">&middot;</span>
+            <div class="d-flex align-items-center gap-1">
+              <img width="15" th:src="@{/img/pinkheart.png}" style="vertical-align: middle;">
+              <div th:text="${post.likeCount != null ? post.likeCount : 0}">0</div>
+            </div>
+          </div>
         </div>
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>번호</th>
-                    <th>제목</th>
-                    <th>작성자</th>
-                    <th>등록일자</th>
-                    <th>수정일자</th>
-                </tr>
-            </thead>
-            <tbody>
-                <th:block th:if="${ list == null || list.isEmpty() }">
-                    <tr>
-                        <td colspan="5" class="text-center">조회된 데이터가 없습니다.</td>
-                    </tr>
-                </th:block>
-                <th:block th:each="post : ${list}">
-                    <tr>
-                        <td><th:block th:text="${post.no}"></th:block></td>
-                        <td>
-                            <a th:href="@{ /posts/read/{id}(id=${post.id})}">
-                                <th:block th:text="${post.title}"></th:block>
-                            </a>
-                        </td>
-                        <td><th:block th:text="${post.user.name}"></th:block></td>
-                        <td><th:block th:text="${ #dates.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss') }"></th:block></td>
-                        <td><th:block th:text="${ #dates.format(post.updatedAt, 'yyyy-MM-dd HH:mm:ss') }"></th:block></td>
-                    </tr>
-                </th:block>
-            </tbody>
-        </table>
+      </div>
+    </div>
+    <div class="search-bar mt-5 mb-4">
+      <form th:action="@{/posts/list}" method="get" class="d-flex gap-2 align-items-center">
 
-        <!-- 페이지 번호 -->
-        <nav aria-label="Page navigation" class="d-flex justify-content-center" 
-            th:object="${pagination}">
-            <ul class="pagination">
-                <!-- [첫] -->
-                <li class="page-item">
-                    <!-- <a class="page-link" th:href="@{ /posts/list(page=*{first}, size=*{size}, count=*{count}) }" aria-label="First"> -->
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + *{first} }" aria-label="First">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                <!-- [이전] -->
-                <li class="page-item" th:if="${ pagination.page != pagination.first }">
-                    <!-- <a class="page-link" th:href="@{ /posts/list(page=*{prev}, size=*{size}, count=*{count}) }" aria-label="Previous"> --> 
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + *{prev} }" aria-label="Previous">
-                        <span aria-hidden="true">&lsaquo;</span>
-                    </a>
-                </li>
-                <!-- [번호] -->
-                <th:block th:each="page : *{ #numbers.sequence( start, end )}">
-                    <li class="page-item" th:classappend="${ pagination.page == page } ? 'active' : '' ">
-                        <!-- <a class="page-link" th:href="@{ /posts/list(page=${page}, size=*{size}, count=*{count}) }" th:text="${page}">1</a>            -->
-                        <a class="page-link" th:href="@{ ${pageUri} + '&page=' + ${page} }" th:text="${page}">1</a>           
-                    </li>
-                </th:block>
-                <!-- [다음] -->
-                <li class="page-item" th:if="${ pagination.page != pagination.last }">
-                    <!-- <a class="page-link" th:href="@{ /posts/list(page=*{next}, size=*{size}, count=*{count}) }" aria-label="Next"> -->
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + *{next} }" aria-label="Next">
-                        <span aria-hidden="true">&rsaquo;</span>
-                    </a>
-                </li>
-                <!-- [마지막] -->
-                <li class="page-item">
-                    <!-- <a class="page-link" th:href="@{ /posts/list(page=*{last}, size=*{size}, count=*{count}) }" aria-label="Last"> -->
-                    <a class="page-link" th:href="@{ ${pageUri} + '&page=' + *{last} }" aria-label="Last">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <!-- 검색 조건 -->
+        <select name="type" class="form-select w-auto">
+          <option value="title" th:selected="${type} == 'title'">제목</option>
+          <option value="titleContent" th:selected="${type} == 'titleContent'">제목+내용</option>
+          <option value="tag" th:selected="${type} == 'tag'">태그</option>
+        </select>
+
+        <!-- 검색어 입력창 -->
+        <input type="text" name="keyword" class="form-control search" placeholder="검색어 입력" th:value="${keyword}" />
+
+        <!-- 검색 버튼 -->
+        <button type="submit" class="btn btn-search">검색</button>
+      </form>
     </div>
 
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+    <!-- 하단 광고 -->
+    <div class="banner">
+      <img th:src="@{/img/ppl2.jpg}" alt="광고배너2">
+    </div>
+
+    <!-- 📄 페이지네이션 -->
+    <div class="pagination">
+      <ul class="pagination justify-content-center">
+
+        <!-- 이전 버튼 -->
+        <li class="page-item" th:if="${pageInfo.start > 1}">
+          <a class="page-link" th:href="@{/posts/list(page=${pageInfo.start - 1})}">이전</a>
+        </li>
+
+        <!-- 페이지 번호 반복 -->
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageInfo.start, pageInfo.end)}"
+          th:classappend="${pageInfo.page == pageNum} ? 'active'">
+          <a class="page-link" th:href="@{/posts/list(page=${pageNum}, sort=${sort})}" th:text="${pageNum}">1</a>
+        </li>
+
+        <!-- 다음 버튼 -->
+        <li class="page-item" th:if="${pageInfo.end < pageInfo.last}">
+          <a class="page-link" th:href="@{/posts/list(page=${pageInfo.end + 1})}">다음</a>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <div th:replace="fragments/footer :: footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  
 </body>
+
 </html>

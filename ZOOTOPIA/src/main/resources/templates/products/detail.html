@@ -1,230 +1,103 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" 
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${product.name} + ' - ZOOTOPIA'">제품 상세 - ZOOTOPIA</title>
-    
-    <!-- Bootstrap CSS -->
+    <title>상품 상세 - ZOOTOPIA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/products.css}">
-    <link rel="stylesheet" th:href="@{/css/product-detail.css}">
+    <style>
+        .btn-primary {
+            background-color: #F27A7A;
+            border-color: #F27A7A;
+        }
+        .btn-primary:hover {
+            background-color: #E06B6B;
+            border-color: #E06B6B;
+        }
+        .text-primary {
+            color: #F27A7A !important;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="container mt-4" th:attr="data-product-no=${product != null ? product.no : 0}">
+        <!-- 뒤로가기 버튼 -->
+        <div class="mb-3">
+            <a href="/products/listp" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>상품 목록으로
+            </a>
+        </div>
 
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
-                <li class="breadcrumb-item"><a th:href="@{/products/list}">스토어</a></li>
-                <li class="breadcrumb-item active" aria-current="page" th:text="${product.name}">제품명</li>
-            </ol>
-        </nav>
-
-        <!-- Product Detail -->
         <div class="row">
-            <!-- Product Image -->
             <div class="col-md-6">
-                <div class="product-detail-image">
-                    <img th:src="${product.imageUrl}" 
-                         th:alt="${product.name}" 
-                         class="img-fluid rounded"
-                         onerror="this.src='/img/default-thumbnail.png'">
-                    <div class="image-zoom-indicator">
-                        <i class="fas fa-search-plus"></i>
+                <img th:src="${product != null ? product.imageUrl : '/img/default-thumbnail.png'}" 
+                     class="img-fluid rounded" alt="상품 이미지"
+                     onerror="this.src='/img/default-thumbnail.png'">
+            </div>
+            <div class="col-md-6">
+                <h1 class="text-primary mb-3" th:text="${product != null ? product.name : '상품명'}">상품명</h1>
+                <p class="text-muted mb-3" th:text="${product != null ? product.description : '상품 설명'}">상품 설명</p>
+                
+                <!-- 상품 정보 -->
+                <div class="mb-3">
+                    <span class="badge bg-primary me-2" th:text="${product != null ? product.category : '카테고리'}">카테고리</span>
+                    <span class="badge bg-success me-2">재고: <span th:text="${product != null ? product.stock : '0'}">0</span>개</span>
+                </div>
+                
+                <!-- 가격 -->
+                <div class="mb-4">
+                    <h3 class="text-primary" id="unitPrice" th:attr="data-price=${product != null ? product.price : 0}">
+                        <span th:text="${product != null ? product.price : '0'}">0</span>원
+                    </h3>
+                </div>
+                
+                <!-- 수량 선택 -->
+                <div class="mb-4">
+                    <label class="form-label">수량</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary" onclick="decreaseQuantity()">-</button>
+                        <input type="number" id="quantity" class="form-control" value="1" min="1" max="10" style="width: 80px;">
+                        <button type="button" class="btn btn-outline-secondary" onclick="increaseQuantity()">+</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Product Info -->
-            <div class="col-md-6">
-                <div class="product-detail-info">
-                    <!-- Category -->
-                    <div class="product-category-badge" th:text="${product.category}">카테고리</div>
-                    
-                    <!-- Product Name -->
-                    <h1 class="product-title" th:text="${product.name}">제품명</h1>
-                    
-                    <!-- Rating -->
-                    <div class="product-rating mb-3">
-                        <div class="stars">
-                            <span th:each="i : ${#numbers.sequence(1, 5)}"
-                                  th:class="${i <= product.rating} ? 'star filled' : 'star'"
-                                  class="star">★</span>
-                        </div>
-                        <span class="rating-text">(<span th:text="${product.reviewCount}">0</span>개 리뷰)</span>
-                    </div>
-                    
-                    <!-- Price -->
-                    <div class="product-price-section">
-                        <span class="current-price" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">가격</span>
-                        <span class="delivery-info">배송비: 3,000 원</span>
-                    </div>
-                    
-                    <!-- Product Description -->
-                    <div class="product-description">
-                        <p th:text="${product.description}">제품 설명</p>
-                    </div>
-
-                    <!-- Product Options -->
-                    <div class="product-options">
-                        <div class="option-group mb-3">
-                            <label class="option-label">옵션 선택</label>
-                            <select class="form-select option-select" id="productOption">
-                                <option value="">옵션을 선택하세요</option>
-                                <option value="red">레드</option>
-                                <option value="blue">블루</option>
-                                <option value="green">그린</option>
-                                <option value="yellow">옐로우</option>
-                            </select>
-                        </div>
-                        
-                        <div class="quantity-group mb-4">
-                            <label class="option-label">수량</label>
-                            <div class="quantity-controls">
-                                <button type="button" class="btn-quantity" onclick="decreaseQuantity()">-</button>
-                                <input type="number" class="quantity-input" id="quantity" value="1" min="1" max="10">
-                                <button type="button" class="btn-quantity" onclick="increaseQuantity()">+</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Total Price -->
-                    <div class="total-price-section mb-4">
-                        <div class="total-label">총 주문금액</div>
-                        <div class="total-price" id="totalPrice" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">총 가격</div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="product-actions">
-                        <button type="button" class="btn btn-cart" onclick="addToCart()">
-                            <i class="fas fa-shopping-cart"></i> 장바구니
-                        </button>
-                        <button type="button" class="btn btn-buy" onclick="buyNow()">
-                            <i class="fas fa-bolt"></i> 바로구매
-                        </button>
-                    </div>
-
-                    <!-- Action Buttons - Back -->
-                    <div class="back-actions mt-3">
-                        <a th:href="@{/products/list}" class="btn btn-outline-secondary">
-                            <i class="fas fa-list"></i> 상품목록
-                        </a>
-                    </div>
-
-                    <!-- Stock Info -->
-                    <div class="stock-info mt-3">
-                        <span th:if="${product.stock > 0}" class="stock-available">
-                            재고: <span th:text="${product.stock}">재고수량</span>개 남음
-                        </span>
-                        <span th:if="${product.stock == 0}" class="stock-out">품절</span>
-                    </div>
+                
+                <!-- 총 가격 -->
+                <div class="mb-4">
+                    <h4>총 가격: <span id="totalPrice" class="text-primary" th:text="${product != null ? product.price : '0'}">0</span>원</h4>
+                </div>
+                
+                <!-- 구매 버튼 -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" onclick="addToCart()">
+                        <i class="fas fa-shopping-cart me-2"></i>장바구니 담기
+                    </button>
+                    <button class="btn btn-outline-primary btn-lg" onclick="buyNow()">
+                        <i class="fas fa-bolt me-2"></i>바로 구매
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Product Details Tabs -->
-        <div class="product-tabs mt-5">
-            <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" 
-                            data-bs-target="#description" type="button" role="tab">상품정보</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" 
-                            data-bs-target="#reviews" type="button" role="tab">
-                        리뷰 (<span th:text="${product.reviewCount}">0</span>)
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="productTabsContent">
-                <!-- Description Tab -->
-                <div class="tab-pane fade show active" id="description" role="tabpanel">
-                    <div class="tab-content-wrapper">
-                        <h5>상품 상세정보</h5>
-                        <p th:text="${product.description}">상세한 제품 설명이 여기에 표시됩니다.</p>
-                        <div class="product-specs">
-                            <h6>제품 사양</h6>
-                            <ul>
-                                <li>카테고리: <span th:text="${product.category}">카테고리</span></li>
-                                <li>재고: <span th:text="${product.stock}">재고수량</span>개</li>
-                                <li>등록일: <span th:text="${#temporals.format(product.createdDate, 'yyyy-MM-dd')}">등록일</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Reviews Tab -->
-                <div class="tab-pane fade" id="reviews" role="tabpanel">
-                    <div class="tab-content-wrapper">
-                        <!-- Review Form (for logged in users) -->
-                        <div sec:authorize="isAuthenticated()" class="review-form-section mb-4">
-                            <h5>리뷰 작성</h5>
-                            <form id="reviewForm" class="review-form">
-                                <input type="hidden" id="productId" th:value="${product.id}">
-                                
-                                <div class="rating-input mb-3">
-                                    <label class="form-label">별점</label>
-                                    <div class="star-rating">
-                                        <input type="radio" id="star5" name="rating" value="5">
-                                        <label for="star5">★</label>
-                                        <input type="radio" id="star4" name="rating" value="4">
-                                        <label for="star4">★</label>
-                                        <input type="radio" id="star3" name="rating" value="3">
-                                        <label for="star3">★</label>
-                                        <input type="radio" id="star2" name="rating" value="2">
-                                        <label for="star2">★</label>
-                                        <input type="radio" id="star1" name="rating" value="1">
-                                        <label for="star1">★</label>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="reviewContent" class="form-label">리뷰 내용</label>
-                                    <textarea class="form-control" id="reviewContent" rows="4" 
-                                              placeholder="제품에 대한 후기를 남겨주세요..."></textarea>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary">리뷰 등록</button>
-                            </form>
-                        </div>
-
-                        <!-- Login prompt for anonymous users -->
-                        <div sec:authorize="!isAuthenticated()" class="login-prompt mb-4">
-                            <p class="text-muted">리뷰를 작성하려면 <a th:href="@{/login}">로그인</a>이 필요합니다.</p>
-                        </div>
-
-                        <!-- Reviews List -->
-                        <div class="reviews-list">
-                            <h5>고객 리뷰</h5>
-                            <div class="review-item" th:each="review : ${reviews}">
-                                <div class="review-header">
-                                    <div class="reviewer-info">
-                                        <span class="reviewer-name" th:text="${review.userName}">사용자명</span>
-                                        <div class="review-rating">
-                                            <span th:each="i : ${#numbers.sequence(1, 5)}"
-                                                  th:class="${i <= review.rating} ? 'star filled' : 'star'"
-                                                  class="star">★</span>
-                                        </div>
-                                    </div>
-                                    <span class="review-date" th:text="${#temporals.format(review.createdDate, 'yyyy-MM-dd')}">작성일</span>
-                                </div>
-                                <div class="review-content" th:text="${review.content}">리뷰 내용</div>
-                            </div>
-                            
-                            <!-- No reviews message -->
-                            <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
-                                <p class="text-muted">아직 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!</p>
-                            </div>
+        <!-- 관련 상품 -->
+        <div class="row mt-5" th:if="${relatedProducts != null and relatedProducts.size() > 0}">
+            <div class="col-12">
+                <h4 class="mb-4 text-primary">관련 상품</h4>
+            </div>
+            <div class="col-md-4 mb-4" th:each="relatedProduct : ${relatedProducts}">
+                <div class="card h-100">
+                    <img th:src="${relatedProduct.imageUrl}" class="card-img-top" alt="관련 상품"
+                         style="height: 200px; object-fit: cover;"
+                         onerror="this.src='/img/default-thumbnail.png'">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary" th:text="${relatedProduct.name}">관련상품명</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h6 text-primary mb-0">
+                                <span th:text="${relatedProduct.price}">0</span>원
+                            </span>
+                            <a th:href="@{'/products/detail/' + ${relatedProduct.no}}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>보기
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -232,12 +105,104 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <div th:replace="~{fragments/footer :: footer}"></div>
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script th:src="@{/js/product-detail.js}"></script>
+    <script>
+        // 페이지 로드 시 초기화
+        let productNo = 0;
+        let unitPrice = 0;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            const unitPriceElement = document.getElementById('unitPrice');
+            
+            if (container && container.hasAttribute('data-product-no')) {
+                productNo = parseInt(container.getAttribute('data-product-no'));
+            }
+            
+            if (unitPriceElement && unitPriceElement.hasAttribute('data-price')) {
+                unitPrice = parseInt(unitPriceElement.getAttribute('data-price'));
+            }
+            
+            updateTotalPrice();
+        });
+        
+        function increaseQuantity() {
+            const quantityInput = document.getElementById('quantity');
+            let quantity = parseInt(quantityInput.value) || 1;
+            if (quantity < 10) {
+                quantityInput.value = quantity + 1;
+                updateTotalPrice();
+            }
+        }
+        
+        function decreaseQuantity() {
+            const quantityInput = document.getElementById('quantity');
+            let quantity = parseInt(quantityInput.value) || 1;
+            if (quantity > 1) {
+                quantityInput.value = quantity - 1;
+                updateTotalPrice();
+            }
+        }
+        
+        function updateTotalPrice() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const totalPrice = unitPrice * quantity;
+            document.getElementById('totalPrice').textContent = totalPrice.toLocaleString();
+        }
+        
+        function addToCart() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'productNo': productNo,
+                    'quantity': quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert('오류: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('장바구니 추가 중 오류가 발생했습니다.');
+            });
+        }
+        
+        function buyNow() {
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'productNo': productNo,
+                    'quantity': quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/cart/checkout';
+                } else {
+                    alert('오류: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('구매 처리 중 오류가 발생했습니다.');
+            });
+        }
+    </script>
 </body>
 </html>

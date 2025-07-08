@@ -221,7 +221,7 @@ function loadMoreProducts() {
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('page', currentPage);
     
-    fetch(`/products/list?${urlParams.toString()}`)
+    fetch(`/products/listp?${urlParams.toString()}`)
         .then(response => response.text())
         .then(html => {
             // HTML 파싱하여 새로운 상품 카드들만 추출

@@ -1,7 +1,5 @@
 package com.aloha.zootopia.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +9,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import com.aloha.zootopia.security.CustomAccessDeniedHandler;
 import com.aloha.zootopia.security.LoginFailureHandler;
@@ -28,8 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 @EnableMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig {
 
-    @Autowired
-    private DataSource dataSource;
+    // @Autowired
+    // private DataSource dataSource;
 
     // @Autowired 
     // private PasswordEncoder passwordEncoder;
@@ -57,12 +53,16 @@ public class SecurityConfig {
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/comments/add").authenticated() 
+                                // .requestMatchers("/products/detail/**").authenticated() // 임시 비활성화 - 템플릿 테스트
+                                .requestMatchers("/cart/**").authenticated() // 장바구니 - 로그인 필요
                                 .requestMatchers("/posts/upload/image").permitAll()
-                                .requestMatchers("/images/**", "/**").permitAll()
+                                .requestMatchers("/images/**", "/static/**", "/css/**", "/js/**", "/img/**").permitAll()
+                                .requestMatchers("/", "/products", "/products/list", "/products/listp", "/products/detail/**", "/login", "/join", "/error/**").permitAll()
                                 .anyRequest().permitAll()
                                 );
         http.csrf(csrf -> csrf
-            .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
+            .ignoringRequestMatchers("/posts/upload/image") // 이미지 업로드 CSRF 무시
+            // 장바구니, 결제 관련 요청은 CSRF 보호 유지 (기본값)
         );
 
                         
@@ -95,11 +95,11 @@ public class SecurityConfig {
         // 👩‍💼 사용자 정의 인증
         http.userDetailsService(userDetailServiceImpl);
 
-        // 🔄 자동 로그인
-        http.rememberMe(me -> me
-                .key("aloha")
-                .tokenRepository(tokenRepository())
-                .tokenValiditySeconds(60 * 60 * 24 * 7));
+        // 🔄 자동 로그인 - 임시 비활성화
+        // http.rememberMe(me -> me
+        //         .key("aloha")
+        //         .tokenRepository(tokenRepository())
+        //         .tokenValiditySeconds(60 * 60 * 24 * 7));
 
         // 🔓 로그아웃 설정
         http.logout(logout -> logout
@@ -113,22 +113,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // PersistentRepository 토큰정보 객체 - 빈 등록
-    @Bean
-    public PersistentTokenRepository tokenRepository() {
-        // JdbcTokenRepositoryImpl : 토큰 저장 데이터 베이스를 등록하는 객체
-        JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl(); 
-        // 토큰 저장소를 사용하는 데이터 소스 지정
-        repositoryImpl.setDataSource(dataSource);
-        // persistent_logins 테이블 자동 생성
-        // repositoryImpl.setCreateTableOnStartup(true);
-        try {
-            repositoryImpl.getJdbcTemplate().execute(JdbcTokenRepositoryImpl.CREATE_TABLE_SQL);
-        } catch (Exception e) {
-            log.error("persistent_logins 테이블이 이미 생성되었습니다.");
-        }
-        return repositoryImpl;
-    }
+    // PersistentRepository 토큰정보 객체 - 빈 등록 (임시 비활성화)
+    // @Bean
+    // public PersistentTokenRepository tokenRepository() {
+    //     // JdbcTokenRepositoryImpl : 토큰 저장 데이터 베이스를 등록하는 객체
+    //     JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl(); 
+    //     // 토큰 저장소를 사용하는 데이터 소스 지정
+    //     repositoryImpl.setDataSource(dataSource);
+    //     // persistent_logins 테이블 자동 생성 비활성화 (이미 존재할 수 있음)
+    //     // repositoryImpl.setCreateTableOnStartup(true);
+    //     return repositoryImpl;
+    // }
 
 
     // 👮‍♂️🔐사용자 인증 관리 메소드

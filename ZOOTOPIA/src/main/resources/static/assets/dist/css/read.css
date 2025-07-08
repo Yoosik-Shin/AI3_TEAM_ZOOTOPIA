@@ -1,0 +1,89 @@
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.post-container {
+  max-width: 720px;
+  margin: 30px auto;
+  border: 2px solid #DEDEDE;
+  padding: 24px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.post-header {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.tolist {
+  color: #F35F4C;
+  font-size: 14px;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 16px;
+}
+
+.post-content {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.post-images img {
+  max-width: 100%;
+  margin: 12px 0;
+  border-radius: 8px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-share {
+  background: #f0f0f0;
+}
+
+.btn-like {
+  background: #ffbbbb;
+  color: white;
+}
+
+.comment-box {
+  border-top: 1px solid #ccc;
+  padding-top: 16px;
+}
+
+.comment {
+  margin-top: 12px;
+}
+
+.comment-meta {
+  font-size: 12px;
+  color: #888;
+}
+
+.comment-content {
+  font-size: 14px;
+}
+
+.content {
+  min-height: 220px;
+}

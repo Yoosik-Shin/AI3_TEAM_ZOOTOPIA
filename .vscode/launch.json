@@ -19,6 +19,16 @@
             "projectName": "ZOOTOPIA",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SecurityApplication<security-ZOOTOPIA>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.aloha.zootopia.SecurityApplication",
+            "projectName": "security-ZOOTOPIA",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
