@@ -3,7 +3,13 @@ package com.aloha.zootopia.controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +29,9 @@ import com.aloha.zootopia.dto.HospitalForm;
 import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.mapper.UserMapper;
 import com.aloha.zootopia.service.AnimalService;
-import com.aloha.zootopia.service.HospitalService;
 // import com.github.pagehelper.PageInfo;
 import com.aloha.zootopia.service.hospital.HospitalImageUploader;
+import com.aloha.zootopia.service.hospital.HospitalService;
 
 @Controller
 public class HospitalController {
@@ -138,13 +144,9 @@ public class HospitalController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/hospitals/new")
-    public String create(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
-        if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
-            String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
-            form.setThumbnailImageUrl(imageUrl);
-        }
+    public ResponseEntity<?> create(@ModelAttribute HospitalForm form) throws Exception {
         hospitalService.createHospital(form);
-        return "redirect:/hospitals";
+        return ResponseEntity.ok().body(Map.of("message", "병원 정보가 성공적으로 등록되었습니다."));
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -181,13 +183,9 @@ public class HospitalController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/hospitals/edit")
-    public String update(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
-        if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
-            String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
-            form.setThumbnailImageUrl(imageUrl);
-        }
+    public ResponseEntity<?> update(@ModelAttribute HospitalForm form) throws Exception {
         hospitalService.updateHospital(form); // HospitalService에 updateHospital 메서드 필요
-        return "redirect:/hospitals/detail/" + form.getHospitalId();
+        return ResponseEntity.ok().body(Map.of("message", "병원 정보가 성공적으로 수정되었습니다."));
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -246,5 +244,25 @@ public class HospitalController {
 
         hospitalService.updateReview(reviewId, content, userId);
         return "redirect:/hospitals/detail/" + id;
+    }
+
+    @PreAuthorize("permitAll()")
+    @PostMapping("/upload/image")
+    @ResponseBody
+    public Map<String, Object> uploadImage(@RequestParam("image") MultipartFile file) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + "_" + file.getOriginalFilename();
+            String savePath = "C:/upload/" + fileName; // 실제 운영 환경에서는 이 경로를 변경해야 합니다.
+            file.transferTo(new File(savePath));
+            result.put("success", 1);
+            result.put("imageUrl", "/upload/" + fileName); // 에디터에 삽입될 이미지 URL
+        } catch (Exception e) {
+            result.put("success", 0);
+            result.put("message", "업로드 실패");
+            e.printStackTrace(); // 에러 로깅
+        }
+        return result;
     }
 }
