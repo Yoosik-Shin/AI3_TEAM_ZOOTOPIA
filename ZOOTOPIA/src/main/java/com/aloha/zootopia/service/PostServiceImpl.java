@@ -1,7 +1,11 @@
 package com.aloha.zootopia.service;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired private PostMapper postMapper;
-    @Autowired private TagMapper tagMapper;
+    @Autowired 
+    private PostMapper postMapper;
+
+    @Autowired 
+    private TagMapper tagMapper;
 
     @Override
     public List<Posts> list() throws Exception {
@@ -108,8 +115,26 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public boolean updateById(Posts post) throws Exception {
+        Posts oldPost = postMapper.selectById(String.valueOf(post.getPostId()));
+        if (oldPost != null) {
+            List<String> oldImages = extractImageFileNames(oldPost.getContent());
+            List<String> newImages = extractImageFileNames(post.getContent());
+
+            List<String> deletedImages = oldImages.stream()
+                    .filter(img -> !newImages.contains(img))
+                    .collect(Collectors.toList());
+            deleteImages(deletedImages);
+        }
+
         boolean success = postMapper.updateById(post) > 0;
         if (!success) return false;
+
+        Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
+                .matcher(post.getContent());
+        if (matcher.find()) {
+            post.setThumbnailUrl(matcher.group(1));
+            postMapper.updateThumbnail(post);
+        }
 
         tagMapper.deletePostTagsByPostId(post.getPostId());
 
@@ -127,7 +152,6 @@ public class PostServiceImpl implements PostService {
                     tagMapper.insertTag(tag);
                     tagId = tag.getTagId();
                 }
-
                 tagMapper.insertPostTag(post.getPostId(), tagId);
             }
         }
@@ -135,8 +159,15 @@ public class PostServiceImpl implements PostService {
         return true;
     }
 
-    @Override
+
+   @Override
     public boolean deleteById(String id) throws Exception {
+        Posts post = postMapper.selectById(id);
+        if (post != null) {
+            List<String> imageFiles = extractImageFileNames(post.getContent());
+            deleteImages(imageFiles); // ✅ 이미지 삭제
+        }
+
         return postMapper.deleteById(id) > 0;
     }
 
@@ -196,5 +227,30 @@ public class PostServiceImpl implements PostService {
 
         return postList;
     }
+
+
+    private List<String> extractImageFileNames(String content) {
+        List<String> imageFiles = new ArrayList<>();
+        if (content == null) return imageFiles;
+
+        Pattern pattern = Pattern.compile("<img[^>]+src=[\"']?/upload/([^\"'>]+)[\"']?");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            imageFiles.add(matcher.group(1)); // abc.jpg
+        }
+        return imageFiles;
+    }
+
+    private void deleteImages(List<String> filenames) {
+        String uploadDir = "C:/upload"; // ✅ 반드시 실제 서버 경로와 일치시켜야 함
+        for (String name : filenames) {
+            File file = new File(uploadDir, name);
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                log.info(deleted ? "✅ 삭제됨: {}" : "❌ 삭제 실패: {}", name);
+            }
+        }
+    }
+
     
 }

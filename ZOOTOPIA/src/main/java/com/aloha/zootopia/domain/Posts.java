@@ -31,11 +31,11 @@ public class Posts {
     private Date updatedAt;           
 
     private Long userId;           
-    private Users user;               // 사용자 정보 포함 (JOIN된 users 테이블)
+    private Users user;              
 
-    private String thumbnailUrl;      // post_images 서브쿼리로 가져온 썸네일 URL
+    private String thumbnailUrl;     
 
-    private List<PostImage> images;   // 글에 첨부된 전체 이미지 목록 (선택적으로 Lazy 로딩)
+    private List<PostImage> images;   
 
     private List<Comment> comments;
 

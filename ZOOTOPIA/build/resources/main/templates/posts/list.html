@@ -73,7 +73,7 @@
     <!-- 게시글 리스트 (일반 게시글) -->
     <div class="post-card" th:each="post : ${list}">
       <div class="post-thumbnail">
-        <img th:src="${post.thumbnailUrl != null} ? ${post.thumbnailUrl} : '/img/default-thumbnail.png'" alt="썸네일">
+        <img th:src="${post.thumbnailUrl} ?: '/img/default-thumbnail.png'" onerror="this.onerror=null; this.src='/img/default-thumbnail.png';" alt="썸네일">
       </div>
       <div class="post-info">
         <div class="title-category d-flex align-items-center">
