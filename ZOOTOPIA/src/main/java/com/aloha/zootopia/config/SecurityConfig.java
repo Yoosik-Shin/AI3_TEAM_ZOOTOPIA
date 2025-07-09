@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/comments/add").authenticated()
-                                .requestMatchers("/images/**").permitAll()
+                                .requestMatchers("/images/**", "/img/**", "/upload/**").permitAll()
                                 .requestMatchers("/hospitals", "/hospitals/detail/**").permitAll()
                                 .anyRequest().permitAll()
                                 );

@@ -3,84 +3,49 @@ package com.aloha.zootopia.controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.http.ResponseEntity;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult; // Import BindingResult
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.Hospital;
+import com.aloha.zootopia.domain.HospReview; // ADDED THIS LINE
 import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.dto.HospitalForm;
 import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.mapper.UserMapper;
-import com.aloha.zootopia.service.AnimalService;
-// import com.github.pagehelper.PageInfo;
-import com.aloha.zootopia.service.hospital.HospitalImageUploader;
 import com.aloha.zootopia.service.hospital.HospitalService;
 
+import jakarta.validation.Valid; // Import @Valid
+
 @Controller
+@RequestMapping("/hospitals")
 public class HospitalController {
-    @Autowired HospitalService hospitalService;
-    @Autowired AnimalService animalService;
-    @Autowired UserMapper userMapper;
-    @Autowired HospitalImageUploader hospitalImageUploader;
 
-    public HospitalController(HospitalService hospitalService, AnimalService animalService, com.aloha.zootopia.mapper.UserMapper userMapper) {
-        this.hospitalService = hospitalService;
-        this.animalService = animalService;
-    }
-    // @GetMapping("/hospitals")
-    // public String list(@RequestParam(required = false) List<Integer> animal, Model model) {
-    //     model.addAttribute("animalList", hospitalService.getAllAnimals());
-    //     model.addAttribute("selectedAnimals", animal == null ? new ArrayList<>() : animal);
-    //     model.addAttribute("hospitals", hospitalService.getHospitals(animal));
-    //     return "service/hospital/hosp_list";
-    // }
+    @Autowired
+    private HospitalService hospitalService;
 
-    /**
-     * 인증 테스트용 메서드
-     * @return
-     */
-    @GetMapping("/auth-test")
-     @ResponseBody // 페이지 이동 없이 응답을 바로 확인하기 위함
-    public String authTest() {
-        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser"
-    )) {
-            return "로그인되지 않은 사용자입니다.";
-    }
-
-        String username = auth.getName();
-        java.util.Collection<? extends org.springframework.security.core.GrantedAuthority>
-        authorities = auth.getAuthorities();
-
-        System.out.println("--- 권한 테스트 ---");
-        System.out.println("사용자: " + username);
-        System.out.println("권한: " + authorities);
-        System.out.println("-------------------");
-
-        return "사용자: " + username + " / 권한: " + authorities;
-    }
+    @Autowired
+    private UserMapper userMapper;
 
 
 
-    @GetMapping("/hospitals")
+
+    // 병원 목록 페이지
+    @GetMapping
     public String list(
         @RequestParam(required = false) List<Integer> animal,
         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
@@ -123,85 +88,121 @@ public class HospitalController {
         return "service/hospital/hosp_list";
     }
 
-
-    @GetMapping("/hospitals/detail/{id}")
+    // 병원 상세 페이지
+    @GetMapping("/detail/{id}")
     public String details(@PathVariable Integer id, Model model) {
-        model.addAttribute("hospital", hospitalService.getHospital(id));
-        model.addAttribute("reviews", hospitalService.getReviews(id));
+        Hospital hospital = hospitalService.getHospital(id);
+        model.addAttribute("hospital", hospital);
+        List<HospReview> reviews = hospitalService.getReviews(id);
+        model.addAttribute("reviews", reviews);
+        System.out.println("DEBUG: Controller received " + (reviews != null ? reviews.size() : "null") + " reviews for model. Hospital ID: " + (hospital != null ? hospital.getHospitalId() : "null"));
         model.addAttribute("reviewForm", new HospReviewForm());
         return "service/hospital/details";
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/hospitals/new")
+
+
+
+
+    // 병원 등록 폼 페이지
+    @GetMapping("/create")
     public String createForm(Model model) {
-
-        // 인증 객체에서 권한 정보 로그 출력
-        org.springframework.security.core.Authentication auth =
-            org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("현재 로그인 사용자: " + auth.getName());
-        System.out.println("권한 목록: " + auth.getAuthorities());
-
         model.addAttribute("hospitalForm", new HospitalForm());
-        model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
-        model.addAttribute("animalList", hospitalService.getAllAnimals());
+        try {
+            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+            model.addAttribute("animalList", hospitalService.getAllAnimals());
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            // Handle error, e.g., add error message to model
+        }
         return "service/hospital/create_hospital";
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/hospitals/new")
-    public ResponseEntity<?> create(@ModelAttribute HospitalForm form) throws Exception {
-        hospitalService.createHospital(form);
-        return ResponseEntity.ok().body(Map.of("message", "병원 정보가 성공적으로 등록되었습니다."));
-    }
+    // 병원 등록/수정 처리 (AJAX 요청 처리)
+    @PostMapping
+    @ResponseBody // For AJAX response
+    public String processHospitalForm(@Valid @RequestPart("hospitalForm") HospitalForm hospitalForm,
+                                      BindingResult bindingResult, // Add BindingResult
+                                      @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) {
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/hospitals/edit/{id}")
-    public String editForm(@PathVariable Integer id, Model model) {
-        Hospital hospital = hospitalService.getHospital(id);
-        HospitalForm hospitalForm = new HospitalForm();
-        // Hospital 객체의 데이터를 HospitalForm으로 복사
-        hospitalForm.setHospitalId(hospital.getHospitalId());
-        hospitalForm.setName(hospital.getName());
-        hospitalForm.setAddress(hospital.getAddress());
-        hospitalForm.setHomepage(hospital.getHomepage());
-        hospitalForm.setPhone(hospital.getPhone());
-        hospitalForm.setEmail(hospital.getEmail());
-        hospitalForm.setThumbnailImageUrl(hospital.getThumbnailImageUrl());
-
-        // 진료 과목 및 진료 가능 동물 ID 리스트 설정
-        if (hospital.getSpecialties() != null) {
-            hospitalForm.setSpecialtyIds(hospital.getSpecialties().stream()
-                                                .map(s -> s.getSpecialtyId())
-                                                .collect(Collectors.toList()));
-        }
-        if (hospital.getAnimals() != null) {
-            hospitalForm.setAnimalIds(hospital.getAnimals().stream()
-                                            .map(a -> a.getAnimalId())
-                                            .collect(Collectors.toList()));
+        if (bindingResult.hasErrors()) {
+            // Log validation errors
+            bindingResult.getAllErrors().forEach(error -> System.err.println("Validation Error: " + error.getDefaultMessage()));
+            return "{\"status\": \"error\", \"message\": \"Validation failed: " + bindingResult.getFieldError().getDefaultMessage().replace("\"", "") + "\"}";
         }
 
-        model.addAttribute("hospitalForm", hospitalForm);
-        model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
-        model.addAttribute("animalList", hospitalService.getAllAnimals());
-        return "service/hospital/create_hospital"; // create_hospital.html 재사용
+        try {
+            if (hospitalForm.getHospitalId() == null) {
+                // Create new hospital
+                hospitalService.createHospital(hospitalForm, thumbnailImageFile);
+            } else {
+                // Update existing hospital
+                hospitalService.updateHospital(hospitalForm, thumbnailImageFile);
+            }
+            return "{\"status\": \"success\", \"message\": \"Hospital data saved successfully.\"}";
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            return "{\"status\": \"error\", \"message\": \"Failed to save hospital data: " + e.getMessage().replace("\"", "") + "\"}";
+        }
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/hospitals/edit")
-    public ResponseEntity<?> update(@ModelAttribute HospitalForm form) throws Exception {
-        hospitalService.updateHospital(form); // HospitalService에 updateHospital 메서드 필요
-        return ResponseEntity.ok().body(Map.of("message", "병원 정보가 성공적으로 수정되었습니다."));
+    // 병원 수정 폼 페이지
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable("id") Integer id, Model model) {
+        try {
+            Hospital hospital = hospitalService.getHospital(id);
+            if (hospital == null) {
+                // Handle hospital not found, e.g., redirect to error page or list
+                return "redirect:/hospitals"; // Or an error page
+            }
+            // Convert Hospital domain object to HospitalForm for the form
+            HospitalForm hospitalForm = HospitalForm.builder()
+                                        .hospitalId(hospital.getHospitalId())
+                                        .name(hospital.getName())
+                                        .address(hospital.getAddress())
+                                        .homepage(hospital.getHomepage())
+                                        .phone(hospital.getPhone())
+                                        .email(hospital.getEmail())
+                                        .hospIntroduce(hospital.getHospIntroduce())
+                                        .thumbnailImageUrl(hospital.getThumbnailImageUrl())
+                                        // Note: specialtyIds and animalIds are not directly in Hospital domain object
+                                        // You might need to fetch them separately if they are not populated by MyBatis collection mapping
+                                        // For now, assuming they are populated via the resultMap in mapper
+                                        .specialtyIds(hospital.getSpecialties() != null ? hospital.getSpecialties().stream().map(s -> s.getSpecialtyId()).collect(java.util.stream.Collectors.toList()) : null)
+                                        .animalIds(hospital.getAnimals() != null ? hospital.getAnimals().stream().map(a -> a.getAnimalId()).collect(java.util.stream.Collectors.toList()) : null)
+                                        .build();
+
+            model.addAttribute("hospitalForm", hospitalForm);
+            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+            model.addAttribute("animalList", hospitalService.getAllAnimals());
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            // Handle error
+            return "redirect:/hospitals"; // Or an error page
+        }
+        return "service/hospital/create_hospital"; // Re-use the same form for edit
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping("/hospitals/delete/{id}")
-    public String delete(@PathVariable Integer id) {
-        hospitalService.deleteHospital(id); // HospitalService에 deleteHospital 메서드 필요
-        return "redirect:/hospitals";
+    // 병원 삭제 처리
+    @PostMapping("/delete/{id}")
+    public String deleteHospital(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            hospitalService.deleteHospital(id);
+            redirectAttributes.addFlashAttribute("message", "Hospital deleted successfully!");
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            redirectAttributes.addFlashAttribute("error", "Failed to delete hospital: " + e.getMessage());
+        }
+        return "redirect:/hospitals"; // Redirect to hospital list page
     }
 
-    @PostMapping("/hospitals/{id}/reviews")
+
+
+
+
+
+    // 병원 리뷰 등록 처리
+        @PostMapping("/{id}/reviews")
     public String addReview(@PathVariable Integer id, @ModelAttribute HospReviewForm form, Principal principal) {
         if (principal == null) {
             // 로그인하지 않은 사용자 처리 (예: 로그인 페이지로 리다이렉트)
@@ -226,7 +227,7 @@ public class HospitalController {
         return "redirect:/hospitals/detail/" + id;
     }
 
-    @PostMapping("/hospitals/{id}/reviews/{reviewId}/edit")
+    @PostMapping("/{id}/reviews/{reviewId}/edit")
     public String updateReview(@PathVariable Integer id,
                                @PathVariable Integer reviewId,
                                @RequestParam String content,
@@ -252,23 +253,9 @@ public class HospitalController {
         return "redirect:/hospitals/detail/" + id;
     }
 
-    @PreAuthorize("permitAll()")
-    @PostMapping("/upload/image")
-    @ResponseBody
-    public Map<String, Object> uploadImage(@RequestParam("image") MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-            String uuid = UUID.randomUUID().toString();
-            String fileName = uuid + "_" + file.getOriginalFilename();
-            String savePath = "C:/upload/" + fileName; // 실제 운영 환경에서는 이 경로를 변경해야 합니다.
-            file.transferTo(new File(savePath));
-            result.put("success", 1);
-            result.put("imageUrl", "/upload/" + fileName); // 에디터에 삽입될 이미지 URL
-        } catch (Exception e) {
-            result.put("success", 0);
-            result.put("message", "업로드 실패");
-            e.printStackTrace(); // 에러 로깅
-        }
-        return result;
-    }
+
+
+
+
 }
+
