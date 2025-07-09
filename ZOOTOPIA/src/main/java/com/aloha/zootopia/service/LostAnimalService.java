@@ -11,7 +11,7 @@ public interface LostAnimalService {
     List<LostAnimalPost> getAll(Pagination pagination);
 
     // 전체 게시글 수 조회
-    long getTotalCount();
+    long countAll();
 
     // 단건 조회
     LostAnimalPost getById(int postId);
@@ -28,9 +28,16 @@ public interface LostAnimalService {
     // 조회수 증가
     void increaseViewCount(int postId);
 
-    // 향후 확장을 위한 메서드 추가 가능:
-    // void increaseCommentCount(int postId);
-    // void decreaseCommentCount(int postId);
+    boolean isOwner(int postId, Long userId);
+
+    void increaseCommentCount(int postId);
+
+    void decreaseCommentCount(int postId);
+
+    List<LostAnimalPost> pageBySearch(String type, String keyword, Pagination pagination) throws Exception;
+
+    long countBySearch(String type, String keyword) throws Exception;
+    
     // List<LostAnimalPost> searchByTag(String tag);
     // List<LostAnimalPost> getTopByViewsOrLikes();
 }

@@ -31,10 +31,10 @@
 
     <!-- 잃어버린 시간 -->
     <div class="form-group mt-3">
-      <label for="lostTime">잃어버린 시간</label>
-      <input type="datetime-local" id="lostTime" name="lostTime"
-             class="form-control"
-             th:value="${post.lostTime != null} ? ${#dates.format(post.lostTime, 'yyyy-MM-dd''T''HH:mm')} : ''">
+      <label for="lostTime">유실 날짜</label>
+      <input type="date" id="lostTime" name="lostTime"
+            class="form-control"
+            th:value="${post.lostTime != null} ? ${#temporals.format(post.lostTime, 'yyyy-MM-dd')} : ''">
     </div>
 
     <!-- 연락처 -->

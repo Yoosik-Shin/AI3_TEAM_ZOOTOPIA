@@ -24,12 +24,14 @@
     LEFT JOIN users u ON c.user_id = u.user_id
     WHERE c.post_id = #{postId}
       AND c.is_deleted = FALSE
-    ORDER BY c.created_at ASC
+    ORDER BY  COALESCE(parent_id, comment_id),  -- 부모 기준 정렬
+              parent_id IS NOT NULL,            -- 부모 먼저
+              created_at ASC
   </select>
 
   <insert id="insert" parameterType="com.aloha.zootopia.domain.Comment">
-    INSERT INTO post_comments (content, user_id, post_id, created_at)
-    VALUES (#{content}, #{userId}, #{postId}, NOW())
+    INSERT INTO post_comments (content, user_id, post_id, created_at, parent_id)
+    VALUES (#{content}, #{userId}, #{postId}, NOW(), #{parentId})
   </insert>
 
   <update id="softDelete">
@@ -71,6 +73,10 @@
     SET is_deleted = TRUE, updated_at = NOW()
     WHERE comment_id = #{commentId}
   </update>
+
+  <delete id="deleteLostByPostId">
+    DELETE FROM lost_post_comments WHERE post_id = #{postId}
+  </delete>
 
   <update id="updateLostContent">
     UPDATE lost_animal_comments

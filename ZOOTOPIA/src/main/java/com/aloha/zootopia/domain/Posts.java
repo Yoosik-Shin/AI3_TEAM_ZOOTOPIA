@@ -8,17 +8,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 게시글 DTO
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Posts {
 
-    private int postId;            // auto_increment
-    private String id;                 // UUID
+    private int postId;            
     private String category;          
     private String title;             
     private String content;           

@@ -68,8 +68,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Posts selectById(String id) throws Exception {
-        return postMapper.selectById(id);
+    public Posts selectById(int postId) throws Exception {
+        return postMapper.selectById(postId);
     }
 
     @Override
@@ -113,67 +113,67 @@ public class PostServiceImpl implements PostService {
         return true;
     }
 
-    @Override
-    public boolean updateById(Posts post) throws Exception {
-        Posts oldPost = postMapper.selectById(String.valueOf(post.getPostId()));
-        if (oldPost != null) {
-            List<String> oldImages = extractImageFileNames(oldPost.getContent());
-            List<String> newImages = extractImageFileNames(post.getContent());
+        @Override
+        public boolean updateById(Posts post) throws Exception {
+            Posts oldPost = postMapper.selectById(post.getPostId());
+            if (oldPost != null) {
+                List<String> oldImages = extractImageFileNames(oldPost.getContent());
+                List<String> newImages = extractImageFileNames(post.getContent());
 
-            List<String> deletedImages = oldImages.stream()
-                    .filter(img -> !newImages.contains(img))
-                    .collect(Collectors.toList());
-            deleteImages(deletedImages);
-        }
-
-        boolean success = postMapper.updateById(post) > 0;
-        if (!success) return false;
-
-        Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
-                .matcher(post.getContent());
-        if (matcher.find()) {
-            post.setThumbnailUrl(matcher.group(1));
-            postMapper.updateThumbnail(post);
-        }
-
-        tagMapper.deletePostTagsByPostId(post.getPostId());
-
-        String tagStr = post.getTags();
-        if (tagStr != null && !tagStr.trim().isEmpty()) {
-            String[] tagNames = tagStr.split(",");
-            for (String rawName : tagNames) {
-                String name = rawName.trim();
-                if (name.isEmpty()) continue;
-
-                Integer tagId = tagMapper.findTagIdByName(name);
-                if (tagId == null) {
-                    Tag tag = new Tag();
-                    tag.setName(name);
-                    tagMapper.insertTag(tag);
-                    tagId = tag.getTagId();
-                }
-                tagMapper.insertPostTag(post.getPostId(), tagId);
+                List<String> deletedImages = oldImages.stream()
+                        .filter(img -> !newImages.contains(img))
+                        .collect(Collectors.toList());
+                deleteImages(deletedImages);
             }
-        }
 
-        return true;
-    }
+            boolean success = postMapper.updateById(post) > 0;
+            if (!success) return false;
+
+            Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
+                    .matcher(post.getContent());
+            if (matcher.find()) {
+                post.setThumbnailUrl(matcher.group(1));
+                postMapper.updateThumbnail(post);
+            }
+
+            tagMapper.deletePostTagsByPostId(post.getPostId());
+
+            String tagStr = post.getTags();
+            if (tagStr != null && !tagStr.trim().isEmpty()) {
+                String[] tagNames = tagStr.split(",");
+                for (String rawName : tagNames) {
+                    String name = rawName.trim();
+                    if (name.isEmpty()) continue;
+
+                    Integer tagId = tagMapper.findTagIdByName(name);
+                    if (tagId == null) {
+                        Tag tag = new Tag();
+                        tag.setName(name);
+                        tagMapper.insertTag(tag);
+                        tagId = tag.getTagId();
+                    }
+                    tagMapper.insertPostTag(post.getPostId(), tagId);
+                }
+            }
+
+            return true;
+        }
 
 
    @Override
-    public boolean deleteById(String id) throws Exception {
-        Posts post = postMapper.selectById(id);
+    public boolean deleteById(int postId) throws Exception {
+        Posts post = postMapper.selectById(postId);
         if (post != null) {
             List<String> imageFiles = extractImageFileNames(post.getContent());
-            deleteImages(imageFiles); // ✅ 이미지 삭제
+            deleteImages(imageFiles); 
         }
 
-        return postMapper.deleteById(id) > 0;
+        return postMapper.deleteById(postId) > 0;
     }
 
     @Override
-    public boolean isOwner(String id, Long userId) throws Exception {
-        Posts post = postMapper.selectById(id);
+    public boolean isOwner(int postId, Long userId) throws Exception {
+        Posts post = postMapper.selectById(postId);
         return post != null && post.getUserId().equals(userId);
     }
 

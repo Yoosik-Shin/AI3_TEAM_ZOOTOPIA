@@ -44,7 +44,7 @@ public class LostAnimalServiceImpl implements LostAnimalService {
     }
 
     @Override
-    public long getTotalCount() {
+    public long countAll() {
         return lostAnimalMapper.countAll();
     }
 
@@ -65,9 +65,11 @@ public class LostAnimalServiceImpl implements LostAnimalService {
 
     @Override
     public boolean update(LostAnimalPost post) {
+        // 기존 게시글 가져오기
         LostAnimalPost oldPost = lostAnimalMapper.findById(post.getPostId());
 
         if (oldPost != null) {
+            // 🔽 기존 vs 새로운 이미지 비교 후 삭제
             List<String> oldImages = extractImageFileNames(oldPost.getContent());
             List<String> newImages = extractImageFileNames(post.getContent());
 
@@ -78,16 +80,42 @@ public class LostAnimalServiceImpl implements LostAnimalService {
             deleteImages(deletedImages);
         }
 
+        // 📝 게시글 내용 수정
         boolean success = lostAnimalMapper.update(post) > 0;
         if (!success) return false;
 
-        extractAndSetThumbnail(post);
+        // 🖼️ 썸네일 추출 및 저장
+        Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
+            .matcher(post.getContent());
+        if (matcher.find()) {
+            post.setThumbnailUrl(matcher.group(1));
+            lostAnimalMapper.updateThumbnail(post);
+        }
 
-        tagMapper.deleteLostPostTagsByPostId(post.getPostId()); // ✅ 변경됨
-        insertTags(post);
+        // 🏷️ 태그 재설정
+        tagMapper.deleteLostPostTagsByPostId(post.getPostId());
+
+        String tagStr = post.getTags();
+        if (tagStr != null && !tagStr.trim().isEmpty()) {
+            String[] tagNames = tagStr.split(",");
+            for (String rawName : tagNames) {
+                String name = rawName.trim();
+                if (name.isEmpty()) continue;
+
+                Integer tagId = tagMapper.findTagIdByName(name);
+                if (tagId == null) {
+                    Tag tag = new Tag();
+                    tag.setName(name);
+                    tagMapper.insertTag(tag);
+                    tagId = tag.getTagId();
+                }
+                tagMapper.insertLostPostTag(post.getPostId(), tagId);
+            }
+        }
 
         return true;
     }
+
 
     @Override
     public boolean delete(int postId) {
@@ -139,8 +167,7 @@ public class LostAnimalServiceImpl implements LostAnimalService {
 
     private void applyTagsToPostList(List<LostAnimalPost> postList) {
         List<Integer> postIds = postList.stream().map(LostAnimalPost::getPostId).toList();
-        List<Tag> tagResults = tagMapper.selectTagsByPostIds(postIds); // ✅ 변경됨
-
+        List<Tag> tagResults = tagMapper.selectTagsByPostIds(postIds); 
         Map<Integer, List<Tag>> tagMap = tagResults.stream()
             .collect(Collectors.groupingBy(Tag::getPostId));
 
@@ -170,4 +197,36 @@ public class LostAnimalServiceImpl implements LostAnimalService {
             }
         }
     }
+
+
+    @Override
+    public boolean isOwner(int postId, Long userId)  {
+        LostAnimalPost post = lostAnimalMapper.findById(postId);
+        return post != null && post.getUserId().equals(userId);
+    }
+
+    @Override
+    public void increaseCommentCount(int postId) {
+        lostAnimalMapper.updateCommentCount(postId); 
+    }
+
+    @Override
+    public void decreaseCommentCount(int postId) {
+        lostAnimalMapper.minusCommentCount(postId);
+    }
+
+    @Override
+    public List<LostAnimalPost> pageBySearch(String type, String keyword, Pagination pagination) throws Exception {
+        return lostAnimalMapper.pageBySearch(type, keyword, pagination);
+    }
+    
+    @Override
+    public long countBySearch(String type, String keyword) throws Exception {
+        return lostAnimalMapper.countBySearch(type, keyword);
+    }
+
+
+
+
+
 }

@@ -122,5 +122,70 @@
     </foreach>
   </select>
 
+    <!-- 댓글 수 증가-->
+  <update id="updateCommentCount" parameterType="int">
+    UPDATE lost_animals
+    SET comment_count = comment_count + 1
+    WHERE post_id = #{postId}
+  </update>
+  <!-- 댓글 수 감소 -->
+  <update id="minusCommentCount" parameterType="int">
+    UPDATE lost_animals
+    SET comment_count = comment_count - 1
+    WHERE post_id = #{postId}
+  </update>
+
+  
+  <!-- 게시글 검색 + 페이징 -->
+  <select id="pageBySearch" resultMap="LostAnimalMap">
+    SELECT 
+      l.*,
+      u.nickname,
+      u.profile_img
+    FROM lost_animals l
+    LEFT JOIN users u ON l.user_id = u.user_id
+    <where>
+      <if test="type == 'title'">
+        l.title LIKE CONCAT('%', #{keyword}, '%')
+      </if>
+      <if test="type == 'titleContent'">
+        (l.title LIKE CONCAT('%', #{keyword}, '%') OR l.content LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+      <if test="type == 'tag'">
+        l.post_id IN (
+          SELECT lat.post_id
+          FROM lost_animal_tags lat
+          JOIN tags t ON lat.tag_id = t.tag_id
+          WHERE t.name LIKE CONCAT('%', #{keyword}, '%')
+        )
+      </if>
+    </where>
+    ORDER BY l.post_id DESC
+    LIMIT #{pagination.offset}, #{pagination.limit}
+  </select>
+
+
+  <select id="countBySearch" resultType="long">
+    SELECT COUNT(*) 
+    FROM lost_animals
+    <where>
+      <if test="type == 'title'">
+        title LIKE CONCAT('%', #{keyword}, '%')
+      </if>
+      <if test="type == 'titleContent'">
+        (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+      <if test="type == 'tag'">
+        post_id IN (
+          SELECT lat.post_id
+          FROM lost_animal_tags lat
+          JOIN tags t ON lat.tag_id = t.tag_id
+          WHERE t.name LIKE CONCAT('%', #{keyword}, '%')
+        )
+      </if>
+    </where>
+  </select>
+
+
 
 </mapper>
