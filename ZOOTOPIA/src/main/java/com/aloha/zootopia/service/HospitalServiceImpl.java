@@ -10,7 +10,6 @@ import com.aloha.zootopia.domain.Hospital;
 import com.aloha.zootopia.domain.HospReview;
 import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.dto.HospitalForm;
-import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.mapper.AnimalMapper;
 import com.aloha.zootopia.mapper.HospitalMapper;

@@ -3,25 +3,33 @@ package com.aloha.zootopia.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.aloha.zootopia.domain.Product;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.aloha.zootopia.domain.Pagination;
+import com.aloha.zootopia.domain.Product;
 
 @Controller
 @RequestMapping("/products")
 public class ProductController {
     
-    // @Autowired
-    // private ProductService productService;
-    
-    // @Autowired
-    // private FileUploadService fileUploadService;
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.aloha.zootopia.service.ProductService productService;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.aloha.zootopia.service.FileUploadService fileUploadService;
     
     // 테스트용 API 엔드포인트
     @GetMapping("/test")
@@ -120,7 +128,7 @@ public class ProductController {
         
         System.out.println("상품 정보 설정 완료");
         
-        return "products/detail_complete";
+        return "products/detail";
     }
     
     // 테스트용 상품 상세 페이지
@@ -206,147 +214,147 @@ public class ProductController {
 //     }
     
 //     // 상품 등록 페이지
-//     @GetMapping("/create")
-//     public String createForm(Model model) {
-//         // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-//         // if (!isAdmin()) {
-//         //     model.addAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-//         //     return "redirect:/products/list";
-//         // }
+    @GetMapping("/create")
+    public String createForm(Model model) {
+        // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
+        // if (!isAdmin()) {
+        //     model.addAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
+        //     return "redirect:/products/list";
+        // }
         
-//         model.addAttribute("product", new Product());
-//         return "products/create";
-//     }
+        model.addAttribute("product", new Product());
+        return "products/create";
+    }
     
 //     // 상품 등록 처리
-//     @PostMapping("/create")
-//     public String create(Product product, 
-//                         @RequestParam(required = false) MultipartFile imageFile,
-//                         RedirectAttributes redirectAttributes) {
-//         try {
-//             // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-//             // if (!isAdmin()) {
-//             //     redirectAttributes.addFlashAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-//             //     return "redirect:/products/list";
-//             // }
+    @PostMapping("/create")
+    public String create(Product product, 
+                        @RequestParam(required = false) MultipartFile imageFile,
+                        RedirectAttributes redirectAttributes) {
+        try {
+            // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
+            if (!isAdmin()) {
+                redirectAttributes.addFlashAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
+                return "redirect:/products/list";
+            }
             
-//             // 이미지 파일 업로드 처리
-//             if (imageFile != null && !imageFile.isEmpty()) {
-//                 String imageUrl = fileUploadService.uploadFile(imageFile);
-//                 product.setImageUrl(imageUrl);
-//             } else {
-//                 product.setImageUrl("/img/default-thumbnail.png");
-//             }
+            // 이미지 파일 업로드 처리
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String imageUrl = fileUploadService.uploadFile(imageFile);
+                product.setImageUrl(imageUrl);
+            } else {
+                product.setImageUrl("/img/default-thumbnail.png");
+            }
             
 //             // 상품 등록
-//             int result = productService.insert(product);
+            int result = productService.insert(product);
             
-//             if (result > 0) {
-//                 redirectAttributes.addFlashAttribute("success", "상품이 성공적으로 등록되었습니다.");
-//                 return "redirect:/products/list";
-//             } else {
-//                 redirectAttributes.addFlashAttribute("error", "상품 등록에 실패했습니다.");
-//                 return "redirect:/products/create";
-//             }
+            if (result > 0) {
+                redirectAttributes.addFlashAttribute("success", "상품이 성공적으로 등록되었습니다.");
+                return "redirect:/products/list";
+            } else {
+                redirectAttributes.addFlashAttribute("error", "상품 등록에 실패했습니다.");
+                return "redirect:/products/create";
+            }
             
-//         } catch (Exception e) {
-//             redirectAttributes.addFlashAttribute("error", "오류가 발생했습니다: " + e.getMessage());
-//             return "redirect:/products/create";
-//         }
-//     }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "오류가 발생했습니다: " + e.getMessage());
+            return "redirect:/products/create";
+        }
+    }
     
 //     // 장바구니 추가 기능
-//     @PostMapping("/add-to-cart")
-//     @ResponseBody
-//     public ResponseEntity<Map<String, Object>> addToCart(@RequestParam int productNo, 
-//                                                         @RequestParam String option,
-//                                                         @RequestParam int quantity) {
-//         Map<String, Object> response = new HashMap<>();
-//         try {
-//             // 로그인 확인
-//             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
-//                 response.put("success", false);
-//                 response.put("message", "로그인이 필요합니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+    @PostMapping("/add-to-cart")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> addToCart(@RequestParam int productNo, 
+                                                        @RequestParam String option,
+                                                        @RequestParam int quantity) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 로그인 확인
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                response.put("success", false);
+                response.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 상품 존재 확인
-//             Product product = productService.getByNo(productNo);
-//             if (product == null) {
-//                 response.put("success", false);
-//                 response.put("message", "상품을 찾을 수 없습니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+            // 상품 존재 확인
+            Product product = productService.getByNo(productNo);
+            if (product == null) {
+                response.put("success", false);
+                response.put("message", "상품을 찾을 수 없습니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 재고 확인
-//             if (product.getStock() < quantity) {
-//                 response.put("success", false);
-//                 response.put("message", "재고가 부족합니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+            // 재고 확인
+            if (product.getStock() < quantity) {
+                response.put("success", false);
+                response.put("message", "재고가 부족합니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 장바구니 추가 로직 (추후 CartService 구현)
-//             // cartService.addToCart(username, productNo, option, quantity);
+            // 장바구니 추가 로직 (추후 CartService 구현)
+            // cartService.addToCart(username, productNo, option, quantity);
             
-//             response.put("success", true);
-//             response.put("message", "장바구니에 추가되었습니다.");
-//             System.out.println("장바구니 추가: " + auth.getName() + " - 상품 " + productNo + " (옵션: " + option + ", 수량: " + quantity + ")");
+            response.put("success", true);
+            response.put("message", "장바구니에 추가되었습니다.");
+            System.out.println("장바구니 추가: " + auth.getName() + " - 상품 " + productNo + " (옵션: " + option + ", 수량: " + quantity + ")");
             
-//         } catch (Exception e) {
-//             e.printStackTrace();
-//             response.put("success", false);
-//             response.put("message", "오류가 발생했습니다: " + e.getMessage());
-//         }
-//         return ResponseEntity.ok(response);
-//     }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "오류가 발생했습니다: " + e.getMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
     
-//     // 바로 구매 기능
-//     @PostMapping("/buy-now")
-//     @ResponseBody
-//     public ResponseEntity<Map<String, Object>> buyNow(@RequestParam int productNo,
-//                                                      @RequestParam String option,
-//                                                      @RequestParam int quantity) {
-//         Map<String, Object> response = new HashMap<>();
-//         try {
-//             // 로그인 확인
-//             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
-//                 response.put("success", false);
-//                 response.put("message", "로그인이 필요합니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+    // 바로 구매 기능
+    @PostMapping("/buy-now")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> buyNow(@RequestParam int productNo,
+                                                     @RequestParam String option,
+                                                     @RequestParam int quantity) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 로그인 확인
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                response.put("success", false);
+                response.put("message", "로그인이 필요합니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 상품 존재 확인
-//             Product product = productService.getByNo(productNo);
-//             if (product == null) {
-//                 response.put("success", false);
-//                 response.put("message", "상품을 찾을 수 없습니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+            // 상품 존재 확인
+            Product product = productService.getByNo(productNo);
+            if (product == null) {
+                response.put("success", false);
+                response.put("message", "상품을 찾을 수 없습니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 재고 확인
-//             if (product.getStock() < quantity) {
-//                 response.put("success", false);
-//                 response.put("message", "재고가 부족합니다.");
-//                 return ResponseEntity.ok(response);
-//             }
+            // 재고 확인
+            if (product.getStock() < quantity) {
+                response.put("success", false);
+                response.put("message", "재고가 부족합니다.");
+                return ResponseEntity.ok(response);
+            }
             
-//             // 주문 페이지로 리다이렉트할 URL 생성 (추후 OrderController 구현)
-//             String orderUrl = "/orders/create?productNo=" + productNo + "&option=" + option + "&quantity=" + quantity;
+            // 주문 페이지로 리다이렉트할 URL 생성 (추후 OrderController 구현)
+            String orderUrl = "/orders/create?productNo=" + productNo + "&option=" + option + "&quantity=" + quantity;
             
-//             response.put("success", true);
-//             response.put("message", "주문 페이지로 이동합니다.");
-//             response.put("redirectUrl", orderUrl);
-//             System.out.println("바로구매: " + auth.getName() + " - 상품 " + productNo + " (옵션: " + option + ", 수량: " + quantity + ")");
+            response.put("success", true);
+            response.put("message", "주문 페이지로 이동합니다.");
+            response.put("redirectUrl", orderUrl);
+            System.out.println("바로구매: " + auth.getName() + " - 상품 " + productNo + " (옵션: " + option + ", 수량: " + quantity + ")");
             
-//         } catch (Exception e) {
-//             e.printStackTrace();
-//             response.put("success", false);
-//             response.put("message", "오류가 발생했습니다: " + e.getMessage());
-//         }
-//         return ResponseEntity.ok(response);
-//     }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "오류가 발생했습니다: " + e.getMessage());
+        }
+        return ResponseEntity.ok(response);
+    }
     
 //     // 리뷰 작성 기능
 //     @PostMapping("/add-review")
@@ -387,15 +395,15 @@ public class ProductController {
 //         return ResponseEntity.ok(response);
 //     }
     
-//     // 관리자 권한 확인
-//     private boolean isAdmin() {
-//         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//         if (auth != null && auth.isAuthenticated()) {
-//             String username = auth.getName();
-//             return "super@admin.com".equals(username);
-//         }
-//         return false;
-//     }
+    // 관리자 권한 확인
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            String username = auth.getName();
+            return "super@admin.com".equals(username);
+        }
+        return false;
+    }
     
     // 더미 데이터 생성 메서드 - 실제 상품 이미지 기반 (CartController에서도 사용)
     public List<Product> createDummyProducts() {
@@ -634,31 +642,7 @@ public class ProductController {
     }
     
     // 관련 상품 가져오기 (하드코딩)
-    private List<Product> getRelatedProducts(String category, int excludeNo) {
-        List<Product> relatedProducts = new java.util.ArrayList<>();
-        
-        if ("사료".equals(category)) {
-            if (excludeNo != 1) {
-                Product p1 = getProductByNo(1);
-                if (p1 != null) relatedProducts.add(p1);
-            }
-            if (excludeNo != 7) {
-                Product p7 = getProductByNo(7);
-                if (p7 != null) relatedProducts.add(p7);
-            }
-            if (excludeNo != 9) {
-                Product p9 = getProductByNo(9);
-                if (p9 != null) relatedProducts.add(p9);
-            }
-        } else if ("용품".equals(category)) {
-            if (excludeNo != 13) {
-                Product p13 = getProductByNo(13);
-                if (p13 != null) relatedProducts.add(p13);
-            }
-        }
-        
-        return relatedProducts;
-    }
+    // (메서드가 사용되지 않아 삭제됨)
     
     // 간단한 템플릿 테스트
     @GetMapping("/template-detail/{no}")

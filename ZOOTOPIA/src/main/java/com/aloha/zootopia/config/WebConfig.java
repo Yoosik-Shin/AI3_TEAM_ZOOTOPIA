@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.lang.NonNull;
 
 @Configuration          // 빈 등록 설정 클래스 지정
 public class WebConfig implements WebMvcConfigurer {
@@ -18,9 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
         // NoOpPasswordEncoder          : 암호화 없이 비밀번호를 저장
         // ...
     }
-
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///C:/upload/");
     }
