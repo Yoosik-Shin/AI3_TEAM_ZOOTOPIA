@@ -14,8 +14,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LostAnimalCommentServiceImpl implements LostAnimalCommentService{
     
-     @Autowired
+    @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private LostAnimalService lostAnimalService;
 
     @Override
     public List<Comment> getCommentsByPostId(Integer postId) {
@@ -25,6 +28,7 @@ public class LostAnimalCommentServiceImpl implements LostAnimalCommentService{
     @Override
     public void addComment(Comment comment) {
         commentMapper.insertLost(comment);
+        lostAnimalService.increaseCommentCount(comment.getPostId());
     }
 
     @Override

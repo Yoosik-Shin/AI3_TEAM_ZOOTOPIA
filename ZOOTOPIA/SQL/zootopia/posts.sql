@@ -93,6 +93,32 @@ CREATE TABLE `post_comments` (
   `post_id` INT
 );
 
+ALTER TABLE post_likes
+DROP FOREIGN KEY FK_posts_TO_post_likes;
+
+ALTER TABLE post_likes
+ADD CONSTRAINT FK_posts_TO_post_likes
+FOREIGN KEY (post_id) REFERENCES posts(post_id)
+ON DELETE CASCADE;
+
+ALTER TABLE post_comments
+DROP FOREIGN KEY FK_posts_TO_post_comments;
+
+ALTER TABLE post_comments
+ADD CONSTRAINT FK_posts_TO_post_comments
+FOREIGN KEY (post_id) REFERENCES posts(post_id)
+ON DELETE CASCADE;
+
+
+ALTER TABLE lost_animal_comments
+DROP FOREIGN KEY FK_lost_animals_TO_lost_animal_comments;
+
+ALTER TABLE lost_animal_comments
+ADD CONSTRAINT FK_lost_animal_TO_lost_animal_comments
+FOREIGN KEY (post_id) REFERENCES lost_animals(post_id)
+ON DELETE CASCADE;
+
+
 DROP TABLE IF EXISTS `user_pets`;
 
 CREATE TABLE `user_pets` (
@@ -200,3 +226,5 @@ CREATE TABLE `lost_animal_comments` (
     FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='유실동물 게시판 댓글';
 
+ALTER TABLE post_comments
+ADD COLUMN parent_id INT NULL;

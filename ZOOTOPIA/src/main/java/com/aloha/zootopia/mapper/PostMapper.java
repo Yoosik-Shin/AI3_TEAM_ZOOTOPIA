@@ -22,7 +22,7 @@ public interface PostMapper {
     long count(Pagination pagination) throws Exception;
 
     // 단건 조회
-    Posts selectById(String id) throws Exception;
+    Posts selectById(int postId) throws Exception;
 
     // 등록
     int insert(Posts post) throws Exception;
@@ -31,7 +31,7 @@ public interface PostMapper {
     int updateById(Posts post) throws Exception;
 
     // 삭제
-    int deleteById(String id) throws Exception;
+    int deleteById(int postId) throws Exception;
 
     // 썸네일 업데이트
     int updateThumbnail(Posts post) throws Exception;

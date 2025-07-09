@@ -109,7 +109,7 @@ public class PostController {
      */
    @GetMapping("/read/{id}")
     public String read(
-        @PathVariable("id") String id,
+        @PathVariable("id") int id,
         Model model,
         HttpServletRequest request,
         @RequestParam(value = "editId", required = false) Integer editId,
@@ -181,7 +181,7 @@ public class PostController {
         }
 
 
-        post.setUserId(user.getUser().getUserId());  // userId 수동 세팅
+        post.setUserId(user.getUser().getUserId());  
         
         boolean result = postService.insert(post);
         if (result) {
@@ -229,11 +229,11 @@ public class PostController {
      */
     @PostMapping("/delete/{id}")
     public String delete(
-        @PathVariable("id") String id,
-        @AuthenticationPrincipal CustomUser user,   // 🔐 로그인 정보 가져오기
+        @PathVariable("id") int id,
+        @AuthenticationPrincipal CustomUser user,
         RedirectAttributes ra
     ) throws Exception {
-        // 🛡️ 글쓴이인지 확인
+        // 🔐 글쓴이인지 확인
         boolean isOwner = postService.isOwner(id, user.getUser().getUserId());
 
         if (!isOwner) {
@@ -241,6 +241,7 @@ public class PostController {
             return "redirect:/posts/list";
         }
 
+        // 🧹 삭제 서비스 호출 (댓글 + 이미지 포함)
         boolean result = postService.deleteById(id);
 
         if (result) {
@@ -255,12 +256,16 @@ public class PostController {
 
     @GetMapping("/edit/{id}")
     public String editForm(
-        @PathVariable("id") String id,
+        @PathVariable("id") int id,
         @AuthenticationPrincipal CustomUser user,
         Model model,
         RedirectAttributes ra
     ) throws Exception {
 
+        if (user == null) {
+            ra.addFlashAttribute("alert", "로그인 후 이용해주세요.");
+            return "redirect:/login";
+        }
         boolean isOwner = postService.isOwner(id, user.getUserId());
         if (!isOwner) {
             ra.addFlashAttribute("error", "수정 권한이 없습니다.");
@@ -275,7 +280,7 @@ public class PostController {
 
     @PostMapping("/edit/{id}")
     public String update(
-        @PathVariable("id") String id,
+        @PathVariable("id") int id,
         @ModelAttribute Posts post,
         @AuthenticationPrincipal CustomUser user,
         RedirectAttributes ra
@@ -299,7 +304,7 @@ public class PostController {
         }
 
         // 수동 설정
-        post.setId(id);
+        post.setPostId(id);
         post.setUserId(user.getUserId());
 
         boolean result = postService.updateById(post); // 이미지 따로 안 다루는 경우
