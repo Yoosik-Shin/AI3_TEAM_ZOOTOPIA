@@ -1,7 +1,8 @@
 package com.aloha.zootopia.controller;
 
+import java.util.HashMap;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,18 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.aloha.zootopia.domain.Product;
 import com.aloha.zootopia.domain.Pagination;
-import com.aloha.zootopia.service.ProductService;
-import com.aloha.zootopia.service.FileUploadService;
 
 @Controller
 @RequestMapping("/products")
 public class ProductController {
     
-    @Autowired
-    private ProductService productService;
+    // @Autowired
+    // private ProductService productService;
     
-    @Autowired
-    private FileUploadService fileUploadService;
+    // @Autowired
+    // private FileUploadService fileUploadService;
     
     // 테스트용 API 엔드포인트
     @GetMapping("/test")
@@ -99,54 +98,29 @@ public class ProductController {
         }
     }
     
-    // 상품 상세 페이지
+    // 상품 상세 페이지 - 완성된 버전
     @GetMapping("/detail/{no}")
-    public String detail(@PathVariable int no, Model model) {
-        System.out.println("=== ProductController /detail/" + no + " 호출됨 ===");
+    public String detail(@PathVariable("no") Integer productNumber, Model model) {
+        System.out.println("=== 상품 상세 페이지 호출됨: " + productNumber + " ===");
         
-        try {
-            // 더미 데이터에서 해당 상품 찾기
-            List<Product> allProducts = createDummyProducts();
-            System.out.println("총 더미 상품 수: " + allProducts.size());
-            
-            Product product = null;
-            for (Product p : allProducts) {
-                if (p.getNo() == no) {
-                    product = p;
-                    break;
-                }
-            }
-            
-            if (product == null) {
-                System.out.println("상품 번호 " + no + "을 찾을 수 없음");
-                model.addAttribute("error", "상품을 찾을 수 없습니다.");
-                return "error/404";
-            }
-            
-            System.out.println("찾은 상품: " + product.getName() + ", 가격: " + product.getPrice());
-            
-            // 관련 상품들 (같은 카테고리 상품 3개) - 더 안전한 방식으로
-            List<Product> relatedProducts = new java.util.ArrayList<>();
-            for (Product p : allProducts) {
-                if (p.getCategory().equals(product.getCategory()) && p.getNo() != no) {
-                    relatedProducts.add(p);
-                    if (relatedProducts.size() >= 3) break;
-                }
-            }
-            
-            System.out.println("관련 상품 수: " + relatedProducts.size());
-            
-            model.addAttribute("product", product);
-            model.addAttribute("relatedProducts", relatedProducts);
-            
-            return "products/detail";
-            
-        } catch (Exception e) {
-            System.err.println("상품 상세 조회 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
-            model.addAttribute("error", "상품 정보를 불러오는 중 오류가 발생했습니다.");
-            return "error/500";
-        }
+        // 더미 상품 데이터 생성
+        model.addAttribute("productNo", productNumber);
+        model.addAttribute("productName", "ZOOTOPIA 프리미엄 사료 " + productNumber);
+        model.addAttribute("productPrice", (productNumber * 15000));
+        model.addAttribute("productCategory", productNumber % 2 == 0 ? "사료" : "용품");
+        model.addAttribute("productDescription", 
+            "반려동물을 위한 최고급 " + (productNumber % 2 == 0 ? "사료" : "용품") + 
+            "입니다. 영양소가 풍부하고 소화가 잘되며, 반려동물의 건강을 위해 엄선된 재료로 만들어졌습니다.");
+        model.addAttribute("productStock", 50 + (productNumber * 10));
+        model.addAttribute("productRating", 4.5 + (productNumber % 5) * 0.1);
+        model.addAttribute("productReviewCount", 120 + (productNumber * 8));
+        
+        // 기본 수량
+        model.addAttribute("quantity", 1);
+        
+        System.out.println("상품 정보 설정 완료");
+        
+        return "products/detail_complete";
     }
     
     // 테스트용 상품 상세 페이지
@@ -161,6 +135,35 @@ public class ProductController {
     public String detailStatic(@PathVariable int no, Model model) {
         System.out.println("=== 정적 테스트 페이지 호출됨: " + no + " ===");
         return "products/detail_static";
+    }
+    
+    // 가장 단순한 테스트 페이지
+    @GetMapping("/simple/{no}")
+    public String simple(@PathVariable int no, Model model) {
+        System.out.println("=== 간단 테스트 페이지 호출됨: " + no + " ===");
+        return "products/test_simple_detail";
+    }
+    
+    // 최소한의 데이터로 상세 페이지 테스트
+    @GetMapping("/minimal-detail/{no}")
+    public String minimalDetail(@PathVariable int no, Model model) {
+        System.out.println("=== 최소한 상세 페이지 호출됨: " + no + " ===");
+        
+        try {
+            Product product = new Product();
+            product.setNo(no);
+            product.setName("테스트 상품 " + no);
+            product.setPrice(10000 + (no * 1000));
+            product.setCategory("테스트");
+            product.setDescription("테스트 상품 설명");
+            
+            model.addAttribute("product", product);
+            return "products/detail_minimal";
+        } catch (Exception e) {
+            System.err.println("최소한 상세 페이지 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "error/500";
+        }
     }
     
 //     // 좋아요/싫어요 토글 기능
@@ -437,21 +440,96 @@ public class ProductController {
         return dummyList;
     }
     
-    // 상품 추가 헬퍼 메서드
+    // 간단한 더미 데이터 생성 메서드 (안전함)
+    public List<Product> createSimpleDummyProducts() {
+        List<Product> dummyList = new java.util.ArrayList<>();
+        
+        try {
+            // 기본 상품들만 생성
+            Product p1 = new Product();
+            p1.setNo(1);
+            p1.setName("새 사료 - 사랑에 빠진 새");
+            p1.setCategory("사료");
+            p1.setDescription("새들이 좋아하는 영양가 높은 사료입니다.");
+            p1.setPrice(25000);
+            p1.setImageUrl("/assets/dist/img/products/foodbirdfallinlove.png");
+            p1.setStatus("판매중");
+            p1.setStock(10);
+            p1.setViews(50);
+            p1.setLikes(5);
+            p1.setDislikes(0);
+            dummyList.add(p1);
+            
+            Product p7 = new Product();
+            p7.setNo(7);
+            p7.setName("개 사료 - 아빠가 좋아해");
+            p7.setCategory("사료");
+            p7.setDescription("개들이 좋아하는 맛있는 사료입니다. 영양가가 풍부합니다.");
+            p7.setPrice(42000);
+            p7.setImageUrl("/assets/dist/img/products/foodddogaddylovesit.png");
+            p7.setStatus("판매중");
+            p7.setStock(15);
+            p7.setViews(75);
+            p7.setLikes(8);
+            p7.setDislikes(1);
+            dummyList.add(p7);
+            
+            Product p9 = new Product();
+            p9.setNo(9);
+            p9.setName("개&고양이 습식 사료");
+            p9.setCategory("사료");
+            p9.setDescription("수분이 풍부한 습식 사료로 기호성이 뛰어납니다.");
+            p9.setPrice(48000);
+            p9.setImageUrl("/assets/dist/img/products/fooddogcatmoistured.png");
+            p9.setStatus("판매중");
+            p9.setStock(8);
+            p9.setViews(30);
+            p9.setLikes(3);
+            p9.setDislikes(0);
+            dummyList.add(p9);
+            
+            Product p13 = new Product();
+            p13.setNo(13);
+            p13.setName("고양이 목걸이");
+            p13.setCategory("용품");
+            p13.setDescription("고양이용 방울이 달린 예쁜 목걸이입니다.");
+            p13.setPrice(15000);
+            p13.setImageUrl("/assets/dist/img/products/productcatbellnecklace.png");
+            p13.setStatus("판매중");
+            p13.setStock(20);
+            p13.setViews(45);
+            p13.setLikes(7);
+            p13.setDislikes(0);
+            dummyList.add(p13);
+            
+        } catch (Exception e) {
+            System.err.println("간단한 더미 데이터 생성 중 오류: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return dummyList;
+    }
+    
+    // 상품 추가 헬퍼 메서드 - 안전한 버전
     private void addProduct(List<Product> list, int no, String name, String category, String description, int price, String imageUrl) {
-        Product product = new Product();
-        product.setNo(no);
-        product.setName(name);
-        product.setCategory(category);
-        product.setDescription(description);
-        product.setPrice(price);
-        product.setImageUrl(imageUrl);
-        product.setStatus("판매중");
-        product.setStock((int)(Math.random() * 20) + 5); // 5-24개 랜덤 재고
-        product.setViews((int)(Math.random() * 100) + 1); // 1-100 랜덤 조회수
-        product.setLikes((int)(Math.random() * 20)); // 0-19 랜덤 좋아요
-        product.setDislikes((int)(Math.random() * 5)); // 0-4 랜덤 싫어요
-        list.add(product);
+        try {
+            Product product = new Product();
+            product.setNo(no);
+            product.setName(name);
+            product.setCategory(category);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setImageUrl(imageUrl);
+            product.setStatus("판매중");
+            product.setStock(10); // 고정값으로 변경
+            product.setViews(50); // 고정값으로 변경
+            product.setLikes(5); // 고정값으로 변경
+            product.setDislikes(0); // 고정값으로 변경
+            list.add(product);
+        } catch (Exception e) {
+            System.err.println("상품 추가 중 오류: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     // 더미 데이터 테스트용 엔드포인트
@@ -478,5 +556,284 @@ public class ProductController {
         } catch (Exception e) {
             return "오류: " + e.getMessage() + "<br>" + java.util.Arrays.toString(e.getStackTrace());
         }
+    }
+    
+    // 기본 템플릿 테스트
+    @GetMapping("/template-test/{no}")
+    public String templateTest(@PathVariable int no, Model model) {
+        System.out.println("=== 기본 템플릿 테스트 호출됨: " + no + " ===");
+        return "test_basic";
+    }
+    
+    // PathVariable 없는 테스트
+    @GetMapping("/no-param-test")
+    @ResponseBody
+    public String noParamTest() {
+        return "<h1>PathVariable 없는 테스트</h1><p>이 응답이 보인다면 기본 매핑은 작동합니다.</p>";
+    }
+    
+    // 상품 번호로 상품 찾기 (단순화된 버전)
+    public Product getProductByNo(int no) {
+        System.out.println("getProductByNo 호출됨: " + no);
+        
+        try {
+            Product product = new Product();
+            
+            // 단순한 switch 문으로 처리
+            switch (no) {
+                case 1:
+                    product.setNo(1);
+                    product.setName("새 사료 - 사랑에 빠진 새");
+                    product.setCategory("사료");
+                    product.setDescription("새들이 좋아하는 영양가 높은 사료입니다.");
+                    product.setPrice(25000);
+                    product.setImageUrl("/img/default-thumbnail.png");
+                    break;
+                case 2:
+                    product.setNo(2);
+                    product.setName("새 사료 - 부엉이가 본");
+                    product.setCategory("사료");
+                    product.setDescription("다양한 곡물과 씨앗이 포함된 프리미엄 새 사료입니다.");
+                    product.setPrice(28000);
+                    product.setImageUrl("/img/default-thumbnail.png");
+                    break;
+                case 3:
+                    product.setNo(3);
+                    product.setName("새 사료 - 스크림");
+                    product.setCategory("사료");
+                    product.setDescription("새들의 건강을 위한 특별한 배합의 사료입니다.");
+                    product.setPrice(22000);
+                    product.setImageUrl("/img/default-thumbnail.png");
+                    break;
+                default:
+                    // 다른 번호는 기본 상품으로 처리
+                    product.setNo(no);
+                    product.setName("상품 " + no);
+                    product.setCategory("기타");
+                    product.setDescription("상품 " + no + "의 설명입니다.");
+                    product.setPrice(10000 + (no * 1000));
+                    product.setImageUrl("/img/default-thumbnail.png");
+                    break;
+            }
+            
+            // 공통 속성 설정
+            product.setStatus("판매중");
+            product.setStock(10);
+            product.setViews(0);
+            product.setLikes(0);
+            product.setDislikes(0);
+            
+            System.out.println("상품 생성 완료: " + product.getName());
+            return product;
+            
+        } catch (Exception e) {
+            System.err.println("getProductByNo 오류: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    // 관련 상품 가져오기 (하드코딩)
+    private List<Product> getRelatedProducts(String category, int excludeNo) {
+        List<Product> relatedProducts = new java.util.ArrayList<>();
+        
+        if ("사료".equals(category)) {
+            if (excludeNo != 1) {
+                Product p1 = getProductByNo(1);
+                if (p1 != null) relatedProducts.add(p1);
+            }
+            if (excludeNo != 7) {
+                Product p7 = getProductByNo(7);
+                if (p7 != null) relatedProducts.add(p7);
+            }
+            if (excludeNo != 9) {
+                Product p9 = getProductByNo(9);
+                if (p9 != null) relatedProducts.add(p9);
+            }
+        } else if ("용품".equals(category)) {
+            if (excludeNo != 13) {
+                Product p13 = getProductByNo(13);
+                if (p13 != null) relatedProducts.add(p13);
+            }
+        }
+        
+        return relatedProducts;
+    }
+    
+    // 간단한 템플릿 테스트
+    @GetMapping("/template-detail/{no}")
+    public String templateDetail(@PathVariable int no, Model model) {
+        System.out.println("=== 템플릿 테스트 /template-detail/" + no + " 호출됨 ===");
+        
+        model.addAttribute("productNo", no);
+        model.addAttribute("productName", "테스트 상품");
+        
+        return "test_simple_detail";
+    }
+    
+    // 안전한 상품 상세 페이지 (예외 처리 강화)
+    @GetMapping("/safe-detail/{no}")
+    public String safeDetail(@PathVariable int no, Model model) {
+        System.out.println("=== SAFE ProductController /safe-detail/" + no + " 호출됨 ===");
+        
+        try {
+            System.out.println("SAFE 1. 메소드 시작, 상품번호: " + no);
+            
+            // 상품 번호 유효성 검증
+            if (no < 1 || no > 50) {
+                System.out.println("SAFE 2. 잘못된 상품 번호: " + no);
+                model.addAttribute("error", "잘못된 상품 번호입니다.");
+                return "error/404";
+            }
+            
+            System.out.println("SAFE 3. 상품 조회 시작");
+            
+            // 직접 Product 객체 생성하여 테스트
+            Product product = new Product();
+            product.setNo(no);
+            product.setName("테스트 상품 " + no);
+            product.setCategory("테스트");
+            product.setDescription("테스트용 상품입니다.");
+            product.setPrice(10000 + (no * 1000));
+            product.setImageUrl("/img/default-thumbnail.png");
+            product.setStatus("판매중");
+            product.setStock(10);
+            product.setViews(0);
+            product.setLikes(0);
+            
+            System.out.println("SAFE 4. 테스트 상품 생성 완료: " + product.getName());
+            
+            System.out.println("SAFE 5. 모델에 데이터 추가");
+            model.addAttribute("product", product);
+            
+            System.out.println("SAFE 6. 템플릿 반환");
+            return "products/detail";
+            
+        } catch (Exception e) {
+            System.err.println("❌ SAFE 상품 상세 조회 중 오류 발생: " + e.getMessage());
+            System.err.println("❌ SAFE 오류 클래스: " + e.getClass().getName());
+            e.printStackTrace();
+            
+            // 매우 안전한 fallback
+            return "products/detail_minimal";
+        }
+    }
+    
+    // 매우 단순한 테스트 엔드포인트
+    @GetMapping("/ultra-simple/{no}")
+    public String ultraSimple(@PathVariable int no, Model model) {
+        System.out.println("=== ULTRA SIMPLE /ultra-simple/" + no + " 호출됨 ===");
+        
+        try {
+            // 가장 기본적인 데이터만 추가
+            model.addAttribute("message", "Ultra Simple Test for Product " + no);
+            model.addAttribute("productNo", no);
+            
+            return "products/detail_minimal";
+            
+        } catch (Exception e) {
+            System.err.println("❌ ULTRA SIMPLE 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "error/500";
+        }
+    }
+    
+    // 정적 응답 테스트 (템플릿 없이)
+    @GetMapping("/static-test/{no}")
+    @ResponseBody
+    public String staticTest(@PathVariable int no) {
+        System.out.println("=== STATIC TEST /static-test/" + no + " 호출됨 ===");
+        
+        return "<html><body><h1>Static Test for Product " + no + "</h1><p>이 페이지가 보인다면 컨트롤러는 정상 작동합니다.</p><a href='/products'>목록으로</a></body></html>";
+    }
+    
+    // 정적 템플릿 테스트
+    @GetMapping("/template-static-test/{no}")
+    public String templateStaticTest(@PathVariable int no, Model model) {
+        System.out.println("=== TEMPLATE STATIC TEST /template-static-test/" + no + " 호출됨 ===");
+        
+        try {
+            return "test_static";
+        } catch (Exception e) {
+            System.err.println("❌ TEMPLATE STATIC TEST 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "error/500";
+        }
+    }
+    
+    // Thymeleaf 테스트
+    @GetMapping("/thymeleaf-test/{no}")
+    public String thymeleafTest(@PathVariable int no, Model model) {
+        System.out.println("=== THYMELEAF TEST /thymeleaf-test/" + no + " 호출됨 ===");
+        
+        try {
+            model.addAttribute("productNo", no);
+            model.addAttribute("message", "Hello Thymeleaf for Product " + no);
+            
+            return "test_thymeleaf";
+        } catch (Exception e) {
+            System.err.println("❌ THYMELEAF TEST 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "error/500";
+        }
+    }
+    
+    // Product 객체 테스트
+    @GetMapping("/product-object-test/{no}")
+    public String productObjectTest(@PathVariable int no, Model model) {
+        System.out.println("=== PRODUCT OBJECT TEST /product-object-test/" + no + " 호출됨 ===");
+        
+        try {
+            System.out.println("1. Product 객체 생성 시작");
+            
+            Product product = new Product();
+            product.setNo(no);
+            product.setName("테스트 상품 " + no);
+            product.setPrice(10000);
+            
+            System.out.println("2. Product 객체 생성 완료: " + product.getName());
+            
+            model.addAttribute("product", product);
+            
+            System.out.println("3. 모델에 추가 완료");
+            
+            return "test_thymeleaf";
+            
+        } catch (Exception e) {
+            System.err.println("❌ PRODUCT OBJECT TEST 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "error/500";
+        }
+    }
+    
+    // 정적 테스트용 상품 상세 페이지
+    @GetMapping("/detail-static-test/{no}")
+    public String detailStaticTest(@PathVariable int no) {
+        System.out.println("=== 정적 테스트 페이지 호출됨: " + no + " ===");
+        return "products/detail_static_test";
+    }
+    
+    // Thymeleaf 테스트용 상품 상세 페이지
+    @GetMapping("/detail-thymeleaf-test/{no}")
+    public String detailThymeleafTest(@PathVariable int no, Model model) {
+        System.out.println("=== Thymeleaf 테스트 페이지 호출됨: " + no + " ===");
+        model.addAttribute("no", no);
+        return "products/detail_thymeleaf_test";
+    }
+    
+    // JSON 응답 테스트
+    @GetMapping("/detail/{no}/json")
+    @ResponseBody
+    public Map<String, Object> detailJson(@PathVariable int no) {
+        System.out.println("=== JSON 상세 페이지 호출됨: " + no + " ===");
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("no", no);
+        result.put("name", "상품" + no);
+        result.put("price", no * 10000);
+        result.put("desc", "설명" + no);
+        result.put("success", true);
+        
+        return result;
     }
 }

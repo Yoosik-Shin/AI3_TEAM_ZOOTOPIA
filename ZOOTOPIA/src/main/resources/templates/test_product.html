@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>테스트 상품</title>
+</head>
+<body>
+    <h1>테스트 상품 페이지</h1>
+    <p>상품명: <span th:text="${product.name}">상품명</span></p>
+    <p>가격: <span th:text="${product.price}">0</span>원</p>
+    <p>카테고리: <span th:text="${product.category}">카테고리</span></p>
+    <p>설명: <span th:text="${product.description}">설명</span></p>
+</body>
+</html>

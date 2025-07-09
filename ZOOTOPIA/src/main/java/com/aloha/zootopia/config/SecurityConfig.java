@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
                                 .requestMatchers("/comments/add").authenticated() 
-                                // .requestMatchers("/products/detail/**").authenticated() // 임시 비활성화 - 템플릿 테스트
+                                // .requestMatchers("/products/detail/**").authenticated() // 상품 상세 - 임시 비활성화
                                 .requestMatchers("/cart/**").authenticated() // 장바구니 - 로그인 필요
                                 .requestMatchers("/posts/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/static/**", "/css/**", "/js/**", "/img/**").permitAll()

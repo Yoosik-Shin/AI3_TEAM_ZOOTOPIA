@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,8 +19,21 @@ import com.aloha.zootopia.domain.Product;
 @RequestMapping("/cart")
 public class CartController {
     
-    @Autowired
-    private ProductController productController;
+    // 더미 상품 생성 메소드 (ProductController에서 복사)
+    private List<Product> createDummyProducts() {
+        List<Product> products = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            Product p = new Product();
+            p.setNo(i);
+            p.setName("ZOOTOPIA 프리미엄 사료 " + i);
+            p.setCategory(i % 2 == 0 ? "사료" : "용품");
+            p.setDescription("반려동물을 위한 최고급 " + (i % 2 == 0 ? "사료" : "용품") + "입니다.");
+            p.setPrice(15000 + i * 1000);
+            p.setImageUrl("/img/default-thumbnail.png");
+            products.add(p);
+        }
+        return products;
+    }
     
     // 장바구니 페이지
     @GetMapping("")
@@ -73,7 +85,7 @@ public class CartController {
         
         try {
             // 상품 정보 조회
-            List<Product> allProducts = productController.createDummyProducts();
+            List<Product> allProducts = createDummyProducts();
             Product product = allProducts.stream()
                 .filter(p -> p.getNo() == productNo)
                 .findFirst()
@@ -130,6 +142,120 @@ public class CartController {
         }
         
         return ResponseEntity.ok(response);
+    }
+    
+    // 장바구니에 상품 추가 (GET 방식 - 상품 상세 페이지에서 호출)
+    @GetMapping("/add")
+    public String addToCartGet(@RequestParam int productNo,
+                              @RequestParam int quantity,
+                              @RequestParam(required = false, defaultValue = "false") boolean direct,
+                              HttpSession session) {
+        System.out.println("=== CartController /cart/add (GET) 호출됨 ===");
+        System.out.println("상품번호: " + productNo + ", 수량: " + quantity + ", 바로구매: " + direct);
+        
+        try {
+            // ProductController에서 상품 정보 조회
+            Product product = createDummyProducts().stream()
+                .filter(p -> p.getNo() == productNo)
+                .findFirst()
+                .orElse(null);
+            
+            if (product == null) {
+                return "redirect:/products/detail/" + productNo + "?error=product_not_found";
+            }
+            
+            // 세션에서 장바구니 정보 조회
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
+            
+            if (cartItems == null) {
+                cartItems = new ArrayList<>();
+                session.setAttribute("cartItems", cartItems);
+            }
+            
+            // 이미 장바구니에 있는 상품인지 확인
+            boolean found = false;
+            for (Map<String, Object> item : cartItems) {
+                if ((Integer) item.get("productNo") == productNo) {
+                    // 수량 증가
+                    int currentQuantity = (Integer) item.get("quantity");
+                    item.put("quantity", currentQuantity + quantity);
+                    found = true;
+                    break;
+                }
+            }
+            
+            // 새로운 상품이면 추가
+            if (!found) {
+                Map<String, Object> newItem = new HashMap<>();
+                newItem.put("productNo", product.getNo());
+                newItem.put("name", product.getName());
+                newItem.put("price", product.getPrice());
+                newItem.put("quantity", quantity);
+                newItem.put("imageUrl", product.getImageUrl());
+                newItem.put("category", product.getCategory());
+                cartItems.add(newItem);
+            }
+            
+            // 바로 구매인 경우 결제 페이지로, 아니면 장바구니 페이지로
+            if (direct) {
+                return "redirect:/cart/checkout";
+            } else {
+                return "redirect:/cart?added=true";
+            }
+            
+        } catch (Exception e) {
+            System.err.println("장바구니 추가 중 오류: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/products/detail/" + productNo + "?error=cart_add_failed";
+        }
+    }
+    
+    // 장바구니에 상품 추가 (폼 전송용)
+    @PostMapping("/add-form")
+    public String addToCartForm(@RequestParam int productNo,
+                                @RequestParam int quantity,
+                                HttpSession session) {
+        try {
+            // 상품 정보 조회
+            List<Product> allProducts = createDummyProducts();
+            Product product = allProducts.stream()
+                .filter(p -> p.getNo() == productNo)
+                .findFirst()
+                .orElse(null);
+            if (product == null) {
+                return "redirect:/products/detail/" + productNo + "?error=notfound";
+            }
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
+            if (cartItems == null) {
+                cartItems = new ArrayList<>();
+                session.setAttribute("cartItems", cartItems);
+            }
+            boolean found = false;
+            for (Map<String, Object> item : cartItems) {
+                if ((Integer) item.get("productNo") == productNo) {
+                    int currentQuantity = (Integer) item.get("quantity");
+                    item.put("quantity", currentQuantity + quantity);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Map<String, Object> newItem = new HashMap<>();
+                newItem.put("productNo", product.getNo());
+                newItem.put("name", product.getName());
+                newItem.put("price", product.getPrice());
+                newItem.put("quantity", quantity);
+                newItem.put("imageUrl", product.getImageUrl());
+                newItem.put("category", product.getCategory());
+                cartItems.add(newItem);
+            }
+            return "redirect:/cart";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/products/detail/" + productNo + "?error=exception";
+        }
     }
     
     // 장바구니 상품 수량 변경
@@ -212,7 +338,7 @@ public class CartController {
                 String[] productNoArray = productNos.split(",");
                 String[] quantityArray = quantities.split(",");
                 
-                List<Product> allProducts = productController.createDummyProducts();
+                List<Product> allProducts = createDummyProducts();
                 
                 for (int i = 0; i < productNoArray.length; i++) {
                     int productNo = Integer.parseInt(productNoArray[i]);
