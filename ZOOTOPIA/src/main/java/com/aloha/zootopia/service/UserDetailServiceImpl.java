@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
-    
+
     @Autowired
     private UserMapper userMapper;
 
@@ -44,5 +44,5 @@ public class UserDetailServiceImpl implements UserDetailsService {
         CustomUser customUser = new CustomUser(user);
         return customUser;
     }
-    
+
 }
