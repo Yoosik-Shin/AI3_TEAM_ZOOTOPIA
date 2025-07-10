@@ -49,7 +49,7 @@ public class ShowoffController {
     @GetMapping("/list")
     public String list(
             @RequestParam(name = "page", defaultValue = "1") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "size", defaultValue = "12") int size,
             @RequestParam(name = "type", required = false) String type,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "sort", defaultValue = "latest") String sort, 
@@ -62,7 +62,7 @@ public class ShowoffController {
         Pagination pagination = new Pagination();
         pagination.setPage(page);
         pagination.setSize(size);
-        pagination.setCount(10); 
+        pagination.setCount(12); 
         pagination.setOffset((page - 1) * size);
         pagination.setCategory(category);
         
