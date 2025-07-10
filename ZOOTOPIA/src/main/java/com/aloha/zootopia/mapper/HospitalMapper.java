@@ -24,9 +24,4 @@ public interface HospitalMapper {
     List<Hospital> selectHospitals(@Param("offset") int offset, @Param("limit") int limit, @Param("animalIds") List<Integer> animalIds);
     int countHospitals(@Param("animalIds") List<Integer> animalIds);
     void deleteHospital(@Param("hospitalId") Integer hospitalId);
-
-    // [추가] 상세 조회 시 collection에서 사용할 메소드들
-    List<HospReview> getReviewsByHospitalId(@Param("hospitalId") Integer hospitalId);
-    List<Animal> getAnimalsByHospitalId(@Param("hospitalId") Integer hospitalId);
-    List<Specialty> getSpecialtiesByHospitalId(@Param("hospitalId") Integer hospitalId);
 }

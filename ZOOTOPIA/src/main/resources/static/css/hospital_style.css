@@ -777,3 +777,28 @@ body {
   max-height: 100%;
   object-fit: cover;
 }
+
+/* 별점 스타일 */
+.rating .star {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+}
+
+.rating .star.selected, 
+.rating .star:hover,
+.rating .star:hover ~ .star {
+    color: #f7d106;
+}
+
+/* 리뷰 카드 내 수정/삭제 버튼 링크 */
+.review-actions a {
+    margin-right: 10px;
+    cursor: pointer;
+    color: #007bff; /* 링크 색상 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.review-actions a:hover {
+    text-decoration: underline; /* 호버 시 밑줄 표시 */
+}

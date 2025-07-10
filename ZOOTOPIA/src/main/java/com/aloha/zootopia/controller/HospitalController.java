@@ -21,16 +21,24 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.aloha.zootopia.service.HospReviewService;
+import com.aloha.zootopia.domain.CustomUser;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.aloha.zootopia.domain.Hospital;
+import com.aloha.zootopia.domain.PageInfo;
 import com.aloha.zootopia.domain.HospReview; // ADDED THIS LINE
 import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.dto.HospitalForm;
-import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.mapper.UserMapper;
 import com.aloha.zootopia.service.hospital.HospitalService;
 
-import jakarta.validation.Valid; // Import @Valid
-
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -43,6 +51,9 @@ public class HospitalController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private HospReviewService hospReviewService;
 
 
 
@@ -97,17 +108,11 @@ public class HospitalController {
         log.info("############################################################");
         log.info("HospitalController - details() 진입");
         log.info("로그인 사용자: {}", principal != null ? principal.getName() : "ANONYMOUS");
+//=================================================================================TODO: 병원 상세 정보 조회 로직 추가
+        // Hospital hospital = hospitalService.getHospital(id);
 
-        Hospital hospital = hospitalService.getHospital(id);
-
-        if (hospital != null && hospital.getReviews() != null) {
-            log.info("Service에서 반환된 리뷰 개수: {}", hospital.getReviews().size());
-        } else {
-            log.warn("Service에서 반환된 리뷰가 없거나 hospital 객체가 null입니다.");
-        }
-
-        model.addAttribute("hospital", hospital);
-        model.addAttribute("reviewForm", new HospReviewForm());
+        
+        // model.addAttribute("hospital", hospital);
 
         log.info("############################################################");
         return "service/hospital/details";
@@ -159,42 +164,7 @@ public class HospitalController {
         }
     }
 
-    // 병원 수정 폼 페이지
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable("id") Integer id, Model model) {
-        try {
-            Hospital hospital = hospitalService.getHospital(id);
-            if (hospital == null) {
-                // Handle hospital not found, e.g., redirect to error page or list
-                return "redirect:/hospitals"; // Or an error page
-            }
-            // Convert Hospital domain object to HospitalForm for the form
-            HospitalForm hospitalForm = HospitalForm.builder()
-                                        .hospitalId(hospital.getHospitalId())
-                                        .name(hospital.getName())
-                                        .address(hospital.getAddress())
-                                        .homepage(hospital.getHomepage())
-                                        .phone(hospital.getPhone())
-                                        .email(hospital.getEmail())
-                                        .hospIntroduce(hospital.getHospIntroduce())
-                                        .thumbnailImageUrl(hospital.getThumbnailImageUrl())
-                                        // Note: specialtyIds and animalIds are not directly in Hospital domain object
-                                        // You might need to fetch them separately if they are not populated by MyBatis collection mapping
-                                        // For now, assuming they are populated via the resultMap in mapper
-                                        .specialtyIds(hospital.getSpecialties() != null ? hospital.getSpecialties().stream().map(s -> s.getSpecialtyId()).collect(java.util.stream.Collectors.toList()) : null)
-                                        .animalIds(hospital.getAnimals() != null ? hospital.getAnimals().stream().map(a -> a.getAnimalId()).collect(java.util.stream.Collectors.toList()) : null)
-                                        .build();
-
-            model.addAttribute("hospitalForm", hospitalForm);
-            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
-            model.addAttribute("animalList", hospitalService.getAllAnimals());
-        } catch (Exception e) {
-            e.printStackTrace(); // Log the exception
-            // Handle error
-            return "redirect:/hospitals"; // Or an error page
-        }
-        return "service/hospital/create_hospital"; // Re-use the same form for edit
-    }
+    
 
     // 병원 삭제 처리
     @PostMapping("/delete/{id}")
@@ -214,83 +184,69 @@ public class HospitalController {
 
 
 
-    // 병원 리뷰 등록 처리
-        @PostMapping("/{id}/reviews")
-    public String addReview(@PathVariable Integer id, @ModelAttribute HospReviewForm form, Principal principal) {
-        if (principal == null) {
-            // 로그인하지 않은 사용자 처리 (예: 로그인 페이지로 리다이렉트)
-            return "redirect:/login"; // 또는 다른 로그인 페이지 경로
-        }
-        String username = principal.getName(); // 이메일 (username)
-        com.aloha.zootopia.domain.Users user = null;
-        try {
-            user = userMapper.select(username);
-        } catch (Exception e) {
-            // 사용자 조회 실패 처리
-            e.printStackTrace();
-            return "redirect:/error"; // 또는 적절한 오류 페이지로 리다이렉트
-        }
-        if (user == null) {
-            return "redirect:/login"; // 사용자 정보가 없으면 로그인 페이지로
-        }
-        Integer userId = (int) user.getUserId(); // long을 int로 캐스팅
-        String nickname = user.getNickname(); // Users 엔티티에 nickname 필드가 있다고 가정
+    
 
-        hospitalService.addReview(id, form, nickname, userId);
-        return "redirect:/hospitals/detail/" + id;
+    // ################################## 리뷰 관련 CRUD ##################################
+
+    // 병원 리뷰 목록
+    @GetMapping("/{hospitalId}/reviews")
+    @ResponseBody
+    public ResponseEntity<List<HospReview>> getReviews(@PathVariable int hospitalId) {
+        List<HospReview> reviews = hospReviewService.listByHospital(hospitalId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @PostMapping("/{id}/reviews/{reviewId}/edit")
-    public String updateReview(@PathVariable Integer id,
-                               @PathVariable Integer reviewId,
-                               @RequestParam String content,
-                               Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
+    // 리뷰 등록
+    @PostMapping("/{hospitalId}/reviews")
+    @ResponseBody
+    public ResponseEntity<String> addReview(@PathVariable int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+        if (customUser == null) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        String username = principal.getName(); // 이메일 (username)
-        com.aloha.zootopia.domain.Users user = null;
-        try {
-            user = userMapper.select(username);
-        } catch (Exception e) {
-            // 사용자 조회 실패 처리
-            e.printStackTrace();
-            return "redirect:/error"; // 또는 적절한 오류 페이지로 리다이렉트
-        }
-        if (user == null) {
-            return "redirect:/login"; // 사용자 정보가 없으면 로그인 페이지로
-        }
-        Integer userId = (int) user.getUserId(); // long을 int로 캐스팅
+        Long userId = customUser.getUser().getUserId();
+        hospReview.setUserId(userId);
+        hospReview.setHospitalId(hospitalId);
 
-        hospitalService.updateReview(reviewId, content, userId);
-        return "redirect:/hospitals/detail/" + id;
+        hospReviewService.addReview(hospReview);
+        return new ResponseEntity<>("Review added successfully", HttpStatus.CREATED);
     }
 
-    @PostMapping("/{id}/reviews/{reviewId}/delete")
-    public String deleteReview(@PathVariable Integer id,
-                               @PathVariable Integer reviewId,
-                               Principal principal,
-                               RedirectAttributes redirectAttributes) {
-        if (principal == null) {
-            return "redirect:/login";
+    // 리뷰 수정
+    @PutMapping("/{hospitalId}/reviews/{reviewId}")
+    @ResponseBody
+    public ResponseEntity<String> updateReview(@PathVariable int hospitalId, @PathVariable int reviewId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+        if (customUser == null) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        String username = principal.getName();
-        com.aloha.zootopia.domain.Users user = null;
-        try {
-            user = userMapper.select(username);
-            if (user == null) return "redirect:/login";
+        HospReview existingReview = hospReviewService.getReviewById(reviewId);
+        Long userId = customUser.getUser().getUserId();
 
-            Integer userId = (int) user.getUserId();
-            hospitalService.deleteReview(reviewId, userId);
-            redirectAttributes.addFlashAttribute("message", "리뷰가 성공적으로 삭제되었습니다.");
-
-        } catch (SecurityException e) {
-            redirectAttributes.addFlashAttribute("error", "리뷰를 삭제할 권한이 없습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "리뷰 삭제 중 오류가 발생했습니다.");
+        if (existingReview.getUserId() != userId) {
+            return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
-        return "redirect:/hospitals/detail/" + id;
+
+        hospReview.setReviewId(reviewId);
+        hospReview.setHospitalId(hospitalId);
+        hospReviewService.updateReview(hospReview);
+        return new ResponseEntity<>("Review updated successfully", HttpStatus.OK);
+    }
+
+    // 리뷰 삭제
+    @DeleteMapping("/{hospitalId}/reviews/{reviewId}")
+    @ResponseBody
+    public ResponseEntity<String> deleteReview(@PathVariable int hospitalId, @PathVariable int reviewId, @AuthenticationPrincipal CustomUser customUser) {
+        if (customUser == null) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        HospReview existingReview = hospReviewService.getReviewById(reviewId);
+        Long userId = customUser.getUser().getUserId();
+
+        if (existingReview.getUserId() != userId) {
+            return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
+        }
+
+        hospReviewService.deleteReview(reviewId);
+        return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
     }
 
 

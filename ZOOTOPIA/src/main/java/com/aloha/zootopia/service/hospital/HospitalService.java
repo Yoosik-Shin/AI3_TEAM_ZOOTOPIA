@@ -13,16 +13,11 @@ import com.aloha.zootopia.dto.HospitalForm;
 
 public interface HospitalService {
     List<Hospital> getHospitals(List<Integer> animalIds);
-    Hospital getHospital(Integer id);
     void createHospital(HospitalForm form, MultipartFile thumbnailImageFile) throws Exception;
     List<Animal> getAllAnimals();
     List<Specialty> getAllSpecialties();
-    List<HospReview> getReviews(Integer hospitalId);
-    void addReview(Integer hospitalId, HospReviewForm form, String nickname, Integer userId);
     List<Hospital> getHospitalList(List<Integer> animalIds, int pageNum, int pageSize);
     int getHospitalCount(List<Integer> animalIds);
-    void updateReview(Integer reviewId, String content, Integer userId);
     void updateHospital(HospitalForm form, MultipartFile thumbnailImageFile) throws Exception;
     void deleteHospital(Integer id);
-    void deleteReview(Integer reviewId, Integer userId);
 }

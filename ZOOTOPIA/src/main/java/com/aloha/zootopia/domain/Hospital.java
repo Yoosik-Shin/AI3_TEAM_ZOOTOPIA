@@ -21,6 +21,5 @@ public class Hospital {
     private List<Animal> animals;
     private List<Specialty> specialties;
     private Double avgRating;
-    private List<HospReview> reviews; // 리뷰 목록 추가
 }
 

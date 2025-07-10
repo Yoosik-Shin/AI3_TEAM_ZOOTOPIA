@@ -44,3 +44,6 @@ launch.json
 /build/
 /ZOOTOPIA/build/
 *.bin
+
+# localhistory 무시
+*.history

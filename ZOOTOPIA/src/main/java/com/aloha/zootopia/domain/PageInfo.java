@@ -1,4 +1,4 @@
-package com.aloha.zootopia.dto;
+package com.aloha.zootopia.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
