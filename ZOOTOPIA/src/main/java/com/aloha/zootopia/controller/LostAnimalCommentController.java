@@ -46,4 +46,22 @@ public class LostAnimalCommentController {
         commentService.deleteComment(commentId);
         return "redirect:/lost/read/" + postId;
     }
+
+
+    @PostMapping("/reply")
+    public String addReplyComment(
+        @RequestParam("postId") Integer postId,
+        @RequestParam("parentId") Integer parentId,
+        @RequestParam("content") String content,
+        @AuthenticationPrincipal CustomUser user
+    ) throws Exception {
+        Comment reply = new Comment();
+        reply.setPostId(postId);
+        reply.setParentId(parentId);
+        reply.setContent(content);
+        reply.setUserId(user.getUser().getUserId());
+
+        commentService.addComment(reply); 
+        return "redirect:/lost/read/" + postId;
+    }
 }

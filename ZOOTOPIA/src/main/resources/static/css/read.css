@@ -141,13 +141,13 @@ a {
 }
 
 .comment-line {
-  border-bottom: 1px solid #f0f0f0;
+  /* border-bottom: 1px solid #f0f0f0; */
   padding-bottom: 5px;
 }
 
 .comment-reply {
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 5px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 5px;
 }
 
 .btn-reply {
@@ -167,9 +167,7 @@ a {
 }
 
 .btn-reply:hover {
-  background-color: #f1f3f5;
-  color: #F35F4C;
-  border-color: #F35F4C;
+  background-color: #aaa9a9;
 }
 
 .btn-reply a {

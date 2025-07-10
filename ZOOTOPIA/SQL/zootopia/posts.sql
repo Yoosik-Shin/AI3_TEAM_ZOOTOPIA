@@ -228,3 +228,7 @@ CREATE TABLE `lost_animal_comments` (
 
 ALTER TABLE post_comments
 ADD COLUMN parent_id INT NULL;
+
+
+ALTER TABLE lost_animal_comments
+ADD COLUMN parent_id INT NULL;

@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     public List<Comment> getCommentsByPostIdAsTree(Integer postId) {
-        List<Comment> flatList = commentMapper.findByPostId(postId); // 모든 댓글 flat하게 가져옴
+        List<Comment> flatList = commentMapper.findByPostId(postId); 
         return buildCommentTree(flatList);
     }
 

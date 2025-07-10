@@ -25,11 +25,9 @@ public class CommentController {
 
     @PostMapping("/add")
     public String addComment(@ModelAttribute Comment comment, @AuthenticationPrincipal CustomUser user) throws Exception {
-  
 
         comment.setUserId(user.getUser().getUserId());
         commentService.addComment(comment);
-        
 
         return "redirect:/posts/read/" + comment.getPostId(); 
     }

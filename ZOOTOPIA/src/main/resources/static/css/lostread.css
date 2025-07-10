@@ -153,7 +153,37 @@ a {
   background-color: #ff9999;
   color: white;
 }
+
 .comment-update:hover {
   background-color: #ffbbbb;
   color: white;
+}
+
+
+.btn-reply {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;               
+  height: 25px;
+  background-color: #f8f9fa;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 11px;           
+  color: #495057;
+  cursor: pointer;
+  white-space: nowrap;      
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-reply:hover {
+  background-color: #aaa9a9;
+}
+
+.btn-reply a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+  font-size: 11px;         
+  line-height: 1;
 }

@@ -85,7 +85,12 @@ public class LostAnimalController {
 
     /** 글쓰기 폼 */
     @GetMapping("/create")
-    public String createForm(Model model) {
+    public String createForm(@AuthenticationPrincipal CustomUser user, Model model, RedirectAttributes ra) {
+
+        if (user == null) {
+            ra.addFlashAttribute("error", "로그인이 필요합니다.");
+            return "redirect:/login";
+        }
         model.addAttribute("post", new LostAnimalPost());
         return "lost/create";
     }
@@ -107,7 +112,7 @@ public class LostAnimalController {
         return result ? "redirect:/lost/list" : "redirect:/lost/create";
     }
 
-    /** 상세 페이지 */
+    /* 게시글 읽기 */
     @GetMapping("/read/{id}")
     public String read(@PathVariable("id") int id,
                        @AuthenticationPrincipal CustomUser user,
@@ -120,7 +125,7 @@ public class LostAnimalController {
 
 
         // 댓글
-        List<Comment> commentList = lostAnimalCommentService.getCommentsByPostId(postId);
+        List<Comment> commentList = lostAnimalCommentService.getCommentsByPostIdAsTree(postId);
         post.setComments(commentList);
 
         // 조회수 중복 방지

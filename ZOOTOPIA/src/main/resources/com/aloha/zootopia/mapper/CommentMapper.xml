@@ -24,8 +24,8 @@
     LEFT JOIN users u ON c.user_id = u.user_id
     WHERE c.post_id = #{postId}
       AND c.is_deleted = FALSE
-    ORDER BY  COALESCE(parent_id, comment_id),  -- 부모 기준 정렬
-              parent_id IS NOT NULL,            -- 부모 먼저
+    ORDER BY  COALESCE(parent_id, comment_id),  
+              parent_id IS NOT NULL,            
               created_at ASC
   </select>
 
@@ -60,7 +60,9 @@
     LEFT JOIN users u ON c.user_id = u.user_id
     WHERE c.post_id = #{postId}
       AND c.is_deleted = FALSE
-    ORDER BY c.created_at ASC
+    ORDER BY  COALESCE(parent_id, comment_id),  
+              parent_id IS NOT NULL,            
+              created_at ASC
   </select>
 
   <insert id="insertLost" parameterType="com.aloha.zootopia.domain.Comment">
