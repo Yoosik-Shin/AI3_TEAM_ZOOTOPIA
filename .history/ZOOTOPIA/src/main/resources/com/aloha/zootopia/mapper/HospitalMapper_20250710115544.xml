@@ -19,9 +19,12 @@
 
   <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
   <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
-    <collection property="animals" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Animal" />
-    <collection property="specialties" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Specialty" />
-    <collection property="reviews" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.HospReview" />
+    <collection property="animals" javaType="java.util.ArrayList"
+                select="getAnimalsByHospitalId" column="hospital_id" ofType="com.aloha.zootopia.domain.Animal" />
+    <collection property="specialties" javaType="java.util.ArrayList"
+                select="getSpecialtiesByHospitalId" column="hospital_id" ofType="com.aloha.zootopia.domain.Specialty" />
+    <collection property="reviews" javaType="java.util.ArrayList"
+                select="getReviewsByHospitalId" column="hospital_id" ofType="com.aloha.zootopia.domain.HospReview" />
   </resultMap>
 
   <select id="findAll" resultMap="HospitalListResultMap">

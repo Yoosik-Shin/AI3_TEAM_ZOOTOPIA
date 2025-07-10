@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aloha.zootopia.mapper.HospReviewMapper">
+
+  <!-- 특정 병원의 리뷰 리스트 조회 -->
+  <!-- <resultMap id="HospReviewResultMap" type="com.aloha.zootopia.domain.HospReview">
+    <id property="reviewId" column="review_id"/>
+    <result property="hospitalId" column="hospital_id"/>
+    <result property="rating" column="rating"/>
+    <result property="content" column="content"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="userId" column="user_id"/>
+    <result property="nickname" column="nickname"/>
+  </resultMap>
+
+  <select id="findByHospitalId" parameterType="int" resultMap="HospReviewResultMap">
+    SELECT r.review_id, r.rating, r.content, r.created_at, r.hospital_id, r.user_id, u.nickname
+    FROM hospital_review r
+    LEFT JOIN users u ON r.user_id = u.user_id
+    WHERE r.hospital_id = #{hospitalId}
+    ORDER BY r.created_at DESC
+  </select> -->
+
+
+      <!-- 
+        [핵심] 병원 정보와 그에 속한 리뷰 목록을 함께 매핑하기 위한 ResultMap 입니다.
+        이것이 MyBatis 방식의 "Fetch Join" 입니다.
+    -->
+    <resultMap id="hospitalWithDetailsResultMap" type="com.aloha.zootopia.domain.Hospital">
+        <!-- 병원 기본 정보 매핑 -->
+        <id property="hospitalId" column="hospital_id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="homepage" column="homepage"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="hospIntroduce" column="hosp_introduce"/>
+        <result property="thumbnailImageUrl" column="thumbnail_image_url"/>
+
+        <!-- 1:N 관계인 리뷰 목록(reviews)을 매핑합니다. -->
+        <collection property="reviews" ofType="com.aloha.zootopia.domain.HospReview">
+            <id property="reviewId" column="review_id"/>
+            <result property="nickname" column="nickname"/>
+            <result property="content" column="content"/>
+            <result property="rating" column="rating"/>
+            <result property="createdAt" column="created_at"/>
+            <result property="userId" column="user_id"/>
+        </collection>
+    </resultMap>
+
+    <!-- 
+        병원 상세 정보를 가져오는 쿼리입니다.
+        현재는 병원 테이블만 조회하고 있을 가능성이 높습니다.
+        [수정] 병원 상세 조회 시, LEFT JOIN으로 리뷰까지 한번에 가져오고,
+        위에서 정의한 resultMap을 사용하도록 변경합니다.
+    -->
+    <select id="getHospital" resultType="com.aloha.zootopia.domain.Hospital">
+        SELECT * FROM hospital WHERE hospital_id = #{id}
+    <select id="getHospital" resultMap="hospitalWithDetailsResultMap" parameterType="int">
+        SELECT
+            h.hospital_id, h.name, h.address, h.homepage, h.phone, h.email, h.hosp_introduce, h.thumbnail_image_url,
+            r.review_id, r.nickname, r.content, r.rating, r.created_at, r.user_id
+        FROM
+            hospital h
+        LEFT JOIN
+            hosp_review r ON h.hospital_id = r.hospital_id
+        WHERE
+            h.hospital_id = #{id}
+    </select>
+
+
+
+
+
+
+
+  <!-- 리뷰 등록 -->
+  <insert id="insertReview" parameterType="com.aloha.zootopia.domain.HospReview" useGeneratedKeys="true" keyProperty="reviewId">
+    INSERT INTO hospital_review (rating, content, hospital_id, user_id, created_at)
+    VALUES (#{rating}, #{content}, #{hospitalId}, #{userId}, NOW())
+  </insert>
+
+  <!-- 평균 별점 조회 -->
+  <select id="findAvgRating" parameterType="int" resultType="double">
+    SELECT AVG(rating) FROM hospital_review WHERE hospital_id = #{hospitalId}
+  </select>
+    <!-- 리뷰 개수 조회 -->
+    <select id="findReviewCount" parameterType="int" resultType="int">
+    SELECT COUNT(*) FROM hospital_review WHERE hospital_id = #{hospitalId}
+    </select>
+    <!-- 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="int">
+    DELETE FROM hospital_review WHERE review_id = #{reviewId}
+    </delete>
+    <!-- 리뷰 수정 -->
+    <update id="updateReview">
+        UPDATE hospital_review
+        SET content = #{content}, updated_at = NOW()
+        WHERE review_id = #{reviewId} AND user_id = #{userId}
+    </update>
+
+    <!-- 리뷰 단건 조회 -->
+    <select id="findById" parameterType="int" resultType="com.aloha.zootopia.domain.HospReview">
+        SELECT review_id, rating, content, created_at, hospital_id, user_id
+        FROM hospital_review
+        WHERE review_id = #{reviewId}
+    </select>
+    
+    
+  <!-- 특정 병원의 모든 리뷰 삭제 -->
+  <delete id="deleteReviewsByHospitalId" parameterType="int">
+    DELETE FROM hospital_review
+    WHERE hospital_id = #{hospitalId}
+  </delete>
+
+</mapper>

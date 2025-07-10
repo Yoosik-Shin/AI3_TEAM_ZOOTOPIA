@@ -112,33 +112,33 @@
                     <div th:if="${#lists.isEmpty(hospital.reviews)}" class="no-reviews-message" style="text-align: center; padding: 20px; color: #666;">
                         <p>등록된 리뷰가 없습니다.</p>
                     </div>
-                    <div th:each="review, stat : ${hospital.reviews}" class="review-item" th:id="'review-item-' + ${review.reviewId}">
+                    <div th:each="review, stat : ${hospital.reviews}" class="review-item" th:id="'review-item-' + *{reviewId}" th:object="${review}">
 
                         <div class="author-rating">
-                            <div class="review-author" th:text="${review.nickname}">작성자</div>
+                            <div class="review-author" th:text="*{nickname}">작성자</div>
                             <div class="review-rating">
-                                <span th:if="${review.rating != null}" th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
+                                <span th:if="*{rating != null}" th:each="i : ${#numbers.sequence(1, *{rating})}">⭐</span>
                             </div>
                         </div>
 
                         <div class="review-date-container">
-                            <div class="review-date" th:text="${#dates.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.08.27 12:12</div>
+                            <div class="review-date" th:text="${#dates.format(createdAt, 'yyyy.MM.dd HH:mm')}">2025.08.27 12:12</div>
                         </div>
 
                         <hr style="margin-bottom: 3px; border: none; border-top: 1px solid #ccc;">
 
-                        <div class="review-content" th:id="'review-content-' + ${review.reviewId}" th:text="${review.content}"></div>
+                        <div class="review-content" th:id="'review-content-' + *{reviewId}" th:text="*{content}"></div>
 
                         
                         <!-- 수정용 hidden form -->
-                        <form th:action="@{/hospitals/{id}/reviews/{reviewId}/edit(id=${hospital.hospitalId}, reviewId=${review.reviewId})}" method="post" class="inline-edit-form" th:id="'edit-form-' + ${review.reviewId}" style="display:none;">
-                            <textarea name="content" th:text="${review.content}" required style="width:90%;height:60px;"></textarea>
+                        <form th:action="@{/hospitals/{id}/reviews/{reviewId}/edit(id=${hospital.hospitalId}, reviewId=*{reviewId})}" method="post" class="inline-edit-form" th:id="'edit-form-' + *{reviewId}" style="display:none;">
+                            <textarea name="content" th:text="*{content}" required style="width:90%;height:60px;"></textarea>
                             <button type="submit" class="review-update-btn">수정완료</button>
                         </form>
                         <!-- 수정/삭제 버튼 컨테이너 -->
-                        <div class="review-actions" th:if="${#authentication.principal != null and #authentication.principal.user.userId == review.userId}">
-                            <button type="button" class="hosp-review-update" th:data-review-id="${review.reviewId}">수정</button>
-                            <form th:action="@{/hospitals/{id}/reviews/{reviewId}/delete(id=${hospital.hospitalId}, reviewId=${review.reviewId})}" method="post" style="display: inline;">
+                        <div class="review-actions" th:if="${#authentication.principal != null and #authentication.principal.user.userId == userId}">
+                            <button type="button" class="hosp-review-update" th:data-review-id="*{reviewId}">수정</button>
+                            <form th:action="@{/hospitals/{id}/reviews/{reviewId}/delete(id=${hospital.hospitalId}, reviewId=*{reviewId})}" method="post" style="display: inline;">
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <button type="submit" class="hosp-review-delete" onclick="return confirm('정말로 이 리뷰를 삭제하시겠습니까?');">삭제</button>
                             </form>

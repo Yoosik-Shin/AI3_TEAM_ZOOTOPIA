@@ -4,7 +4,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aloha.zootopia.mapper.HospitalMapper">
 
-  <!-- 1. 병원 '목록' 조회를 위한 간단한 ResultMap -->
+  <!-- 병원 목록 조회를 위한 기본 ResultMap (리뷰 제외) -->
   <resultMap id="HospitalListResultMap" type="Hospital">
     <id property="hospitalId" column="hospital_id"/>
     <result property="name" column="name"/>
@@ -15,13 +15,23 @@
     <result property="thumbnailImageUrl" column="thumbnail_image_url"/>
     <result property="hospIntroduce" column="hosp_introduce"/>
     <result property="avgRating" column="avg_rating"/>
+    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal"
+                select="com.aloha.zootopia.mapper.AnimalMapper.findByHospitalId" column="hospital_id"/>
+    <collection property="specialties" ofType="Specialty"
+                select="com.aloha.zootopia.mapper.SpecialtyMapper.findByHospitalId" column="hospital_id"/>
   </resultMap>
 
-  <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
+  <!-- 병원 상세 조회를 위한 ResultMap (리뷰 포함, 기본 맵 상속) -->
   <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
-    <collection property="animals" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Animal" />
-    <collection property="specialties" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Specialty" />
-    <collection property="reviews" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.HospReview" />
+    <!-- [추가] 1:N 관계인 리뷰 목록(reviews)을 매핑합니다. -->
+    <collection property="reviews" ofType="com.aloha.zootopia.domain.HospReview" javaType="java.util.ArrayList">
+        <id property="reviewId" column="review_id"/>
+        <result property="content" column="content"/>
+        <result property="rating" column="rating"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+    </collection>
   </resultMap>
 
   <select id="findAll" resultMap="HospitalListResultMap">
@@ -43,40 +53,20 @@
     HAVING COUNT(DISTINCT ha.animal_id) = #{_parameter.size}
   </select>
 
-  <!-- [수정] 병원 상세 조회를 위한 메인 쿼리 (기본 정보만 조회) -->
-  <select id="findById" parameterType="int" resultMap="HospitalDetailResultMap">
+  <!-- [수정] 병원 상세 조회 시, LEFT JOIN으로 리뷰와 사용자 닉네임까지 한번에 가져오도록 변경합니다. -->
+  <select id="findById" parameterType="int" resultMap="HospitalDetailResultMap" >
     SELECT
         h.*,
-        (SELECT AVG(rating) FROM hospital_review r_avg WHERE r_avg.hospital_id = h.hospital_id) AS avg_rating
+        (SELECT AVG(rating) FROM hospital_review r_avg WHERE r_avg.hospital_id = h.hospital_id) AS avg_rating,
+        r.review_id, r.content, r.rating, r.created_at, r.user_id,
+        u.nickname
     FROM
         hospital_info h
-    WHERE
-        h.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 동물 목록을 조회하는 쿼리 -->
-  <select id="getAnimalsByHospitalId" resultType="com.aloha.zootopia.domain.Animal">
-    SELECT pa.animal_id, pa.species
-    FROM possible_animal pa
-    JOIN hospital_animal ha ON pa.animal_id = ha.animal_id
-    WHERE ha.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 진료과목 목록을 조회하는 쿼리 -->
-  <select id="getSpecialtiesByHospitalId" resultType="com.aloha.zootopia.domain.Specialty">
-    SELECT s.specialty_id, s.category
-    FROM specialty s
-    JOIN hospital_specialty hs ON s.specialty_id = hs.specialty_id
-    WHERE hs.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 리뷰 목록을 조회하는 쿼리 -->
-  <select id="getReviewsByHospitalId" resultType="com.aloha.zootopia.domain.HospReview">
-    SELECT r.*, u.nickname
-    FROM hospital_review r
-    JOIN users u ON r.user_id = u.user_id
-    WHERE r.hospital_id = #{hospitalId}
-    ORDER BY r.created_at DESC
+    LEFT JOIN
+        hospital_review r ON h.hospital_id = r.hospital_id
+    LEFT JOIN
+        users u ON r.user_id = u.user_id
+    WHERE h.hospital_id = #{hospitalId}
   </select>
 
   <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">

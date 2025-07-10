@@ -129,8 +129,7 @@
 
                         <div class="review-content" th:id="'review-content-' + ${review.reviewId}" th:text="${review.content}"></div>
 
-                        
-                        <!-- 수정용 hidden form -->
+                        <!-- 수정 hidden form -->
                         <form th:action="@{/hospitals/{id}/reviews/{reviewId}/edit(id=${hospital.hospitalId}, reviewId=${review.reviewId})}" method="post" class="inline-edit-form" th:id="'edit-form-' + ${review.reviewId}" style="display:none;">
                             <textarea name="content" th:text="${review.content}" required style="width:90%;height:60px;"></textarea>
                             <button type="submit" class="review-update-btn">수정완료</button>

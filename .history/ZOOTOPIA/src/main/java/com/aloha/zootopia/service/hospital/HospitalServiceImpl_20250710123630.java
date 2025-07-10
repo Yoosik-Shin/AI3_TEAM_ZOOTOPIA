@@ -21,9 +21,7 @@ import com.aloha.zootopia.mapper.HospitalMapper;
 import com.aloha.zootopia.mapper.HospReviewMapper;
 import com.aloha.zootopia.mapper.SpecialtyMapper;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class HospitalServiceImpl implements HospitalService {
     @Autowired HospitalMapper hospitalMapper;
@@ -60,26 +58,15 @@ public class HospitalServiceImpl implements HospitalService {
 
     @Override
     public Hospital getHospital(Integer id) {
-        log.info("############################################################");
-        log.info("HospitalServiceImpl - getHospital() 진입");
         Hospital hospital = hospitalMapper.findById(id);
         if (hospital != null) {
-            log.info("Mapper.findById() 호출 후 병원 기본 정보 조회 완료. Hospital ID: {}", id);
             List<HospReview> reviews = hospitalMapper.getReviewsByHospitalId(id);
-            log.info("Mapper.getReviewsByHospitalId() 호출 후 리뷰 개수: {}", reviews != null ? reviews.size() : 0);
             List<Animal> animals = hospitalMapper.getAnimalsByHospitalId(id);
-            log.info("Mapper.getAnimalsByHospitalId() 호출 후 동물 개수: {}", animals != null ? animals.size() : 0);
             List<Specialty> specialties = hospitalMapper.getSpecialtiesByHospitalId(id);
-            log.info("Mapper.getSpecialtiesByHospitalId() 호출 후 진료과목 개수: {}", specialties != null ? specialties.size() : 0);
-
             hospital.setReviews(reviews);
             hospital.setAnimals(animals);
             hospital.setSpecialties(specialties);
-            log.info("Hospital 객체에 리뷰, 동물, 진료과목 설정 완료. 최종 리뷰 개수: {}", hospital.getReviews() != null ? hospital.getReviews().size() : 0);
-        } else {
-            log.warn("HospitalServiceImpl - getHospital(): Hospital ID {} 에 해당하는 병원을 찾을 수 없습니다.", id);
         }
-        log.info("############################################################");
         return hospital;
     }
 

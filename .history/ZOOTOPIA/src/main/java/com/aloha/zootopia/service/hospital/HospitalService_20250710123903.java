@@ -9,6 +9,7 @@ import com.aloha.zootopia.domain.HospReview;
 import com.aloha.zootopia.domain.Hospital;
 import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.dto.HospReviewForm;
+// import com.github.pagehelper.PageInfo;
 import com.aloha.zootopia.dto.HospitalForm;
 
 public interface HospitalService {

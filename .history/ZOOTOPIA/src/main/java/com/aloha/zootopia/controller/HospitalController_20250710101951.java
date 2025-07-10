@@ -31,9 +31,6 @@ import com.aloha.zootopia.service.hospital.HospitalService;
 
 import jakarta.validation.Valid; // Import @Valid
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Controller
 @RequestMapping("/hospitals")
 public class HospitalController {
@@ -93,23 +90,19 @@ public class HospitalController {
 
     // 병원 상세 페이지
     @GetMapping("/detail/{id}")
-    public String details(@PathVariable Integer id, Model model, Principal principal) {
-        log.info("############################################################");
-        log.info("HospitalController - details() 진입");
-        log.info("로그인 사용자: {}", principal != null ? principal.getName() : "ANONYMOUS");
-
+    public String details(@PathVariable Integer id, Model model) {
         Hospital hospital = hospitalService.getHospital(id);
-
-        if (hospital != null && hospital.getReviews() != null) {
-            log.info("Service에서 반환된 리뷰 개수: {}", hospital.getReviews().size());
-        } else {
-            log.warn("Service에서 반환된 리뷰가 없거나 hospital 객체가 null입니다.");
-        }
-
         model.addAttribute("hospital", hospital);
-        model.addAttribute("reviewForm", new HospReviewForm());
+        // List<HospReview> reviews = hospitalService.getReviews(id);
+        // model.addAttribute("reviews", reviews);
+        // System.out.println("DEBUG: Controller received " + (reviews != null ? reviews.size() : "null") + " reviews for model. Hospital ID: " + (hospital != null ? hospital.getHospitalId() : "null"));
 
-        log.info("############################################################");
+                // 더 이상 리뷰를 별도로 조회할 필요가 없습니다.
+        // model.addAttribute("reviews", hospitalService.getReviews(id)); // 이 라인 삭제 또는 주석 처리
+        // 디버깅을 위해 hospital 객체 안의 리뷰를 확인합니다.
+        System.out.println("DEBUG: Hospital object contains " + (hospital.getReviews() != null ? hospital.getReviews().size() : "null") + " reviews.");
+
+        model.addAttribute("reviewForm", new HospReviewForm());
         return "service/hospital/details";
     }
 
@@ -266,34 +259,9 @@ public class HospitalController {
         return "redirect:/hospitals/detail/" + id;
     }
 
-    @PostMapping("/{id}/reviews/{reviewId}/delete")
-    public String deleteReview(@PathVariable Integer id,
-                               @PathVariable Integer reviewId,
-                               Principal principal,
-                               RedirectAttributes redirectAttributes) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
-        String username = principal.getName();
-        com.aloha.zootopia.domain.Users user = null;
-        try {
-            user = userMapper.select(username);
-            if (user == null) return "redirect:/login";
-
-            Integer userId = (int) user.getUserId();
-            hospitalService.deleteReview(reviewId, userId);
-            redirectAttributes.addFlashAttribute("message", "리뷰가 성공적으로 삭제되었습니다.");
-
-        } catch (SecurityException e) {
-            redirectAttributes.addFlashAttribute("error", "리뷰를 삭제할 권한이 없습니다.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "리뷰 삭제 중 오류가 발생했습니다.");
-        }
-        return "redirect:/hospitals/detail/" + id;
-    }
 
 
 
 
 }
+

@@ -100,37 +100,26 @@
                     <span class="review-count" th:text="'댓글 개수 ' + ${#lists.size(hospital.reviews)}">댓글 개수 100</span>
                 </div>
 
-                <!-- [수정] 디버깅을 위한 코드 블록: 리스트의 크기뿐만 아니라 전체 내용을 시각적으로 확인합니다. -->
-                <div style="background-color: #fffbe6; border: 1px solid #ffe58f; padding: 1rem; margin: 1rem 0; border-radius: 4px; font-family: 'Courier New', monospace;">
-                    <h5 style="margin-top: 0; color: #d46b08;">[디버깅 정보]</h5>
-                    <p style="margin-bottom: 0.5rem;"><strong>'hospital.reviews' 리스트 크기: </strong><strong th:text="${#lists.size(hospital.reviews)}">0</strong></p>
-                    <p style="margin-bottom: 0.5rem;"><strong>'hospital.reviews' 리스트 내용:</strong></p>
-                    <pre style="white-space: pre-wrap; word-wrap: break-word; background-color: #fff; padding: 0.5rem; border-radius: 3px;" th:text="${hospital.reviews}"></pre>
-                </div>
+                <p>DEBUG: hospital.reviews 리스트 크기: <span th:text="${#lists.size(hospital.reviews)}"></span></p>
 
                 <div class="review-list">
                     <div th:if="${#lists.isEmpty(hospital.reviews)}" class="no-reviews-message" style="text-align: center; padding: 20px; color: #666;">
                         <p>등록된 리뷰가 없습니다.</p>
                     </div>
                     <div th:each="review, stat : ${hospital.reviews}" class="review-item" th:id="'review-item-' + ${review.reviewId}">
-
+                        <p>DEBUG: hospital.reviews 리스트 크기: <span th:text="${#lists.size(hospital.reviews)}"></span></p>
+                        <p>DEBUG: Review ID: <span th:text="${review.reviewId}"></span>, Hospital ID: <span th:text="${hospital.hospitalId}"></span>, Review Index: <span th:text="${stat.index}"></span>, Review Count: <span th:text="${stat.count}"></span></p>
                         <div class="author-rating">
                             <div class="review-author" th:text="${review.nickname}">작성자</div>
                             <div class="review-rating">
                                 <span th:if="${review.rating != null}" th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
                             </div>
                         </div>
-
                         <div class="review-date-container">
                             <div class="review-date" th:text="${#dates.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.08.27 12:12</div>
                         </div>
-
                         <hr style="margin-bottom: 3px; border: none; border-top: 1px solid #ccc;">
-
                         <div class="review-content" th:id="'review-content-' + ${review.reviewId}" th:text="${review.content}"></div>
-
-                        
-                        <!-- 수정용 hidden form -->
                         <form th:action="@{/hospitals/{id}/reviews/{reviewId}/edit(id=${hospital.hospitalId}, reviewId=${review.reviewId})}" method="post" class="inline-edit-form" th:id="'edit-form-' + ${review.reviewId}" style="display:none;">
                             <textarea name="content" th:text="${review.content}" required style="width:90%;height:60px;"></textarea>
                             <button type="submit" class="review-update-btn">수정완료</button>

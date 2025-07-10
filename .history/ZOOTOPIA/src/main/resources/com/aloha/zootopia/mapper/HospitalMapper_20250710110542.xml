@@ -4,7 +4,7 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aloha.zootopia.mapper.HospitalMapper">
 
-  <!-- 1. 병원 '목록' 조회를 위한 간단한 ResultMap -->
+  <!-- 1. 병원 '목록' 조회를 위한 간단한 ResultMap (N+1 문제 해결) -->
   <resultMap id="HospitalListResultMap" type="Hospital">
     <id property="hospitalId" column="hospital_id"/>
     <result property="name" column="name"/>
@@ -17,11 +17,24 @@
     <result property="avgRating" column="avg_rating"/>
   </resultMap>
 
-  <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
+  <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (JOIN 기반) -->
   <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
-    <collection property="animals" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Animal" />
-    <collection property="specialties" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Specialty" />
-    <collection property="reviews" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.HospReview" />
+    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal" javaType="java.util.ArrayList">
+        <id property="animalId" column="animal_id"/>
+        <result property="species" column="animal_species"/>
+    </collection>
+    <collection property="specialties" ofType="com.aloha.zootopia.domain.Specialty" javaType="java.util.ArrayList">
+        <id property="specialtyId" column="specialty_id"/>
+        <result property="category" column="specialty_category"/>
+    </collection>
+    <collection property="reviews" ofType="com.aloha.zootopia.domain.HospReview" javaType="java.util.ArrayList">
+        <id property="reviewId" column="review_id"/>
+        <result property="content" column="content"/>
+        <result property="rating" column="rating"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="userId" column="user_id"/>
+        <result property="nickname" column="nickname"/>
+    </collection>
   </resultMap>
 
   <select id="findAll" resultMap="HospitalListResultMap">
@@ -43,40 +56,30 @@
     HAVING COUNT(DISTINCT ha.animal_id) = #{_parameter.size}
   </select>
 
-  <!-- [수정] 병원 상세 조회를 위한 메인 쿼리 (기본 정보만 조회) -->
-  <select id="findById" parameterType="int" resultMap="HospitalDetailResultMap">
+  <!-- [수정] 병원 상세 조회 시, 모든 연관 정보를 JOIN으로 한번에 가져오도록 변경 -->
+  <select id="findById" parameterType="int" resultMap="HospitalDetailResultMap" >
     SELECT
-        h.*,
-        (SELECT AVG(rating) FROM hospital_review r_avg WHERE r_avg.hospital_id = h.hospital_id) AS avg_rating
+        h.hospital_id, h.name, h.address, h.homepage, h.phone, h.email, h.thumbnail_image_url, h.hosp_introduce,
+        (SELECT AVG(rating) FROM hospital_review r_avg WHERE r_avg.hospital_id = h.hospital_id) AS avg_rating,
+        r.review_id, r.content, r.rating, r.created_at, r.user_id,
+        u.nickname,
+        pa.animal_id, pa.species as animal_species,
+        s.specialty_id, s.category as specialty_category
     FROM
         hospital_info h
-    WHERE
-        h.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 동물 목록을 조회하는 쿼리 -->
-  <select id="getAnimalsByHospitalId" resultType="com.aloha.zootopia.domain.Animal">
-    SELECT pa.animal_id, pa.species
-    FROM possible_animal pa
-    JOIN hospital_animal ha ON pa.animal_id = ha.animal_id
-    WHERE ha.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 진료과목 목록을 조회하는 쿼리 -->
-  <select id="getSpecialtiesByHospitalId" resultType="com.aloha.zootopia.domain.Specialty">
-    SELECT s.specialty_id, s.category
-    FROM specialty s
-    JOIN hospital_specialty hs ON s.specialty_id = hs.specialty_id
-    WHERE hs.hospital_id = #{hospitalId}
-  </select>
-
-  <!-- [추가] 병원 ID로 리뷰 목록을 조회하는 쿼리 -->
-  <select id="getReviewsByHospitalId" resultType="com.aloha.zootopia.domain.HospReview">
-    SELECT r.*, u.nickname
-    FROM hospital_review r
-    JOIN users u ON r.user_id = u.user_id
-    WHERE r.hospital_id = #{hospitalId}
-    ORDER BY r.created_at DESC
+    LEFT JOIN
+        hospital_review r ON h.hospital_id = r.hospital_id
+    LEFT JOIN
+        users u ON r.user_id = u.user_id
+    LEFT JOIN
+        hospital_animal ha ON h.hospital_id = ha.hospital_id
+    LEFT JOIN
+        possible_animal pa ON ha.animal_id = pa.animal_id
+    LEFT JOIN
+        hospital_specialty hs ON h.hospital_id = hs.hospital_id
+    LEFT JOIN
+        specialty s ON hs.specialty_id = s.specialty_id
+    WHERE h.hospital_id = #{hospitalId}
   </select>
 
   <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">

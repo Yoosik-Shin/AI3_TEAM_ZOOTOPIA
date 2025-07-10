@@ -113,24 +113,18 @@
                         <p>등록된 리뷰가 없습니다.</p>
                     </div>
                     <div th:each="review, stat : ${hospital.reviews}" class="review-item" th:id="'review-item-' + ${review.reviewId}">
-
+                        
                         <div class="author-rating">
                             <div class="review-author" th:text="${review.nickname}">작성자</div>
                             <div class="review-rating">
                                 <span th:if="${review.rating != null}" th:each="i : ${#numbers.sequence(1, review.rating)}">⭐</span>
                             </div>
                         </div>
-
                         <div class="review-date-container">
                             <div class="review-date" th:text="${#dates.format(review.createdAt, 'yyyy.MM.dd HH:mm')}">2025.08.27 12:12</div>
                         </div>
-
                         <hr style="margin-bottom: 3px; border: none; border-top: 1px solid #ccc;">
-
                         <div class="review-content" th:id="'review-content-' + ${review.reviewId}" th:text="${review.content}"></div>
-
-                        
-                        <!-- 수정용 hidden form -->
                         <form th:action="@{/hospitals/{id}/reviews/{reviewId}/edit(id=${hospital.hospitalId}, reviewId=${review.reviewId})}" method="post" class="inline-edit-form" th:id="'edit-form-' + ${review.reviewId}" style="display:none;">
                             <textarea name="content" th:text="${review.content}" required style="width:90%;height:60px;"></textarea>
                             <button type="submit" class="review-update-btn">수정완료</button>
