@@ -10,5 +10,6 @@ public interface LostAnimalCommentService {
     void deleteComment(Integer commentId);
     void updateCommentContent(Comment comment);
     Comment findById(Integer commentId);
+    List<Comment> getCommentsByPostIdAsTree(Integer postId);
 
 }

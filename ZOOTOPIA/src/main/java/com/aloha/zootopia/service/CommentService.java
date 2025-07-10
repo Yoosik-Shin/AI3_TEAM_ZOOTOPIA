@@ -6,7 +6,6 @@ import com.aloha.zootopia.domain.Comment;
 
 public interface CommentService {
 
-    // 커뮤니티 댓글
     List<Comment> getCommentsByPostId(Integer postId);
     void addComment(Comment comment);
     void deleteComment(Integer commentId);

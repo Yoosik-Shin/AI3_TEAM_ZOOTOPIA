@@ -236,13 +236,13 @@ public class PostServiceImpl implements PostService {
         Pattern pattern = Pattern.compile("<img[^>]+src=[\"']?/upload/([^\"'>]+)[\"']?");
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            imageFiles.add(matcher.group(1)); // abc.jpg
+            imageFiles.add(matcher.group(1)); 
         }
         return imageFiles;
     }
 
     private void deleteImages(List<String> filenames) {
-        String uploadDir = "C:/upload"; // ✅ 반드시 실제 서버 경로와 일치시켜야 함
+        String uploadDir = "C:/upload"; 
         for (String name : filenames) {
             File file = new File(uploadDir, name);
             if (file.exists()) {
