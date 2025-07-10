@@ -151,17 +151,7 @@
 
                         <!-- 수량 조절 -->
                         <div class="col-md-3 col-6 mt-2 mt-md-0">
-                            <div class="quantity-controls">
-                                <button type="button" class="quantity-btn" th:onclick="'updateQuantity(' + ${item.productNo} + ', ' + (${item.quantity} - 1) + ')'">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" class="quantity-input" th:value="${item.quantity}" 
-                                       th:id="'quantity-' + ${item.productNo}" min="1" max="99"
-                                       th:onchange="'updateQuantity(' + ${item.productNo} + ', this.value)'">
-                                <button type="button" class="quantity-btn" th:onclick="'updateQuantity(' + ${item.productNo} + ', ' + (${item.quantity} + 1) + ')'">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
+                            <form class="d-flex flex-row align-items-center" style="gap:4px;" th:action="@{/cart/update}" method="post"><input type="hidden" name="productNo" th:value="${item.productNo}" /><button type="submit" name="quantity" th:value="${item.quantity - 1}" class="btn btn-outline-secondary btn-sm" th:disabled="${item.quantity == 1}">-</button><input type="number" class="form-control text-center mx-1" name="quantity" th:value="${item.quantity}" min="1" max="99" style="width:60px;" readonly /><button type="submit" name="quantity" th:value="${item.quantity + 1}" class="btn btn-outline-secondary btn-sm">+</button></form>
                         </div>
 
                         <!-- 가격 및 삭제 -->

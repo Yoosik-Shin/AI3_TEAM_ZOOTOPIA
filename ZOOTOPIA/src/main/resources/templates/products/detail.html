@@ -6,6 +6,7 @@
     <title th:text="${productName} + ' - ZOOTOPIA'">상품 상세 - ZOOTOPIA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/dist/css/product-detail.css">
     <style>
         .navbar-brand img {
             height: 40px;
@@ -78,8 +79,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <img src="/img/zootopialogo.png" alt="Zootopia" onerror="this.style.display='none'">
-                <span class="ms-2 fw-bold" style="color: #F27A7A;">ZOOTOPIA</span>
+                <img src="/img/zootopialogo.png" alt="Zootopia" style="height:150px;" onerror="this.style.display='none'">
             </a>
             
             <div class="navbar-nav ms-auto">
@@ -107,7 +107,7 @@
             <!-- 상품 이미지 -->
             <div class="col-lg-6 mb-4">
                 <div class="text-center">
-                    <img src="/assets/dist/img/products/productcatbowl.png" 
+                    <img th:src="${productImage}" 
                          class="img-fluid product-image" 
                          alt="상품 이미지"
                          th:alt="${productName}"
@@ -271,6 +271,7 @@
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/dist/js/product-detail.js"></script>
     <script th:inline="javascript">
         // 상품 가격 정보
         const productPrice = /*[[${productPrice}]]*/ 20000;

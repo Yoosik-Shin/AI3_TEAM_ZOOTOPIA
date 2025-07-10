@@ -80,7 +80,7 @@ public class ProductController {
             
             List<Product> products = allProducts.subList(startIndex, endIndex);
             
-            // 페이지네이션 정보 생성
+            // 페이지네이션 count 동적 설정
             Pagination pagination = new Pagination(page, totalProducts);
             pagination.setSize(size);
             pagination.setCategory(category);
@@ -110,24 +110,28 @@ public class ProductController {
     @GetMapping("/detail/{no}")
     public String detail(@PathVariable("no") Integer productNumber, Model model) {
         System.out.println("=== 상품 상세 페이지 호출됨: " + productNumber + " ===");
-        
-        // 더미 상품 데이터 생성
-        model.addAttribute("productNo", productNumber);
-        model.addAttribute("productName", "ZOOTOPIA 프리미엄 사료 " + productNumber);
-        model.addAttribute("productPrice", (productNumber * 15000));
-        model.addAttribute("productCategory", productNumber % 2 == 0 ? "사료" : "용품");
-        model.addAttribute("productDescription", 
-            "반려동물을 위한 최고급 " + (productNumber % 2 == 0 ? "사료" : "용품") + 
-            "입니다. 영양소가 풍부하고 소화가 잘되며, 반려동물의 건강을 위해 엄선된 재료로 만들어졌습니다.");
-        model.addAttribute("productStock", 50 + (productNumber * 10));
-        model.addAttribute("productRating", 4.5 + (productNumber % 5) * 0.1);
-        model.addAttribute("productReviewCount", 120 + (productNumber * 8));
-        
+        // 더미 상품 데이터에서 해당 상품 찾기
+        List<Product> allProducts = createDummyProducts();
+        Product product = allProducts.stream()
+            .filter(p -> p.getNo() == productNumber)
+            .findFirst()
+            .orElse(null);
+        if (product == null) {
+            model.addAttribute("error", "상품을 찾을 수 없습니다.");
+            return "error/404";
+        }
+        model.addAttribute("productNo", product.getNo());
+        model.addAttribute("productName", product.getName());
+        model.addAttribute("productPrice", product.getPrice());
+        model.addAttribute("productCategory", product.getCategory());
+        model.addAttribute("productDescription", product.getDescription());
+        model.addAttribute("productStock", product.getStock() > 0 ? product.getStock() : 50);
+        model.addAttribute("productRating", product.getRating() > 0 ? product.getRating() : 4.5);
+        model.addAttribute("productReviewCount", product.getReviewCount() > 0 ? product.getReviewCount() : 120);
+        model.addAttribute("productImage", product.getImageUrl());
         // 기본 수량
         model.addAttribute("quantity", 1);
-        
         System.out.println("상품 정보 설정 완료");
-        
         return "products/detail";
     }
     
@@ -149,7 +153,7 @@ public class ProductController {
     @GetMapping("/simple/{no}")
     public String simple(@PathVariable int no, Model model) {
         System.out.println("=== 간단 테스트 페이지 호출됨: " + no + " ===");
-        return "products/test_simple_detail";
+        return "product_detail";
     }
     
     // 최소한의 데이터로 상세 페이지 테스트
@@ -186,8 +190,7 @@ public class ProductController {
 //                 response.put("success", false);
 //                 response.put("message", "로그인이 필요합니다.");
 //                 return ResponseEntity.ok(response);
-//             }
-            
+
 //             int result = 0;
 //             if ("like".equals(type)) {
 //                 result = productService.updateLikes(no);
@@ -648,11 +651,9 @@ public class ProductController {
     @GetMapping("/template-detail/{no}")
     public String templateDetail(@PathVariable int no, Model model) {
         System.out.println("=== 템플릿 테스트 /template-detail/" + no + " 호출됨 ===");
-        
         model.addAttribute("productNo", no);
         model.addAttribute("productName", "테스트 상품");
-        
-        return "test_simple_detail";
+        return "product_detail";
     }
     
     // 안전한 상품 상세 페이지 (예외 처리 강화)
