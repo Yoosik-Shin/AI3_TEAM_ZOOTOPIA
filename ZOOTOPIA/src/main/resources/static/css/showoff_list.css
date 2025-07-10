@@ -6,6 +6,9 @@ body {
   padding: 0;
   color: #333;
 }
+.container {
+  width: 900px;
+}
 
 a {
   text-decoration: none;

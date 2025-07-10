@@ -35,9 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-@RequestMapping("/posts")
+@RequestMapping("/showoff")
 @RequiredArgsConstructor
-public class PostController {
+public class ShowoffController {
 
     private final PostService postService;
     private final CommentService commentService;
@@ -50,21 +50,21 @@ public class PostController {
     public String list(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
-            @RequestParam(name = "category", required = false) String category,
             @RequestParam(name = "type", required = false) String type,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "sort", defaultValue = "latest") String sort, 
             Model model
     ) throws Exception {
 
+        String category = "자랑글";
+
         List<Posts> list;
         Pagination pagination = new Pagination();
         pagination.setPage(page);
         pagination.setSize(size);
-        pagination.setCount(10); // 보여줄 페이지 번호 수 (예: 1 2 3 ... 10)
+        pagination.setCount(10); 
         pagination.setOffset((page - 1) * size);
-        pagination.setCategory(category); // 카테고리도 페이징 객체에 포함
-
+        pagination.setCategory(category);
         
         if (type != null && keyword != null && !keyword.isBlank()) {
             // 🔍 검색 결과
@@ -99,7 +99,7 @@ public class PostController {
         model.addAttribute("topList", topList);
         model.addAttribute("sort", sort);
 
-        return "posts/list";
+        return "showoff/list";
     }
 
 
@@ -146,7 +146,7 @@ public class PostController {
         model.addAttribute("loginUserId", user != null ? user.getUser().getUserId() : null);
         model.addAttribute("liked", liked); 
 
-        return "posts/read";
+        return "showoff/read";
     }
 
 
@@ -157,7 +157,7 @@ public class PostController {
     @GetMapping("/create")
     public String createForm(Model model) {
         model.addAttribute("post", new Posts());
-        return "posts/create";
+        return "showoff/create";
     }
 
     /**
@@ -172,12 +172,12 @@ public class PostController {
 
         if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
             ra.addFlashAttribute("error", "제목은 1자 이상 입력해주세요.");
-            return "redirect:/posts/create";
+            return "redirect:/showoff/create";
         }
 
         if (post.getContent() == null || post.getContent().trim().length() < 5) {
             ra.addFlashAttribute("error", "본문은 5자 이상 입력해주세요.");
-            return "redirect:/posts/create";
+            return "redirect:/showoff/create";
         }
 
 
@@ -186,10 +186,10 @@ public class PostController {
         boolean result = postService.insert(post);
         if (result) {
             ra.addFlashAttribute("msg", "등록되었습니다.");
-            return "redirect:/posts/list";
+            return "redirect:/showoff/list";
         }
         ra.addFlashAttribute("error", "등록에 실패했습니다.");
-        return "redirect:/posts/create";
+        return "redirect:/showoff/create";
     }
 
     @PostMapping("/upload/image")
@@ -238,7 +238,7 @@ public class PostController {
 
         if (!isOwner) {
             ra.addFlashAttribute("error", "삭제 권한이 없습니다.");
-            return "redirect:/posts/list";
+            return "redirect:/showoff/list";
         }
 
         // 🧹 삭제 서비스 호출 (댓글 + 이미지 포함)
@@ -250,7 +250,7 @@ public class PostController {
             ra.addFlashAttribute("error", "삭제에 실패했습니다.");
         }
 
-        return "redirect:/posts/list";
+        return "redirect:/showoff/list";
     }
 
 
@@ -269,12 +269,12 @@ public class PostController {
         boolean isOwner = postService.isOwner(id, user.getUserId());
         if (!isOwner) {
             ra.addFlashAttribute("error", "수정 권한이 없습니다.");
-            return "redirect:/posts/list";
+            return "redirect:/showoff/list";
         }
 
         Posts post = postService.selectById(id);
         model.addAttribute("post", post);
-        return "posts/edit";  // edit.html로 이동
+        return "showoff/edit";  // edit.html로 이동
     }
 
 
@@ -289,18 +289,18 @@ public class PostController {
         // 🔒 글쓴이 확인
         if (!postService.isOwner(id, user.getUserId())) {
             ra.addFlashAttribute("error", "수정 권한이 없습니다.");
-            return "redirect:/posts/list";
+            return "redirect:/showoff/list";
         }
 
         // ✅ 유효성 검사
         if (post.getTitle() == null || post.getTitle().trim().isEmpty()) {
             ra.addFlashAttribute("error", "제목은 1자 이상 입력해주세요.");
-            return "redirect:/posts/edit/" + id;
+            return "redirect:/showoff/edit/" + id;
         }
 
         if (post.getContent() == null || post.getContent().replaceAll("<[^>]*>", "").trim().length() < 5) {
             ra.addFlashAttribute("error", "본문은 5자 이상 입력해주세요.");
-            return "redirect:/posts/edit/" + id;
+            return "redirect:/showoff/edit/" + id;
         }
 
         // 수동 설정
@@ -311,10 +311,10 @@ public class PostController {
 
         if (result) {
             ra.addFlashAttribute("msg", "글이 수정되었습니다.");
-            return "redirect:/posts/read/" + id;
+            return "redirect:/showoff/read/" + id;
         } else {
             ra.addFlashAttribute("error", "글 수정에 실패했습니다.");
-            return "redirect:/posts/edit/" + id;
+            return "redirect:/showoff/edit/" + id;
         }
     }
 
@@ -336,7 +336,7 @@ public class PostController {
         } else {
             ra.addFlashAttribute("msg", "좋아요를 취소했습니다.");
         }
-        return "redirect:/posts/read/" + postId;
+        return "redirect:/showoff/read/" + postId;
     }
 
 

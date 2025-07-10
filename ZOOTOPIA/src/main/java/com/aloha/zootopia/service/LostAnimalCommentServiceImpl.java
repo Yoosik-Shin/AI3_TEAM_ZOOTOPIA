@@ -11,49 +11,47 @@ import org.springframework.stereotype.Service;
 import com.aloha.zootopia.domain.Comment;
 import com.aloha.zootopia.mapper.CommentMapper;
 
-
-
+import lombok.RequiredArgsConstructor;
 
 @Service
-
-public class CommentServiceImpl implements CommentService {
-
+@RequiredArgsConstructor
+public class LostAnimalCommentServiceImpl implements LostAnimalCommentService{
+    
     @Autowired
     private CommentMapper commentMapper;
-    @Autowired
-    private PostService postService;
 
+    @Autowired
+    private LostAnimalService lostAnimalService;
 
     @Override
     public List<Comment> getCommentsByPostId(Integer postId) {
-        return commentMapper.findByPostId(postId);
+        return commentMapper.findLostByPostId(postId);
     }
 
     @Override
     public void addComment(Comment comment) {
-        commentMapper.insert(comment);
-        postService.increaseCommentCount(comment.getPostId());
+        commentMapper.insertLost(comment);
+        lostAnimalService.increaseCommentCount(comment.getPostId());
     }
 
     @Override
     public void deleteComment(Integer commentId) {
-        commentMapper.softDelete(commentId);
+        commentMapper.softDeleteLost(commentId);
     }
-    
+
     @Override
     public void updateCommentContent(Comment comment) {
-        commentMapper.updateContent(comment);
+        commentMapper.updateLostContent(comment);
     }
 
     @Override
     public Comment findById(Integer commentId) {
-        return commentMapper.findById(commentId);
+        return commentMapper.findLostById(commentId);
     }
 
 
-
     public List<Comment> getCommentsByPostIdAsTree(Integer postId) {
-        List<Comment> flatList = commentMapper.findByPostId(postId); 
+        List<Comment> flatList = commentMapper.findLostByPostId(postId); 
         return buildCommentTree(flatList);
     }
 
@@ -80,6 +78,6 @@ public class CommentServiceImpl implements CommentService {
 
         return roots;
     }
-    
-
 }
+
+

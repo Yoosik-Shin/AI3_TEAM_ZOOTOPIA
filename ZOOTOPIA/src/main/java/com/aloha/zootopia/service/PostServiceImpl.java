@@ -1,7 +1,11 @@
 package com.aloha.zootopia.service;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +16,6 @@ import com.aloha.zootopia.domain.Posts;
 import com.aloha.zootopia.domain.Tag;
 import com.aloha.zootopia.mapper.PostMapper;
 import com.aloha.zootopia.mapper.TagMapper;
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,10 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired private PostMapper postMapper;
-    
-    @Autowired private TagMapper tagMapper;
+    @Autowired 
+    private PostMapper postMapper;
 
+    @Autowired 
+    private TagMapper tagMapper;
 
     @Override
     public List<Posts> list() throws Exception {
@@ -33,16 +36,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Posts> page(Pagination pagination) throws Exception {
+        // 전체 게시글 수 조회 후 pagination 계산
         long total = postMapper.count(pagination);
         pagination.setTotal(total);
-        return postMapper.page(pagination);
-    }
 
-    @Override
-    public PageInfo<Posts> page(int page, int size, String category) {
-        PageHelper.startPage(page, size);
-        List<Posts> postList = postMapper.pageByCategory(category);
-        PageInfo<Posts> pageInfo = new PageInfo<>(postList);
+        List<Posts> postList = postMapper.page(pagination);
 
         if (!postList.isEmpty()) {
             List<Integer> postIds = postList.stream()
@@ -50,7 +48,6 @@ public class PostServiceImpl implements PostService {
                     .toList();
 
             List<Tag> tagResults = postMapper.selectTagsByPostIds(postIds);
-
             Map<Integer, List<Tag>> tagMap = tagResults.stream()
                     .collect(Collectors.groupingBy(Tag::getPostId));
 
@@ -62,7 +59,7 @@ public class PostServiceImpl implements PostService {
             }
         }
 
-        return pageInfo;
+        return postList;
     }
 
     @Override
@@ -71,30 +68,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Posts selectById(String id) throws Exception {
-        return postMapper.selectById(id);
+    public Posts selectById(int postId) throws Exception {
+        return postMapper.selectById(postId);
     }
 
     @Override
     public boolean insert(Posts post) throws Exception {
-        // 게시글 저장
         boolean success = postMapper.insert(post) > 0;
         if (!success) return false;
 
-        // ✅ 썸네일 자동 추출: 본문(content)에서 첫 <img src="..."> 태그 파싱
+        // 썸네일 추출
         String content = post.getContent();
         if (content != null) {
-            // 정규표현식으로 첫 번째 이미지 src 추출
-            java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?").matcher(content);
+            java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
+                .matcher(content);
             if (matcher.find()) {
-                String firstImgSrc = matcher.group(1); // ex) /upload/abc.jpg
+                String firstImgSrc = matcher.group(1);
                 post.setThumbnailUrl(firstImgSrc);
-                postMapper.updateThumbnail(post); // 썸네일 반영
+                postMapper.updateThumbnail(post);
             }
         }
 
-        // ✅ 태그 처리 (기존 유지)
-        String tagStr = post.getTags();  // 예: "고양이,귀여움,햇살"
+        // 태그 처리
+        String tagStr = post.getTags();
         if (tagStr != null && !tagStr.trim().isEmpty()) {
             String[] tagNames = tagStr.split(",");
             for (String rawName : tagNames) {
@@ -106,7 +103,7 @@ public class PostServiceImpl implements PostService {
                     Tag tag = new Tag();
                     tag.setName(name);
                     tagMapper.insertTag(tag);
-                    tagId = tag.getTagId();  // generated key 반환됨
+                    tagId = tag.getTagId();
                 }
 
                 tagMapper.insertPostTag(post.getPostId(), tagId);
@@ -116,51 +113,67 @@ public class PostServiceImpl implements PostService {
         return true;
     }
 
+        @Override
+        public boolean updateById(Posts post) throws Exception {
+            Posts oldPost = postMapper.selectById(post.getPostId());
+            if (oldPost != null) {
+                List<String> oldImages = extractImageFileNames(oldPost.getContent());
+                List<String> newImages = extractImageFileNames(post.getContent());
 
-
-    @Override
-    public boolean updateById(Posts post) throws Exception {
-        // 1. 게시글 본문, 제목, 카테고리 등 업데이트
-        boolean success = postMapper.updateById(post) > 0;
-        if (!success) return false;
-
-        // 2. 기존 태그 연결 삭제
-        tagMapper.deletePostTagsByPostId(post.getPostId());
-
-        // 3. 새 태그 문자열 파싱 및 등록
-        String tagStr = post.getTags();  // 예: "고양이, 햇살, 귀여움"
-        if (tagStr != null && !tagStr.trim().isEmpty()) {
-            String[] tagNames = tagStr.split(",");
-            for (String rawName : tagNames) {
-                String name = rawName.trim();
-                if (name.isEmpty()) continue;
-
-                // DB에 존재하는 태그인지 확인
-                Integer tagId = tagMapper.findTagIdByName(name);
-                if (tagId == null) {
-                    // 없으면 새로 등록
-                    Tag tag = new Tag();
-                    tag.setName(name);
-                    tagMapper.insertTag(tag);
-                    tagId = tag.getTagId(); // 생성된 태그 ID
-                }
-
-                // post_tags 관계 테이블에 연결
-                tagMapper.insertPostTag(post.getPostId(), tagId);
+                List<String> deletedImages = oldImages.stream()
+                        .filter(img -> !newImages.contains(img))
+                        .collect(Collectors.toList());
+                deleteImages(deletedImages);
             }
+
+            boolean success = postMapper.updateById(post) > 0;
+            if (!success) return false;
+
+            Matcher matcher = Pattern.compile("<img[^>]+src=[\"']?([^\"'>]+)[\"']?")
+                    .matcher(post.getContent());
+            if (matcher.find()) {
+                post.setThumbnailUrl(matcher.group(1));
+                postMapper.updateThumbnail(post);
+            }
+
+            tagMapper.deletePostTagsByPostId(post.getPostId());
+
+            String tagStr = post.getTags();
+            if (tagStr != null && !tagStr.trim().isEmpty()) {
+                String[] tagNames = tagStr.split(",");
+                for (String rawName : tagNames) {
+                    String name = rawName.trim();
+                    if (name.isEmpty()) continue;
+
+                    Integer tagId = tagMapper.findTagIdByName(name);
+                    if (tagId == null) {
+                        Tag tag = new Tag();
+                        tag.setName(name);
+                        tagMapper.insertTag(tag);
+                        tagId = tag.getTagId();
+                    }
+                    tagMapper.insertPostTag(post.getPostId(), tagId);
+                }
+            }
+
+            return true;
         }
 
-        return true;
+
+   @Override
+    public boolean deleteById(int postId) throws Exception {
+        Posts post = postMapper.selectById(postId);
+        if (post != null) {
+            List<String> imageFiles = extractImageFileNames(post.getContent());
+            deleteImages(imageFiles); 
+        }
+
+        return postMapper.deleteById(postId) > 0;
     }
 
     @Override
-    public boolean deleteById(String id) throws Exception {
-        return postMapper.deleteById(id) > 0;
-    }
-
-    @Override
-    public boolean isOwner(String id, Long userId) throws Exception {
-        Posts post = postMapper.selectById(id);
+    public boolean isOwner(int postId, Long userId) throws Exception {
+        Posts post = postMapper.selectById(postId);
         return post != null && post.getUserId().equals(userId);
     }
 
@@ -174,7 +187,6 @@ public class PostServiceImpl implements PostService {
         return postMapper.selectTop10ByPopularity();
     }
 
-
     @Override
     public void increaseCommentCount(int postId) {
         postMapper.updateCommentCount(postId); 
@@ -185,8 +197,60 @@ public class PostServiceImpl implements PostService {
         postMapper.minusCommentCount(postId);
     }
 
+    @Override
+    public List<Posts> pageBySearch(String type, String keyword, Pagination pagination) throws Exception {
+        return postMapper.pageBySearch(type, keyword, pagination);
+    }
+
+    @Override
+    public long countBySearch(String type, String keyword) throws Exception {
+        return postMapper.countBySearch(type, keyword);
+    }
 
 
+    @Override
+    public List<Posts> pageByPopularity(Pagination pagination) throws Exception {
+        long total = postMapper.count(pagination);
+        pagination.setTotal(total);
+        List<Posts> postList = postMapper.pageByPopularity(pagination);
+
+        // 태그 매핑 (기존 코드 재사용)
+        if (!postList.isEmpty()) {
+            List<Integer> postIds = postList.stream().map(Posts::getPostId).toList();
+            List<Tag> tagResults = postMapper.selectTagsByPostIds(postIds);
+            Map<Integer, List<Tag>> tagMap = tagResults.stream().collect(Collectors.groupingBy(Tag::getPostId));
+            for (Posts post : postList) {
+                List<Tag> tagList = tagMap.get(post.getPostId());
+                if (tagList != null) post.setTagList(tagList);
+            }
+        }
+
+        return postList;
+    }
 
 
+    private List<String> extractImageFileNames(String content) {
+        List<String> imageFiles = new ArrayList<>();
+        if (content == null) return imageFiles;
+
+        Pattern pattern = Pattern.compile("<img[^>]+src=[\"']?/upload/([^\"'>]+)[\"']?");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            imageFiles.add(matcher.group(1)); 
+        }
+        return imageFiles;
+    }
+
+    private void deleteImages(List<String> filenames) {
+        String uploadDir = "C:/upload"; 
+        for (String name : filenames) {
+            File file = new File(uploadDir, name);
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                log.info(deleted ? "✅ 삭제됨: {}" : "❌ 삭제 실패: {}", name);
+            }
+        }
+    }
+
+    
 }
