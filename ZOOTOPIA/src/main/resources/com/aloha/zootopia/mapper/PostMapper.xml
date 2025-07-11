@@ -275,6 +275,13 @@
     LIMIT #{offset}, #{size}
   </select>
 
+  <select id="findByUserId" resultType="com.aloha.zootopia.domain.Posts">
+    SELECT *
+    FROM posts
+    WHERE user_id = #{userId}
+    ORDER BY created_at DESC
+  </select>
+
 
 
 

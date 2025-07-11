@@ -17,5 +17,10 @@ public interface UserMapper {
 
     // 회원 조회
     public Users select(@Param("email") String email) throws Exception;
+
+    int updatePassword(@Param("userId") Long userId, @Param("password") String password);
     
+    Users findUserById(@Param("userId") Long userId);
+    
+    int updateUser(Users user);
 }

@@ -39,7 +39,7 @@ public class LostAnimalPost {
 
     private List<Comment> comments;
 
-    
+    private String category;
     private String tags;
     private List<Tag> tagList;
 }

@@ -66,4 +66,5 @@ public interface PostMapper {
     
     List<Posts> pageByPopularity(Pagination pagination) throws Exception;
 
+    List<Posts> findByUserId(Long userId);
 }

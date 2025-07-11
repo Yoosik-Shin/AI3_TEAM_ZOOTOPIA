@@ -56,4 +56,23 @@
         WHERE email = #{email}
     </select>
 
+    <update id="updatePassword">
+        UPDATE users
+        SET password = #{password}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findUserById" resultMap="UserMap">
+        SELECT * FROM users WHERE user_id = #{userId}
+    </select>
+
+    <!-- 사용자 정보 수정 -->
+    <update id="updateUser">
+        UPDATE users
+        SET nickname = #{nickname},
+            intro = #{intro},
+            phone = #{phone},
+            profile_img = #{profileImg}
+        WHERE user_id = #{userId}
+    </update>
 </mapper>
