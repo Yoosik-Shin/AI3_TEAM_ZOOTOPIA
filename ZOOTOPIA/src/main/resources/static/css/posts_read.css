@@ -56,11 +56,23 @@ a {
 }
 
 .btn-share {
-  background: #f0f0f0;
+  /* background: #f0f0f0; */
+  border: 1px solid black;
+  min-width: 150px;
+  height: 40px;
+}
+.btn-share:hover {
+  background: #e0e0e0;
 }
 
 .btn-like {
   background: #ffbbbb;
+  color: white;
+  min-width: 150px;
+  height: 40px;
+}
+.btn-like:hover {
+  background: #ff9999;  
   color: white;
 }
 
@@ -84,9 +96,6 @@ a {
 
 .content {
   min-height: 220px;
-<<<<<<<< HEAD:ZOOTOPIA/src/main/resources/static/assets/dist/css/read.css
-}
-========
 }
 
 .comment-b {
@@ -168,4 +177,3 @@ a {
   font-size: 11px;         
   line-height: 1;
 }
->>>>>>>> main:ZOOTOPIA/src/main/resources/static/assets/dist/css/posts_read.css
