@@ -5,13 +5,22 @@
 <mapper namespace="com.aloha.zootopia.mapper.InsuranceProductMapper">
 
     <!-- 등록 -->
-    <insert id="insertProduct">
-        INSERT INTO insurance_product
-        (name, slogan, coverage_percent, monthly_fee_range, max_coverage, species, join_condition, coverage_items, precautions)
-        VALUES
-        (#{name}, #{slogan}, #{coveragePercent}, #{monthlyFeeRange}, #{maxCoverage}, #{species},
-         #{joinCondition}, #{coverageItems}, #{precautions})
-    </insert>
+    <select id="getProduct" resultType="com.aloha.zootopia.domain.InsuranceProduct">
+    SELECT 
+        product_id,
+        name,
+        slogan,
+        coverage_percent,
+        monthly_fee_range,
+        max_coverage,
+        species,
+        join_condition,    -- 가입조건
+        coverage_items,    -- 보장항목
+        precautions,       -- 유의사항
+        created_at
+    FROM insurance_product
+    WHERE product_id = #{productId}
+    </select>
 
     <!-- 목록 -->
     <select id="selectAllProducts" resultType="com.aloha.zootopia.domain.InsuranceProduct">

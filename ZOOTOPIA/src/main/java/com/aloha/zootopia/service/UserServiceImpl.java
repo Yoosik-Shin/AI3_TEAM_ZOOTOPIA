@@ -103,5 +103,9 @@ public class UserServiceImpl implements UserService {
                     .map(GrantedAuthority::getAuthority)
                     .anyMatch(role -> role.equals("ROLE_ADMIN"));
     }
-    
+
+    @Override
+    public Users getUserById(Long userId) throws Exception {
+        return userMapper.selectById(userId);
+    }
 }

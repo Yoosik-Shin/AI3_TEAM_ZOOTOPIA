@@ -31,9 +31,9 @@
     </resultMap>
 
     <!-- 회원 가입 -->
-    <insert id="join">
-        INSERT INTO users ( email, password, nickname )
-        VALUES ( #{email}, #{password}, #{nickname} )
+    <insert id="join" parameterType="com.aloha.zootopia.domain.Users">
+        INSERT INTO users ( email, password, nickname, phone )
+        VALUES ( #{email}, #{password}, #{nickname}, #{phone} )
     </insert>
 
     <!-- 회원 권한 등록 -->
@@ -47,6 +47,13 @@
         SELECT *
         FROM users
         WHERE email = #{email}
+    </select>
+
+    <!-- 사용자 단건 조회 (by userId) -->
+    <select id="selectById" resultMap="UserMap">
+        SELECT *
+        FROM users
+        WHERE user_id = #{userId}
     </select>
 
     <!-- 사용자 권한 목록 조회 -->

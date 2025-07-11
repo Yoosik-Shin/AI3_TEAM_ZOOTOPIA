@@ -2,9 +2,9 @@ package com.aloha.zootopia.domain;
 
 import java.util.Date;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Users {
-    private long userId;        // PK
+    private Long userId;        // PK
     private String email;          // 이메일
     private String password;       // 비밀번호
     private String nickname;       // 닉네임

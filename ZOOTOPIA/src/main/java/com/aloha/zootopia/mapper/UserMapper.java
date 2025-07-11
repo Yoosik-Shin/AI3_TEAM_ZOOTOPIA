@@ -18,4 +18,7 @@ public interface UserMapper {
     // 회원 조회
     public Users select(@Param("email") String email) throws Exception;
     
+    // userId로 회원 조회 (추가)
+    public Users selectById(@Param("userId") Long userId) throws Exception;
+
 }
