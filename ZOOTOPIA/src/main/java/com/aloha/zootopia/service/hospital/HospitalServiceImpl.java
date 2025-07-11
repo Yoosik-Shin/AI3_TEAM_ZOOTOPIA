@@ -11,14 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.aloha.zootopia.domain.Animal;
 import com.aloha.zootopia.domain.Hospital;
+import com.aloha.zootopia.domain.PageInfo;
 import com.aloha.zootopia.domain.HospReview;
 import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.dto.HospitalForm;
-import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.mapper.AnimalMapper;
 import com.aloha.zootopia.mapper.HospitalMapper;
-import com.aloha.zootopia.mapper.HospReviewMapper;
 import com.aloha.zootopia.mapper.SpecialtyMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ public class HospitalServiceImpl implements HospitalService {
     @Autowired HospitalMapper hospitalMapper;
     @Autowired AnimalMapper animalMapper;
     @Autowired SpecialtyMapper specialtyMapper;
-    @Autowired HospReviewMapper reviewMapper;
 
     @Value("${file.upload.path}")
     private String uploadPath;
@@ -58,30 +56,6 @@ public class HospitalServiceImpl implements HospitalService {
         return hospitalMapper.findByAnimalIds(animalIds);
     }
 
-    @Override
-    public Hospital getHospital(Integer id) {
-        log.info("############################################################");
-        log.info("HospitalServiceImpl - getHospital() 진입");
-        Hospital hospital = hospitalMapper.findById(id);
-        if (hospital != null) {
-            log.info("Mapper.findById() 호출 후 병원 기본 정보 조회 완료. Hospital ID: {}", id);
-            List<HospReview> reviews = hospitalMapper.getReviewsByHospitalId(id);
-            log.info("Mapper.getReviewsByHospitalId() 호출 후 리뷰 개수: {}", reviews != null ? reviews.size() : 0);
-            List<Animal> animals = hospitalMapper.getAnimalsByHospitalId(id);
-            log.info("Mapper.getAnimalsByHospitalId() 호출 후 동물 개수: {}", animals != null ? animals.size() : 0);
-            List<Specialty> specialties = hospitalMapper.getSpecialtiesByHospitalId(id);
-            log.info("Mapper.getSpecialtiesByHospitalId() 호출 후 진료과목 개수: {}", specialties != null ? specialties.size() : 0);
-
-            hospital.setReviews(reviews);
-            hospital.setAnimals(animals);
-            hospital.setSpecialties(specialties);
-            log.info("Hospital 객체에 리뷰, 동물, 진료과목 설정 완료. 최종 리뷰 개수: {}", hospital.getReviews() != null ? hospital.getReviews().size() : 0);
-        } else {
-            log.warn("HospitalServiceImpl - getHospital(): Hospital ID {} 에 해당하는 병원을 찾을 수 없습니다.", id);
-        }
-        log.info("############################################################");
-        return hospital;
-    }
 
     @Override
     public void createHospital(HospitalForm form, MultipartFile thumbnailImageFile) throws Exception {
@@ -111,23 +85,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public List<Specialty> getAllSpecialties() { return specialtyMapper.findAll(); }
 
-    @Override
-    public List<HospReview> getReviews(Integer hospitalId) {
-        List<HospReview> reviews = reviewMapper.findByHospitalId(hospitalId);
-        System.out.println("DEBUG: getReviews for hospitalId " + hospitalId + " returned " + (reviews != null ? reviews.size() : "null") + " reviews.");
-        return reviews;
-    }
 
-    @Override
-    public void addReview(Integer hospitalId, HospReviewForm form, String nickname, Integer userId) {
-        HospReview review = new HospReview();
-        review.setHospitalId(hospitalId);
-        review.setRating(form.getRating());
-        review.setContent(form.getContent());
-        review.setNickname(nickname);
-        review.setUserId(userId);
-        reviewMapper.insertReview(review);
-    }
 
 
 public HospitalServiceImpl(HospitalMapper hospitalMapper) {
@@ -146,30 +104,6 @@ public HospitalServiceImpl(HospitalMapper hospitalMapper) {
         return hospitalMapper.countHospitals(animalIds);
     }
 
-    @Override
-    public void updateReview(Integer reviewId, String content, Integer userId) {
-        HospReview review = reviewMapper.findById(reviewId);
-        if (review == null) {
-            throw new IllegalArgumentException("Review not found.");
-        }
-        if (!review.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("You are not authorized to update this review.");
-        }
-        reviewMapper.updateReview(reviewId, content, userId);
-    }
-
-    @Override
-    public void deleteReview(Integer reviewId, Integer userId) {
-        HospReview review = reviewMapper.findById(reviewId);
-        if (review == null) {
-            // 리뷰가 이미 삭제되었거나 존재하지 않는 경우
-            return; 
-        }
-        if (!review.getUserId().equals(userId)) {
-            throw new SecurityException("삭제할 권한이 없습니다.");
-        }
-        reviewMapper.deleteReview(reviewId, userId);
-    }
 
     @Override
     public void updateHospital(HospitalForm form, MultipartFile thumbnailImageFile) throws Exception {
@@ -230,10 +164,14 @@ public HospitalServiceImpl(HospitalMapper hospitalMapper) {
                 imageFile.delete();
             }
         }
-        reviewMapper.deleteReviewsByHospitalId(id);
         hospitalMapper.deleteHospitalAnimals(id);
         hospitalMapper.deleteHospitalSpecialties(id);
         hospitalMapper.deleteHospital(id);
+    }
+
+    @Override
+    public Hospital getHospital(Integer id) {
+        return hospitalMapper.findById(id);
     }
 
 
