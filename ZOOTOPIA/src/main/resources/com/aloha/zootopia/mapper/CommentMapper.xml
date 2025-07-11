@@ -15,6 +15,8 @@
     <result property="postId" column="post_id" />
     <result property="nickname" column="nickname" />
     <result property="profileImg" column="profile_img" />
+    <result property="postTitle" column="post_title"/>
+    <result property="postCategory" column="post_category"/>  
   </resultMap>
 
   <!-- 일반 게시판 댓글 -->
@@ -92,5 +94,7 @@
     LEFT JOIN users u ON c.user_id = u.user_id
     WHERE comment_id = #{commentId}
   </select>
+
+  
 
 </mapper>

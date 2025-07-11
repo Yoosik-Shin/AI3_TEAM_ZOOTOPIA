@@ -36,10 +36,10 @@ public class LostAnimalServiceImpl implements LostAnimalService {
 
         List<LostAnimalPost> postList = lostAnimalMapper.findAll(pagination);
 
-        if (!postList.isEmpty()) {
-            applyTagsToPostList(postList);
+        for (LostAnimalPost post : postList) {
+             post.setCategory("유실동물");
         }
-
+        applyTagsToPostList(postList);
         return postList;
     }
 
@@ -50,7 +50,11 @@ public class LostAnimalServiceImpl implements LostAnimalService {
 
     @Override
     public LostAnimalPost getById(int postId) {
-        return lostAnimalMapper.findById(postId);
+        LostAnimalPost post = lostAnimalMapper.findById(postId);
+        if (post != null) {
+            post.setCategory("유실동물");
+        }
+        return post;
     }
 
     @Override

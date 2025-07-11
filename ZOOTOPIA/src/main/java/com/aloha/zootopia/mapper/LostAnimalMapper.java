@@ -59,4 +59,7 @@ public interface LostAnimalMapper {
         @Param("keyword") String keyword
     );
 
+    List<LostAnimalPost> findByUserId(Long userId);
+
+
 }
