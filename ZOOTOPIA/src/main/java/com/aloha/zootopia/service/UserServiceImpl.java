@@ -105,6 +105,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Users getUserById(Long userId) throws Exception {
+        return userMapper.selectById(userId);
+    }
+
     public boolean checkPassword(Long userId, String rawPassword) throws Exception {
         Users user = userMapper.findUserById(userId);
         return passwordEncoder.matches(rawPassword, user.getPassword());
@@ -125,5 +129,5 @@ public class UserServiceImpl implements UserService {
     return userMapper.updateUser(user);
     }
 
-    
+
 }

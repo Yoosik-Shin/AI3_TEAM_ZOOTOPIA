@@ -22,5 +22,11 @@ public interface UserMapper {
     
     Users findUserById(@Param("userId") Long userId);
     
+
+    // userId로 회원 조회 (추가)
+    public Users selectById(@Param("userId") Long userId) throws Exception;
+
+
     int updateUser(Users user);
+
 }

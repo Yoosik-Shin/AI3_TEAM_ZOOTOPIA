@@ -2,9 +2,9 @@ package com.aloha.zootopia.domain;
 
 import java.util.Date;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Users {
+
     private long userId;        
     private String email;          
     private String password;      
@@ -23,6 +24,7 @@ public class Users {
     private String profileImg;    
     private Date createdAt; 
     private int enabled;       
+
     
     private List<UserAuth> authList;
 }
