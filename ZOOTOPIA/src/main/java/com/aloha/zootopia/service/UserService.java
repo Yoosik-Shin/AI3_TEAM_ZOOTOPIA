@@ -25,4 +25,12 @@ public interface UserService {
     // 👮‍♀️ 관리자 확인
     public boolean isAdmin() throws Exception;
     
+    boolean checkPassword(Long userId, String rawPassword) throws Exception;
+
+    int updatePassword(Long userId, String newPassword) throws Exception;
+
+    Users findUserById(Long userId) throws Exception;
+    
+    int updateUser(Users user) throws Exception;
+
 }

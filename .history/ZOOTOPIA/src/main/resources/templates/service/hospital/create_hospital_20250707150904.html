@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병원 등록</title>
+    <link rel="stylesheet" th:href="@{/css/hospital_style.css}">
+</head>
+<body>
+    <th:block th:replace="~{/fragments/header :: header}"></th:block>
+    <div class="container">
+        <!-- 상단 로고 -->
+        <div class="logo-container">
+            <div class="logo">
+                <img th:src="@{/img/hosp_logo.png}" alt="병원 아이콘" class="logo-icon">
+            </div>
+        </div>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="main-content">
+            <form th:action="@{/hospitals}" method="post" th:object="${hospitalForm}" enctype="multipart/form-data">
+                <div class="form-container">
+                    <div class="image-upload-section">
+                        <div class="image-upload-area" onclick="document.getElementById('fileInput').click();">
+                                <img id="preview" src="/img/de" alt="이미지를 업로드하세요" />
+                            </div>
+                            <input type="file" id="fileInput" name="thumbnailImageFile" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                    </div>
+
+                <div class="form-section">
+
+                        <div class="form-group">
+                            <label for="name">병원 이름</label>
+                            <input type="text" id="name" th:field="*{name}" placeholder="병원 이름을 작성하세요" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>진료 과목</label>
+                            <div class="checkbox-group">
+                                <div th:each="spec : ${specialtyList}" class="checkbox-item">
+                                    <input type="checkbox" th:field="*{specialtyIds}" th:value="${spec.specialtyId}" th:id="'spec-' + ${spec.specialtyId}">
+                                    <label th:for="'spec-' + ${spec.specialtyId}" th:text="${spec.category}"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>진료 가능 동물</label>
+                            <div class="checkbox-group">
+                                <div th:each="animal : ${animalList}" class="checkbox-item">
+                                    <input type="checkbox" th:field="*{animalIds}" th:value="${animal.animalId}" th:id="'animal-' + ${animal.animalId}">
+                                    <label th:for="'animal-' + ${animal.animalId}" th:text="${animal.species}"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">병원 주소</label>
+                            <input type="text" id="address" th:field="*{address}" placeholder="주소를 입력해 주세요" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="homepage">홈페이지</label>
+                            <input type="url" id="homepage" th:field="*{homepage}" placeholder="홈페이지 주소를 입력해 주세요">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">대표번호</label>
+                            <input type="tel" id="phone" th:field="*{phone}" placeholder="병원 전화번호를 입력하세요" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">이메일</label>
+                            <input type="email" id="email" th:field="*{email}" placeholder="이메일 주소를 입력하세요">
+                        </div>
+
+                        <div class="form-group">
+                            <label>카테고리</label>
+                            <div class="category-group">
+                                <label class="category-item">
+                                    <input type="checkbox" name="category" value="포유류">
+                                    <span>포유류</span>
+                                </label>
+                                <label class="category-item">
+                                    <input type="checkbox" name="category" value="비충류">
+                                    <span>파충류</span>
+                                </label>
+                                <label class="category-item">
+                                    <input type="checkbox" name="category" value="조류">
+                                    <span>조류</span>
+                                </label>
+                                <label class="category-item">
+                                    <input type="checkbox" name="category" value="원시류">
+                                    <span>절지류</span>
+                                </label>
+                                <label class="category-item">
+                                    <input type="checkbox" name="category" value="설치류">
+                                    <span>설치류</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="button" class="btn btn-cancel" onclick="history.back()">취소하기</button>
+                            <button type="submit" class="btn btn-submit">등록하기</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+  function previewImage(event) {
+    const input = event.target;
+    const reader = new FileReader();
+
+    reader.onload = function () {
+      const preview = document.getElementById('preview');
+      preview.src = reader.result;
+    };
+
+    if (input.files && input.files[0]) {
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+
+
+    <th:block th:replace="~{/fragments/footer :: footer}"></th:block>
+</body>
+</html>

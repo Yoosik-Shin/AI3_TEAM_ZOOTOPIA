@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>병원 상세</title></head>
+<body>
+  <h2 th:text="${hospital.name}"></h2>
+  <div>주소: <span th:text="${hospital.address}"></span></div>
+  <div>전화: <span th:text="${hospital.phone}"></span></div>
+  <div>홈페이지: <a th:href="${hospital.homepage}" th:text="${hospital.homepage}"></a></div>
+  <div>이메일: <span th:text="${hospital.email}"></span></div>
+  <div>
+    진료 과목:
+    <span th:each="spec : ${hospital.specialties}" th:text="${spec.category} + ' '"></span>
+  </div>
+  <div>
+    진료 가능 동물:
+    <span th:each="animal : ${hospital.animals}" th:text="${animal.species} + ' '"></span>
+  </div>
+  <hr>
+  <h3>리뷰</h3>
+  <div th:each="review : ${reviews}">
+    <div>
+      <span th:text="'⭐'.repeat(${review.rating})"></span>
+      <span th:text="${review.content}"></span>
+      <span th:text="${review.nickname}"></span>
+    </div>
+  </div>
+  <form th:action="@{/hospitals/{id}/reviews(id=${hospital.hospitalId})}" method="post" th:object="${reviewForm}">
+    <label>별점</label>
+    <input type="number" th:field="*{rating}" min="1" max="5" required>
+    <label>내용</label>
+    <input type="text" th:field="*{content}" required>
+    <button type="submit">리뷰 남기기</button>
+  </form>
+</body>
+</html>

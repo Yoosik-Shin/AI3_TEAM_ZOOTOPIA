@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>병원 등록</title></head>
+<body>
+  <form th:action="@{/hospitals}" method="post" th:object="${hospitalForm}">
+    <label>병원 이름</label>
+    <input type="text" th:field="*{name}" required><br>
+    <label>진료 과목</label><br>
+    <div th:each="spec : ${specialtyList}">
+      <input type="checkbox" th:field="*{specialtyIds}" th:value="${spec.specialtyId}">
+      <label th:text="${spec.category}"></label>
+    </div>
+    <label>진료 가능 동물</label><br>
+    <div th:each="animal : ${animalList}">
+      <input type="checkbox" th:field="*{animalIds}" th:value="${animal.animalId}">
+      <label th:text="${animal.species}"></label>
+    </div>
+    <label>병원 주소</label>
+    <input type="text" th:field="*{address}" required><br>
+    <label>홈페이지</label>
+    <input type="url" th:field="*{homepage}"><br>
+    <label>대표번호</label>
+    <input type="tel" th:field="*{phone}" required><br>
+    <label>이메일</label>
+    <input type="email" th:field="*{email}"><br>
+    <button type="submit">등록</button>
+  </form>
+</body>
+</html>
