@@ -19,8 +19,8 @@ public class HospReview {
     private String content;
     private Date createdAt;
     private Date updatedAt;
-    private Integer userId;
-    private String nickname;
+    private Long userId;
+    private String userNickname;
     // getter/setter
 
 }

@@ -43,4 +43,10 @@ launch.json
 # Gradle 빌드 파일 무시
 /build/
 /ZOOTOPIA/build/
+
 *.bin
+
+# localhistory 무시
+*.history
+*.bin/ZOOTOPIA/build/
+

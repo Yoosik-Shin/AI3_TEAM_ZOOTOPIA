@@ -1,19 +1,16 @@
 package com.aloha.zootopia.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 
 import com.aloha.zootopia.security.CustomAccessDeniedHandler;
 import com.aloha.zootopia.security.LoginFailureHandler;
@@ -30,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 
     @Autowired
-    private DataSource dataSource;
+    private javax.sql.DataSource dataSource;
 
     // @Autowired
     // private PasswordEncoder passwordEncoder;
@@ -67,10 +64,13 @@ public class SecurityConfig {
                                 .requestMatchers("/hospitals", "/hospitals/detail/**").permitAll()
 
                                 .requestMatchers("/comments/add").authenticated() 
+                                // .requestMatchers("/products/detail/**").authenticated() // 상품 상세 - 임시 비활성화
+                                .requestMatchers("/cart/**").authenticated() // 장바구니 - 로그인 필요
                                 .requestMatchers("/posts/upload/image").permitAll()
                                 .requestMatchers("/lost/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
 
+                                .requestMatchers(HttpMethod.GET, "/hospitals/{hospitalId}/reviews").permitAll() // 추가
                                 .anyRequest().permitAll()
                                 );
         http.csrf(csrf -> csrf
@@ -109,11 +109,11 @@ public class SecurityConfig {
         // 👩‍💼 사용자 정의 인증
         http.userDetailsService(userDetailServiceImpl);
 
-        // 🔄 자동 로그인
-        http.rememberMe(me -> me
-                .key("aloha")
-                .tokenRepository(tokenRepository())
-                .tokenValiditySeconds(60 * 60 * 24 * 7));
+        // 🔄 자동 로그인 - 임시 비활성화
+        // http.rememberMe(me -> me
+        //         .key("aloha")
+        //         .tokenRepository(tokenRepository())
+        //         .tokenValiditySeconds(60 * 60 * 24 * 7));
 
         // 🔓 로그아웃 설정
         http.logout(logout -> logout

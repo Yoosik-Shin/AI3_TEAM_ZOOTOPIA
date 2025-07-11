@@ -15,13 +15,13 @@
     <result property="thumbnailImageUrl" column="thumbnail_image_url"/>
     <result property="hospIntroduce" column="hosp_introduce"/>
     <result property="avgRating" column="avg_rating"/>
+    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal" column="hospital_id" select="getAnimalsByHospitalId" />
   </resultMap>
 
   <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
   <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
-    <collection property="animals" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Animal" />
-    <collection property="specialties" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Specialty" />
-    <collection property="reviews" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.HospReview" />
+    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal" column="hospital_id" select="getAnimalsByHospitalId" />
+    <collection property="specialties" ofType="com.aloha.zootopia.domain.Specialty" column="hospital_id" select="getSpecialtiesByHospitalId" />
   </resultMap>
 
   <select id="findAll" resultMap="HospitalListResultMap">
