@@ -2,31 +2,73 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
     <!-- Header Fragment -->
-    <nav th:fragment="header" class="navbar navbar-expand-lg navbar-light bg-white border-bottom" style="height: 120px; padding: 10px 0;">
-        <div class="container-fluid px-4">
+    <nav th:fragment="header" class="navbar navbar-expand-lg navbar-light bg-white border-bottom" style="height: 100px; padding: 10px 0;">
+        
+        <div class="container-fluid px-4" style="height: 100px; padding: 10px 0;">
             <!-- Logo -->
             <a class="navbar-brand" href="/" style="text-decoration: none;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <img src="/img/zootopialogo.png" alt="Zootopia Logo" 
-                         style="width: 150px; height: 150px; object-fit: contain;">
+                         style="width: 120px; height: 100px; object-fit: contain;">
                        
                 </div>
             </a>
 
             <!-- Mobile Toggle Button -->
-            <!-- <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <!-- <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                    aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button> -->
 
             <!-- Navigation - Center (Desktop) -->
-            <div class="navbar-nav mx-auto d-none d-lg-flex">
-                <a class="nav-link" href="/" style="padding: 8px 16px;">홈</a>
-                <a class="nav-link" href="/products/listp" style="padding: 8px 16px;">스토어</a>
-                <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
-                <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
-                <a class="nav-link" th:href="@{/posts/list}" style="padding: 8px 16px;">커뮤니티</a>
-            </div>
+            <ul class="main-menu navbar-nav mx-auto d-none d-lg-flex">
+                <li>
+                    <a class="nav-link" href="/" style="padding: 8px 16px;">홈</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="nav-link" href="/products/listp" style="padding: 8px 16px;">스토어</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="nav-link" th:href="@{/posts/list}" style="padding: 8px 16px;">커뮤니티</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">서브메뉴</a></li>
+                    </ul>
+                </li>
+            </ul>
+
 
             <!-- Mobile Navigation Menu -->
             <!-- <div class="collapse navbar-collapse d-lg-none" id="navbarNav">
@@ -83,7 +125,12 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- Offcanvas -->
         </div>
     </nav>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script> -->
+
+    
 </body>
 </html>

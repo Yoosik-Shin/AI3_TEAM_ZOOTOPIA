@@ -113,3 +113,32 @@ function debugHeader() {
 window.addEventListener('load', function() {
     setTimeout(debugHeader, 1000); // Wait 1 second after page load
 });
+
+
+// 메뉴 슬라이드
+document.addEventListener("DOMContentLoaded", function () {
+    const mainMenus = document.querySelectorAll(".main-menu");
+    const subMenus = document.querySelectorAll(".sub-menu");
+
+    mainMenus.forEach(menu => {
+        menu.addEventListener("mouseover", () => {
+            subMenus.forEach(sub => {
+                sub.style.display = "block"; // display는 유지 (혹시 모를 경우 대비)
+                sub.style.visibility = "visible"; // 추가
+                sub.style.opacity = "1"; // 추가
+                sub.style.maxHeight = sub.scrollHeight + "px"; // 서브메뉴의 실제 높이로 설정
+            });
+        });
+
+        menu.addEventListener("mouseout", () => {
+            subMenus.forEach(sub => {
+                sub.style.opacity = "0"; // 추가
+                sub.style.maxHeight = "0";
+                sub.style.visibility = "hidden"; // 추가
+                // setTimeout(() => { // display: none;은 transition 완료 후 적용
+                //     sub.style.display = "none";
+                // }, 300); // transition과 일치
+            });
+        });
+    });
+});
