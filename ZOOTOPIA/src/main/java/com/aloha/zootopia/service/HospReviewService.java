@@ -4,9 +4,11 @@ import com.aloha.zootopia.domain.HospReview;
 import com.aloha.zootopia.mapper.HospReviewMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j; // Import Slf4j
 
 import java.util.List;
 
+@Slf4j // Add Slf4j annotation
 @Service
 public class HospReviewService {
 
@@ -14,7 +16,9 @@ public class HospReviewService {
     private HospReviewMapper hospReviewMapper;
 
     public List<HospReview> listByHospital(int hospitalId) {
-        return hospReviewMapper.listByHospital(hospitalId);
+        List<HospReview> reviews = hospReviewMapper.listByHospital(hospitalId);
+        log.info("Reviews for hospitalId {}: {}", hospitalId, reviews); // Add log
+        return reviews;
     }
 
     public void addReview(HospReview hospReview) {

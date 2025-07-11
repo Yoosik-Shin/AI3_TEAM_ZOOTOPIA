@@ -200,6 +200,9 @@
                 if (content === '') {
                     alert('내용을 입력해주세요.');
                     event.preventDefault(); // 제출 방지
+
+                    // r백업용 날짜 
+                    <span class="review-date">${new Date(review.createdAt).toLocaleDateString()}</span>
                     return;
                 }
             });

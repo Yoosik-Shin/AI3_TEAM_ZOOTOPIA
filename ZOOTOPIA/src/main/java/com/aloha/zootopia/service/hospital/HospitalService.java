@@ -20,4 +20,5 @@ public interface HospitalService {
     int getHospitalCount(List<Integer> animalIds);
     void updateHospital(HospitalForm form, MultipartFile thumbnailImageFile) throws Exception;
     void deleteHospital(Integer id);
+    Hospital getHospital(Integer id);
 }

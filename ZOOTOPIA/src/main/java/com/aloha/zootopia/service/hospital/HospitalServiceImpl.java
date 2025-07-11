@@ -169,5 +169,10 @@ public HospitalServiceImpl(HospitalMapper hospitalMapper) {
         hospitalMapper.deleteHospital(id);
     }
 
+    @Override
+    public Hospital getHospital(Integer id) {
+        return hospitalMapper.findById(id);
+    }
+
 
 }

@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.aloha.zootopia.domain.Animal;
+import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.domain.Hospital;
 import com.aloha.zootopia.domain.PageInfo;
 import com.aloha.zootopia.domain.HospReview; // ADDED THIS LINE
@@ -108,11 +110,11 @@ public class HospitalController {
         log.info("############################################################");
         log.info("HospitalController - details() 진입");
         log.info("로그인 사용자: {}", principal != null ? principal.getName() : "ANONYMOUS");
-//=================================================================================TODO: 병원 상세 정보 조회 로직 추가
-        // Hospital hospital = hospitalService.getHospital(id);
+        //=================================================================================TODO: 병원 상세 정보 조회 로직 추가
+        Hospital hospital = hospitalService.getHospital(id);
 
-        
-        // model.addAttribute("hospital", hospital);
+
+        model.addAttribute("hospital", hospital);
 
         log.info("############################################################");
         return "service/hospital/details";
@@ -134,6 +136,43 @@ public class HospitalController {
             // Handle error, e.g., add error message to model
         }
         return "service/hospital/create_hospital";
+    }
+
+    // 병원 수정 폼 페이지
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable Integer id, Model model) {
+        try {
+            Hospital hospital = hospitalService.getHospital(id);
+            HospitalForm hospitalForm = new HospitalForm();
+            hospitalForm.setHospitalId(hospital.getHospitalId());
+            hospitalForm.setName(hospital.getName());
+            hospitalForm.setAddress(hospital.getAddress());
+            hospitalForm.setHomepage(hospital.getHomepage());
+            hospitalForm.setPhone(hospital.getPhone());
+            hospitalForm.setEmail(hospital.getEmail());
+            hospitalForm.setHospIntroduce(hospital.getHospIntroduce());
+            hospitalForm.setThumbnailImageUrl(hospital.getThumbnailImageUrl());
+
+            // 동물 및 진료과목 ID 설정 (수정 폼에서 기존 선택값 표시용)
+            if (hospital.getAnimals() != null) {
+                hospitalForm.setAnimalIds(hospital.getAnimals().stream()
+                                                .map(Animal::getAnimalId)
+                                                .collect(Collectors.toList()));
+            }
+            if (hospital.getSpecialties() != null) {
+                hospitalForm.setSpecialtyIds(hospital.getSpecialties().stream()
+                                                    .map(Specialty::getSpecialtyId)
+                                                    .collect(Collectors.toList()));
+            }
+
+            model.addAttribute("hospitalForm", hospitalForm);
+            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+            model.addAttribute("animalList", hospitalService.getAllAnimals());
+        } catch (Exception e) {
+            log.error("Error loading hospital for edit: {}", e.getMessage());
+            // 에러 처리 로직 추가 (예: 에러 페이지로 리다이렉트 또는 메시지 표시)
+        }
+        return "service/hospital/create_hospital"; // create_hospital.html을 재사용
     }
 
     // 병원 등록/수정 처리 (AJAX 요청 처리)
@@ -192,7 +231,9 @@ public class HospitalController {
     @GetMapping("/{hospitalId}/reviews")
     @ResponseBody
     public ResponseEntity<List<HospReview>> getReviews(@PathVariable int hospitalId) {
+        log.info("HospitalController - getReviews() 진입. hospitalId: {}", hospitalId); // 추가
         List<HospReview> reviews = hospReviewService.listByHospital(hospitalId);
+        log.info("HospitalController - getReviews() 반환 리뷰 수: {}", reviews.size()); // 추가
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
@@ -200,7 +241,9 @@ public class HospitalController {
     @PostMapping("/{hospitalId}/reviews")
     @ResponseBody
     public ResponseEntity<String> addReview(@PathVariable int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+        log.info("HospitalController - addReview() 진입. hospitalId: {}, hospReview: {}", hospitalId, hospReview); // 추가
         if (customUser == null) {
+            log.warn("HospitalController - addReview() : Unauthorized access - customUser is null"); // 추가
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
         Long userId = customUser.getUser().getUserId();
@@ -208,6 +251,7 @@ public class HospitalController {
         hospReview.setHospitalId(hospitalId);
 
         hospReviewService.addReview(hospReview);
+        log.info("HospitalController - addReview() : Review added successfully"); // 추가
         return new ResponseEntity<>("Review added successfully", HttpStatus.CREATED);
     }
 
@@ -215,19 +259,23 @@ public class HospitalController {
     @PutMapping("/{hospitalId}/reviews/{reviewId}")
     @ResponseBody
     public ResponseEntity<String> updateReview(@PathVariable int hospitalId, @PathVariable int reviewId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+        log.info("HospitalController - updateReview() 진입. hospitalId: {}, reviewId: {}, hospReview: {}", hospitalId, reviewId, hospReview); // 추가
         if (customUser == null) {
+            log.warn("HospitalController - updateReview() : Unauthorized access - customUser is null"); // 추가
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
         HospReview existingReview = hospReviewService.getReviewById(reviewId);
         Long userId = customUser.getUser().getUserId();
 
         if (existingReview.getUserId() != userId) {
+            log.warn("HospitalController - updateReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
             return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
 
         hospReview.setReviewId(reviewId);
         hospReview.setHospitalId(hospitalId);
         hospReviewService.updateReview(hospReview);
+        log.info("HospitalController - updateReview() : Review updated successfully"); // 추가
         return new ResponseEntity<>("Review updated successfully", HttpStatus.OK);
     }
 
@@ -235,17 +283,21 @@ public class HospitalController {
     @DeleteMapping("/{hospitalId}/reviews/{reviewId}")
     @ResponseBody
     public ResponseEntity<String> deleteReview(@PathVariable int hospitalId, @PathVariable int reviewId, @AuthenticationPrincipal CustomUser customUser) {
+        log.info("HospitalController - deleteReview() 진입. hospitalId: {}, reviewId: {}", hospitalId, reviewId); // 추가
         if (customUser == null) {
+            log.warn("HospitalController - deleteReview() : Unauthorized access - customUser is null"); // 추가
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
         HospReview existingReview = hospReviewService.getReviewById(reviewId);
         Long userId = customUser.getUser().getUserId();
 
         if (existingReview.getUserId() != userId) {
+            log.warn("HospitalController - deleteReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
             return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
         }
 
         hospReviewService.deleteReview(reviewId);
+        log.info("HospitalController - deleteReview() : Review deleted successfully"); // 추가
         return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
     }
 

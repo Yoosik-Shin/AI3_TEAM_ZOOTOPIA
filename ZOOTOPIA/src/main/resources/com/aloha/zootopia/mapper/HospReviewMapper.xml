@@ -8,7 +8,7 @@
     <select id="listByHospital" resultType="com.aloha.zootopia.domain.HospReview">
         SELECT r.*, u.nickname AS userNickname
         FROM hospital_review r
-        JOIN user u ON r.user_id = u.user_id
+        JOIN users u ON r.user_id = u.user_id
         WHERE r.hospital_id = #{hospitalId}
         ORDER BY r.created_at DESC
     </select>
@@ -36,7 +36,7 @@
     <select id="select" resultType="com.aloha.zootopia.domain.HospReview">
         SELECT r.*, u.nickname AS userNickname
         FROM hospital_review r
-        JOIN user u ON r.user_id = u.user_id
+        JOIN users u ON r.user_id = u.user_id
         WHERE r.review_id = #{reviewId}
     </select>
 
