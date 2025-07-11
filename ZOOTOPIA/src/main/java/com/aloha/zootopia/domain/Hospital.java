@@ -16,9 +16,11 @@ public class Hospital {
     private String homepage;
     private String phone;
     private String email;
+    private String hospIntroduce; // 250708 추가
     private String thumbnailImageUrl; // 추가될 필드
     private List<Animal> animals;
     private List<Specialty> specialties;
     private Double avgRating;
-    // getter/setter
+    private List<HospReview> reviews; // 리뷰 목록 추가
 }
+

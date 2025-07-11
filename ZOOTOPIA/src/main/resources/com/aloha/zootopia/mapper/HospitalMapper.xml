@@ -4,26 +4,32 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aloha.zootopia.mapper.HospitalMapper">
 
-  <resultMap id="HospitalResultMap" type="Hospital">
+  <!-- 1. 병원 '목록' 조회를 위한 간단한 ResultMap -->
+  <resultMap id="HospitalListResultMap" type="Hospital">
     <id property="hospitalId" column="hospital_id"/>
     <result property="name" column="name"/>
     <result property="address" column="address"/>
     <result property="homepage" column="homepage"/>
     <result property="phone" column="phone"/>
     <result property="email" column="email"/>
+    <result property="thumbnailImageUrl" column="thumbnail_image_url"/>
+    <result property="hospIntroduce" column="hosp_introduce"/>
     <result property="avgRating" column="avg_rating"/>
-    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal"
-                select="com.aloha.zootopia.mapper.AnimalMapper.findByHospitalId" column="hospital_id"/>
-    <collection property="specialties" ofType="Specialty"
-                select="com.aloha.zootopia.mapper.SpecialtyMapper.findByHospitalId" column="hospital_id"/>
   </resultMap>
 
-  <select id="findAll" resultMap="HospitalResultMap">
+  <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
+  <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
+    <collection property="animals" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Animal" />
+    <collection property="specialties" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.Specialty" />
+    <collection property="reviews" javaType="java.util.ArrayList" ofType="com.aloha.zootopia.domain.HospReview" />
+  </resultMap>
+
+  <select id="findAll" resultMap="HospitalListResultMap">
     SELECT h.*, (SELECT AVG(rating) FROM hospital_review r WHERE r.hospital_id = h.hospital_id) AS avg_rating
     FROM hospital_info h
   </select>
 
-  <select id="findByAnimalIds" parameterType="list" resultMap="HospitalResultMap">
+  <select id="findByAnimalIds" parameterType="list" resultMap="HospitalListResultMap">
     SELECT DISTINCT h.*, (SELECT AVG(rating)
                             FROM hospital_review r
                             WHERE r.hospital_id = h.hospital_id) AS avg_rating
@@ -37,15 +43,45 @@
     HAVING COUNT(DISTINCT ha.animal_id) = #{_parameter.size}
   </select>
 
-  <select id="findById" parameterType="int" resultMap="HospitalResultMap">
-    SELECT h.*, (SELECT AVG(rating) FROM hospital_review r WHERE r.hospital_id = h.hospital_id) AS avg_rating
-    FROM hospital_info h
-    WHERE h.hospital_id = #{hospitalId}
+  <!-- [수정] 병원 상세 조회를 위한 메인 쿼리 (기본 정보만 조회) -->
+  <select id="findById" parameterType="int" resultMap="HospitalDetailResultMap">
+    SELECT
+        h.*,
+        (SELECT AVG(rating) FROM hospital_review r_avg WHERE r_avg.hospital_id = h.hospital_id) AS avg_rating
+    FROM
+        hospital_info h
+    WHERE
+        h.hospital_id = #{hospitalId}
   </select>
 
-  <insert id="insertHospital" useGeneratedKeys="true" keyProperty="hospitalId">
-    INSERT INTO hospital_info (name, address, homepage, phone, email, thumbnail_image_url)
-    VALUES (#{name}, #{address}, #{homepage}, #{phone}, #{email}, #{thumbnailImageUrl})
+  <!-- [추가] 병원 ID로 동물 목록을 조회하는 쿼리 -->
+  <select id="getAnimalsByHospitalId" resultType="com.aloha.zootopia.domain.Animal">
+    SELECT pa.animal_id, pa.species
+    FROM possible_animal pa
+    JOIN hospital_animal ha ON pa.animal_id = ha.animal_id
+    WHERE ha.hospital_id = #{hospitalId}
+  </select>
+
+  <!-- [추가] 병원 ID로 진료과목 목록을 조회하는 쿼리 -->
+  <select id="getSpecialtiesByHospitalId" resultType="com.aloha.zootopia.domain.Specialty">
+    SELECT s.specialty_id, s.category
+    FROM specialty s
+    JOIN hospital_specialty hs ON s.specialty_id = hs.specialty_id
+    WHERE hs.hospital_id = #{hospitalId}
+  </select>
+
+  <!-- [추가] 병원 ID로 리뷰 목록을 조회하는 쿼리 -->
+  <select id="getReviewsByHospitalId" resultType="com.aloha.zootopia.domain.HospReview">
+    SELECT r.*, u.nickname
+    FROM hospital_review r
+    JOIN users u ON r.user_id = u.user_id
+    WHERE r.hospital_id = #{hospitalId}
+    ORDER BY r.created_at DESC
+  </select>
+
+  <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
+    INSERT INTO hospital_info (name, address, homepage, phone, email, thumbnail_image_url, hosp_introduce)
+    VALUES (#{name}, #{address}, #{homepage}, #{phone}, #{email}, #{thumbnailImageUrl}, #{hospIntroduce})
   </insert>
 
   <insert id="insertHospitalAnimal">
@@ -58,7 +94,30 @@
     VALUES (#{hospitalId}, #{specialtyId})
   </insert>
 
-  <select id="selectHospitals" resultMap="HospitalResultMap">
+  <update id="updateHospital" parameterType="Hospital">
+    UPDATE hospital_info
+    SET
+      name = #{name},
+      address = #{address},
+      homepage = #{homepage},
+      phone = #{phone},
+      email = #{email},
+      thumbnail_image_url = #{thumbnailImageUrl},
+      hosp_introduce = #{hospIntroduce}
+    WHERE hospital_id = #{hospitalId}
+  </update>
+
+  <delete id="deleteHospitalAnimals" parameterType="int">
+    DELETE FROM hospital_animal
+    WHERE hospital_id = #{hospitalId}
+  </delete>
+
+  <delete id="deleteHospitalSpecialties" parameterType="int">
+    DELETE FROM hospital_specialty
+    WHERE hospital_id = #{hospitalId}
+  </delete>
+
+  <select id="selectHospitals" resultMap="HospitalListResultMap">
     SELECT h.*, (SELECT AVG(rating) FROM hospital_review r WHERE r.hospital_id = h.hospital_id) AS avg_rating
     FROM hospital_info h
     <if test="animalIds != null and animalIds.size() > 0">
@@ -89,5 +148,11 @@
 
     </if>
   </select>
+
+  <!-- 병원 삭제 -->
+  <delete id="deleteHospital" parameterType="int">
+    DELETE FROM hospital_info
+    WHERE hospital_id = #{hospitalId}
+  </delete>
 
 </mapper>

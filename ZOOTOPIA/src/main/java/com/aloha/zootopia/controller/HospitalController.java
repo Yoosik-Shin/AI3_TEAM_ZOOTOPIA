@@ -6,45 +6,49 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult; // Import BindingResult
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.Hospital;
+import com.aloha.zootopia.domain.HospReview; // ADDED THIS LINE
 import com.aloha.zootopia.dto.HospReviewForm;
 import com.aloha.zootopia.dto.HospitalForm;
 import com.aloha.zootopia.dto.PageInfo;
 import com.aloha.zootopia.mapper.UserMapper;
-import com.aloha.zootopia.service.AnimalService;
-import com.aloha.zootopia.service.HospitalService;
-// import com.github.pagehelper.PageInfo;
-import com.aloha.zootopia.service.hospital.HospitalImageUploader;
+import com.aloha.zootopia.service.hospital.HospitalService;
 
+import jakarta.validation.Valid; // Import @Valid
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
+@RequestMapping("/hospitals")
 public class HospitalController {
-    @Autowired HospitalService hospitalService;
-    @Autowired AnimalService animalService;
-    @Autowired UserMapper userMapper;
-    @Autowired HospitalImageUploader hospitalImageUploader;
 
-    public HospitalController(HospitalService hospitalService, AnimalService animalService, com.aloha.zootopia.mapper.UserMapper userMapper) {
-        this.hospitalService = hospitalService;
-        this.animalService = animalService;
-    }
-    // @GetMapping("/hospitals")
-    // public String list(@RequestParam(required = false) List<Integer> animal, Model model) {
-    //     model.addAttribute("animalList", hospitalService.getAllAnimals());
-    //     model.addAttribute("selectedAnimals", animal == null ? new ArrayList<>() : animal);
-    //     model.addAttribute("hospitals", hospitalService.getHospitals(animal));
-    //     return "service/hospital/hosp_list";
-    // }
+    @Autowired
+    private HospitalService hospitalService;
 
-    @GetMapping("/hospitals")
+    @Autowired
+    private UserMapper userMapper;
+
+
+
+
+    // 병원 목록 페이지
+    @GetMapping
     public String list(
         @RequestParam(required = false) List<Integer> animal,
         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
@@ -87,36 +91,131 @@ public class HospitalController {
         return "service/hospital/hosp_list";
     }
 
+    // 병원 상세 페이지
+    @GetMapping("/detail/{id}")
+    public String details(@PathVariable Integer id, Model model, Principal principal) {
+        log.info("############################################################");
+        log.info("HospitalController - details() 진입");
+        log.info("로그인 사용자: {}", principal != null ? principal.getName() : "ANONYMOUS");
 
-    @GetMapping("/hospitals/detail/{id}")
-    public String details(@PathVariable Integer id, Model model) {
-        model.addAttribute("hospital", hospitalService.getHospital(id));
-        model.addAttribute("reviews", hospitalService.getReviews(id));
+        Hospital hospital = hospitalService.getHospital(id);
+
+        if (hospital != null && hospital.getReviews() != null) {
+            log.info("Service에서 반환된 리뷰 개수: {}", hospital.getReviews().size());
+        } else {
+            log.warn("Service에서 반환된 리뷰가 없거나 hospital 객체가 null입니다.");
+        }
+
+        model.addAttribute("hospital", hospital);
         model.addAttribute("reviewForm", new HospReviewForm());
+
+        log.info("############################################################");
         return "service/hospital/details";
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/hospitals/new")
+
+
+
+
+    // 병원 등록 폼 페이지
+    @GetMapping("/create")
     public String createForm(Model model) {
         model.addAttribute("hospitalForm", new HospitalForm());
-        model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
-        model.addAttribute("animalList", hospitalService.getAllAnimals());
+        try {
+            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+            model.addAttribute("animalList", hospitalService.getAllAnimals());
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            // Handle error, e.g., add error message to model
+        }
         return "service/hospital/create_hospital";
     }
 
-    // @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/hospitals")
-    public String create(@ModelAttribute HospitalForm form, @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) throws Exception {
-        if (thumbnailImageFile != null && !thumbnailImageFile.isEmpty()) {
-            String imageUrl = hospitalImageUploader.uploadFile(thumbnailImageFile);
-            form.setThumbnailImageUrl(imageUrl);
+    // 병원 등록/수정 처리 (AJAX 요청 처리)
+    @PostMapping
+    @ResponseBody // For AJAX response
+    public String processHospitalForm(@Valid @RequestPart("hospitalForm") HospitalForm hospitalForm,
+                                      BindingResult bindingResult, // Add BindingResult
+                                      @RequestParam(value = "thumbnailImageFile", required = false) MultipartFile thumbnailImageFile) {
+
+        if (bindingResult.hasErrors()) {
+            // Log validation errors
+            bindingResult.getAllErrors().forEach(error -> System.err.println("Validation Error: " + error.getDefaultMessage()));
+            return "{\"status\": \"error\", \"message\": \"Validation failed: " + bindingResult.getFieldError().getDefaultMessage().replace("\"", "") + "\"}";
         }
-        hospitalService.createHospital(form);
-        return "redirect:/hospitals";
+
+        try {
+            if (hospitalForm.getHospitalId() == null) {
+                // Create new hospital
+                hospitalService.createHospital(hospitalForm, thumbnailImageFile);
+            } else {
+                // Update existing hospital
+                hospitalService.updateHospital(hospitalForm, thumbnailImageFile);
+            }
+            return "{\"status\": \"success\", \"message\": \"Hospital data saved successfully.\"}";
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            return "{\"status\": \"error\", \"message\": \"Failed to save hospital data: " + e.getMessage().replace("\"", "") + "\"}";
+        }
     }
 
-    @PostMapping("/hospitals/{id}/reviews")
+    // 병원 수정 폼 페이지
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable("id") Integer id, Model model) {
+        try {
+            Hospital hospital = hospitalService.getHospital(id);
+            if (hospital == null) {
+                // Handle hospital not found, e.g., redirect to error page or list
+                return "redirect:/hospitals"; // Or an error page
+            }
+            // Convert Hospital domain object to HospitalForm for the form
+            HospitalForm hospitalForm = HospitalForm.builder()
+                                        .hospitalId(hospital.getHospitalId())
+                                        .name(hospital.getName())
+                                        .address(hospital.getAddress())
+                                        .homepage(hospital.getHomepage())
+                                        .phone(hospital.getPhone())
+                                        .email(hospital.getEmail())
+                                        .hospIntroduce(hospital.getHospIntroduce())
+                                        .thumbnailImageUrl(hospital.getThumbnailImageUrl())
+                                        // Note: specialtyIds and animalIds are not directly in Hospital domain object
+                                        // You might need to fetch them separately if they are not populated by MyBatis collection mapping
+                                        // For now, assuming they are populated via the resultMap in mapper
+                                        .specialtyIds(hospital.getSpecialties() != null ? hospital.getSpecialties().stream().map(s -> s.getSpecialtyId()).collect(java.util.stream.Collectors.toList()) : null)
+                                        .animalIds(hospital.getAnimals() != null ? hospital.getAnimals().stream().map(a -> a.getAnimalId()).collect(java.util.stream.Collectors.toList()) : null)
+                                        .build();
+
+            model.addAttribute("hospitalForm", hospitalForm);
+            model.addAttribute("specialtyList", hospitalService.getAllSpecialties());
+            model.addAttribute("animalList", hospitalService.getAllAnimals());
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            // Handle error
+            return "redirect:/hospitals"; // Or an error page
+        }
+        return "service/hospital/create_hospital"; // Re-use the same form for edit
+    }
+
+    // 병원 삭제 처리
+    @PostMapping("/delete/{id}")
+    public String deleteHospital(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            hospitalService.deleteHospital(id);
+            redirectAttributes.addFlashAttribute("message", "Hospital deleted successfully!");
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            redirectAttributes.addFlashAttribute("error", "Failed to delete hospital: " + e.getMessage());
+        }
+        return "redirect:/hospitals"; // Redirect to hospital list page
+    }
+
+
+
+
+
+
+    // 병원 리뷰 등록 처리
+        @PostMapping("/{id}/reviews")
     public String addReview(@PathVariable Integer id, @ModelAttribute HospReviewForm form, Principal principal) {
         if (principal == null) {
             // 로그인하지 않은 사용자 처리 (예: 로그인 페이지로 리다이렉트)
@@ -141,7 +240,7 @@ public class HospitalController {
         return "redirect:/hospitals/detail/" + id;
     }
 
-    @PostMapping("/hospitals/{id}/reviews/{reviewId}/edit")
+    @PostMapping("/{id}/reviews/{reviewId}/edit")
     public String updateReview(@PathVariable Integer id,
                                @PathVariable Integer reviewId,
                                @RequestParam String content,
@@ -166,4 +265,35 @@ public class HospitalController {
         hospitalService.updateReview(reviewId, content, userId);
         return "redirect:/hospitals/detail/" + id;
     }
+
+    @PostMapping("/{id}/reviews/{reviewId}/delete")
+    public String deleteReview(@PathVariable Integer id,
+                               @PathVariable Integer reviewId,
+                               Principal principal,
+                               RedirectAttributes redirectAttributes) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        String username = principal.getName();
+        com.aloha.zootopia.domain.Users user = null;
+        try {
+            user = userMapper.select(username);
+            if (user == null) return "redirect:/login";
+
+            Integer userId = (int) user.getUserId();
+            hospitalService.deleteReview(reviewId, userId);
+            redirectAttributes.addFlashAttribute("message", "리뷰가 성공적으로 삭제되었습니다.");
+
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("error", "리뷰를 삭제할 권한이 없습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "리뷰 삭제 중 오류가 발생했습니다.");
+        }
+        return "redirect:/hospitals/detail/" + id;
+    }
+
+
+
+
 }

@@ -20,7 +20,7 @@ public interface PostService {
     List<Posts> getTopN(int limit) throws Exception;
 
     // 단건 조회
-    Posts selectById(String id) throws Exception;
+    Posts selectById(int postId) throws Exception;
 
     // 등록 
     boolean insert(Posts post) throws Exception;
@@ -29,10 +29,10 @@ public interface PostService {
     boolean updateById(Posts post) throws Exception;
 
     // 삭제
-    boolean deleteById(String id) throws Exception;
+    boolean deleteById(int postId) throws Exception;
 
     // 소유자 검증
-    boolean isOwner(String id, Long userId) throws Exception;
+    boolean isOwner(int postId, Long userId) throws Exception;
 
     void increaseViewCount(Integer postId);
 
@@ -47,8 +47,5 @@ public interface PostService {
     long countBySearch(String type, String keyword) throws Exception;
 
     List<Posts> pageByPopularity(Pagination pagination) throws Exception;
-    
-
-
 
 }

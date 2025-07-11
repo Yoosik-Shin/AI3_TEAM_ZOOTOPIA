@@ -25,11 +25,9 @@ public class CommentController {
 
     @PostMapping("/add")
     public String addComment(@ModelAttribute Comment comment, @AuthenticationPrincipal CustomUser user) throws Exception {
-  
 
         comment.setUserId(user.getUser().getUserId());
         commentService.addComment(comment);
-        
 
         return "redirect:/posts/read/" + comment.getPostId(); 
     }
@@ -52,6 +50,23 @@ public class CommentController {
     public String deleteComment(@PathVariable("id") Integer commentId,
                                  @RequestParam("postId") Integer postId) {
         commentService.deleteComment(commentId);
+        return "redirect:/posts/read/" + postId;
+    }
+
+    @PostMapping("/reply")
+    public String addReplyComment(
+        @RequestParam("postId") Integer postId,
+        @RequestParam("parentId") Integer parentId,
+        @RequestParam("content") String content,
+        @AuthenticationPrincipal CustomUser user
+    ) throws Exception {
+        Comment reply = new Comment();
+        reply.setPostId(postId);
+        reply.setParentId(parentId);
+        reply.setContent(content);
+        reply.setUserId(user.getUser().getUserId());
+
+        commentService.addComment(reply); 
         return "redirect:/posts/read/" + postId;
     }
     
