@@ -151,4 +151,16 @@ public class MypageController {
         ra.addFlashAttribute("msg", "비밀번호가 변경되었습니다.");
         return "redirect:/mypage/edit";
     }
+
+
+    @GetMapping("/{userId}")
+    public String viewOtherUserMypage(@PathVariable Long userId, Model model) throws Exception {
+        Users user = userService.findUserById(userId);
+        if (user == null) return "error/404"; // 사용자 없으면 404 페이지로
+
+        model.addAttribute("user", user);
+        model.addAttribute("pets", mypageService.getPets(userId));
+        model.addAttribute("myPosts", mypageService.getMyPosts(userId));
+        return "mypage/user"; // 타인용 마이페이지 뷰
+    }
 }

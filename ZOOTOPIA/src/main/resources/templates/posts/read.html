@@ -38,10 +38,14 @@
 
     <div class="post-meta">
       <div class="d-flex justify-content-start">
-        <img th:src="${post.user.profileImg != null} ? ${post.user.profileImg} : '/img/default-profile.png'" width="50"
-          height="50" class="profile-img">
+        <a th:href="@{'/mypage/' + ${post.user.userId}}">
+          <img th:src="${post.user.profileImg != null} ? ${post.user.profileImg} : '/img/default-profile.png'"
+            width="50" height="50" class="profile-img rounded-circle">
+        </a>
         <div class="d-flex flex-column justify-content-center ms-2">
-          <span th:text="${post.user.nickname}">닉네임</span>
+          <a th:href="@{'/mypage/' + ${post.user.userId}}" class="text-decoration-none text-dark fw-semibold">
+            <span th:text="${post.user.nickname}">닉네임</span>
+          </a>
           <span th:text="${#dates.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
         </div>
       </div>
@@ -72,7 +76,8 @@
         </button>
       </form>
       <div sec:authorize="isAnonymous()">
-        <button class="btn btn-like d-flex align-items-center justify-content-center" disabled onclick="alert('로그인 후 이용해주세요.')">
+        <button class="btn btn-like d-flex align-items-center justify-content-center" disabled
+          onclick="alert('로그인 후 이용해주세요.')">
           <span class="material-symbols-outlined icon icon-heart me-1"
             th:classappend="${liked} ? ' selected' : ''">favorite</span>
           <div>좋아요</div>
@@ -111,8 +116,7 @@
       </div>
       <div sec:authorize="isAnonymous()" class="mt-4">
         <div class="mb-3">
-          <textarea class="form-control" rows="3" placeholder="댓글을 작성하려면 로그인하세요"
-            readonly></textarea>
+          <textarea class="form-control" rows="3" placeholder="댓글을 작성하려면 로그인하세요" readonly></textarea>
         </div>
         <div class="d-flex justify-content-end align-items-center">
           <a href="/login" class="btn comment-b">로그인하기</a>
@@ -177,8 +181,7 @@
 
         <div sec:authorize="isAnonymous()" th:id="'replyForm-' + ${commentItem.commentId}" style="display:none;"
           class="mt-2 ms-5">
-          <textarea class="form-control" rows="2" placeholder="답글을 입력하려면 로그인해주세요"
-            readonly></textarea>
+          <textarea class="form-control" rows="2" placeholder="답글을 입력하려면 로그인해주세요" readonly></textarea>
           <a href="/login" class="btn btn-sm btn-outline-secondary mt-2">로그인</a>
         </div>
 
