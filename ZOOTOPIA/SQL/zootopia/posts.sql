@@ -183,7 +183,6 @@ ALTER TABLE `user_pets`
 
 
 ALTER TABLE posts ADD COLUMN thumbnail_url VARCHAR(255);
-<<<<<<< HEAD
 
 
 

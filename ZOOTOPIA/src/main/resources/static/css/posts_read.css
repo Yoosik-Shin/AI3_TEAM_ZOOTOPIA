@@ -75,6 +75,12 @@ a {
   background: #ff9999;  
   color: white;
 }
+.btn-like:disabled {
+  background-color: #ff9999; 
+  color: white;
+  opacity: 1; 
+  cursor: not-allowed;
+}
 
 .comment-box {
   border-top: 1px solid #ccc;
@@ -176,4 +182,8 @@ a {
   font-weight: 500;
   font-size: 11px;         
   line-height: 1;
+}
+
+.profile-img {
+  border-radius: 50%;
 }
