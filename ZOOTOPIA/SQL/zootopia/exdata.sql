@@ -214,11 +214,11 @@ SET profile_img = NULL;
 
 
 UPDATE users
-SET profile_img = '/images/default-profile.png'
+SET profile_img = '/img/default-profile.png'
 WHERE profile_img IS NULL;
 
 ALTER TABLE users
-MODIFY COLUMN profile_img VARCHAR(255) DEFAULT '/image/default-profile.png';
+MODIFY COLUMN profile_img VARCHAR(255) DEFAULT '/img/default-profile.png';
 
 
 INSERT INTO insurance_product 
