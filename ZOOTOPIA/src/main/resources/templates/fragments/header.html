@@ -10,6 +10,12 @@
             </div>
         </a>
 
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
         <!-- 메인 메뉴 -->
         <div class="main-menu-container">
             <ul class="main-menu navbar-nav mx-auto d-none d-lg-flex">
@@ -25,34 +31,34 @@
             <div class="sub-menu-panel">
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">우리애 굿즈</a></li>
+                        <li><a href="#">우리애 먹일거</a></li>
+                        <li><a href="#">우리애 놀거</a></li>
+                        <li><a href="#">우리애 산책</a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
-                        <li><a href="#">서브메뉴</a></li>
+                        <li><a href="#">동물원 / 아쿠아리움</a></li>
+                        <li><a href="#">병원 찾기</a></li>
+                        <li><a href="#">Pet Shop</a></li>
+                        <li><a href="#">임시 보호소</a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">보험</a></li>
+                        <li><a href="#">펫 보험</a></li>
                         <li><a href="#">펫 시터</a></li>
                         <li><a href="/hospitals">추천 병원</a></li>
                         <li><a href="/service/funeral/procedure">Crossing Rainbow</a></li>
@@ -82,6 +88,7 @@
 
             <!-- 로그인 후 -->
             <div th:if="${#authentication.name != 'anonymousUser'}" class="d-flex gap-2 align-items-center">
+                <!-- User Dropdown Button -->
                 <div class="user-menu">
                     <img src="/assets/dist/img/user.png" class="user-pic" alt="" onclick="toggleUserMenu()">
         
@@ -107,10 +114,9 @@
                     </div>
 
                 </div>
-                <!-- User Dropdown Button -->
                 <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
                 <form th:action="@{/logout}" method="post" class="m-0">
-                    <button type="submit" class="btn btn-danger">로그아웃</button>
+                    <button type="submit" class="btn btn-sm btn-danger">로그아웃</button>
                 </form>
             </div>
         </div>
@@ -122,5 +128,44 @@
             <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
             <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
 
+    </div>
+
+    <!-- Offcanvas -->
+    <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">홈</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products/listp">스토어</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">내 주변 찾기</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">서비스</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/posts/list}">커뮤니티</a>
+                </li>
+            </ul>
+            <!-- 로그인/회원가입 버튼 (모바일용) -->
+            <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name == 'anonymousUser'}">
+                <a href="/login" class="btn btn-outline-primary btn-sm">로그인</a>
+                <a href="/join" class="btn btn-primary btn-sm">회원가입</a>
+            </div>
+            <!-- 로그아웃 버튼 (모바일용) -->
+            <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name != 'anonymousUser'}">
+                <span class="text-muted small" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">로그아웃</button>
+                </form>
+            </div>
+        </div>
     </div>
 </nav>
