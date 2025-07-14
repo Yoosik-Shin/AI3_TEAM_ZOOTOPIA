@@ -22,17 +22,20 @@ CREATE TABLE `hospital_info` (
     `thumbnail_image_url` VARCHAR(255), -- 추가될 컬럼
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+    
 
 
 CREATE TABLE `hospital_review` (
-    `review_id` INT AUTO_INCREMENT PRIMARY KEY,
-    `rating` INT CHECK (rating BETWEEN 1 AND 5),
-    `content` TEXT NOT NULL,
-    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-    `hospital_id` INT NOT NULL,
-    `user_id` INT NOT NULL,
-    FOREIGN KEY (hospital_id) REFERENCES hospital_info(hospital_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+  `review_id` int NOT NULL AUTO_INCREMENT,
+  `rating` INT CHECK (rating BETWEEN 1 AND 5),
+  `content` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `hospital_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`review_id`),
+  KEY `hospital_id` (`hospital_id`),
+  KEY `user_id` (`user_id`)
 );
 
 CREATE TABLE `possible_animal` (
@@ -85,3 +88,7 @@ VALUES
 
 ALTER TABLE hospital_info
 ADD COLUMN hosp_introduce TEXT NOT NULL;
+
+
+ALTER TABLE hospital_review
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;

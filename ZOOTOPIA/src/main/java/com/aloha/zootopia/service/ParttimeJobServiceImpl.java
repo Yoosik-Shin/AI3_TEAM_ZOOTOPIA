@@ -1,6 +1,7 @@
 package com.aloha.zootopia.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,12 @@ public class ParttimeJobServiceImpl implements ParttimeJobService {
 
     @Override
     public List<ParttimeJob> listJobs() {
-        return jobMapper.selectAllJobs();
+        return jobMapper.listJobs();
     }
 
+
     @Override
-    public ParttimeJob getJob(int jobId) {
+    public ParttimeJob getJob(Long jobId) {
         return jobMapper.selectJobById(jobId);
     }
 
@@ -35,8 +37,27 @@ public class ParttimeJobServiceImpl implements ParttimeJobService {
     }
 
     @Override
-    public void deleteJob(int jobId) {
+    public void deleteJob(Long jobId) {
         jobMapper.deleteJob(jobId);
     }
     
+    @Override
+    public List<ParttimeJob> getPagedJobs(int offset, int limit) {
+        return jobMapper.selectPaged(offset, limit);
+    }
+
+    @Override
+    public int countAllJobs() {
+        return jobMapper.countAllJobs();
+    }
+
+    @Override
+    public List<ParttimeJob> getFilteredJobs(Map<String, Object> filters) {
+        return jobMapper.selectFilteredJobs(filters);
+    }
+
+    @Override
+    public int countFilteredJobs(Map<String, Object> filters) {
+        return jobMapper.countFilteredJobs(filters);
+    }
 }

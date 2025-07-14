@@ -132,6 +132,11 @@ CREATE TABLE `user_pets` (
 );
 
 
+ALTER TABLE user_pets
+MODIFY COLUMN name VARCHAR(50) NULL,
+MODIFY COLUMN species VARCHAR(100) NULL;
+
+
 
 
 
@@ -178,7 +183,6 @@ ALTER TABLE `user_pets`
 
 
 ALTER TABLE posts ADD COLUMN thumbnail_url VARCHAR(255);
-<<<<<<< HEAD
 
 
 

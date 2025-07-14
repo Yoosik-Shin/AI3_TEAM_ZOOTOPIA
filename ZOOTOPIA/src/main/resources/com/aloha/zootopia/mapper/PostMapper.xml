@@ -230,21 +230,17 @@
   LIMIT #{pagination.offset}, #{pagination.limit}
 </select>
 
-<select id="countBySearch" resultType="long">
+  <select id="countBySearch" resultType="long">
     SELECT COUNT(*) FROM posts
     <where>
-      <if test="pagination.category != null">
-        category = #{pagination.category}
-      </if>
-
       <if test="type == 'title'">
-        AND title LIKE CONCAT('%', #{keyword}, '%')
+        title LIKE CONCAT('%', #{keyword}, '%')
       </if>
       <if test="type == 'titleContent'">
-        AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+        (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
       </if>
       <if test="type == 'tag'">
-        AND post_id IN (
+        post_id IN (
           SELECT pt.post_id
           FROM post_tags pt
           JOIN tags t ON pt.tag_id = t.tag_id
@@ -273,6 +269,13 @@
     </where>
     ORDER BY (p.view_count * 0.3 + p.like_count * 1.0 + p.comment_count * 0.7) DESC
     LIMIT #{offset}, #{size}
+  </select>
+
+  <select id="findByUserId" resultType="com.aloha.zootopia.domain.Posts">
+    SELECT *
+    FROM posts
+    WHERE user_id = #{userId}
+    ORDER BY created_at DESC
   </select>
 
 

@@ -186,6 +186,11 @@
     </where>
   </select>
 
+  <select id="findByUserId" resultType="LostAnimalPost">
+    SELECT * FROM lost_animals WHERE user_id = #{userId} ORDER BY created_at DESC
+  </select>
+
+
 
 
 </mapper>

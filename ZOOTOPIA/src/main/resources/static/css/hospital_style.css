@@ -422,7 +422,7 @@ body {
     display: none;
 }
 
-.category-item input[type="checkbox"]:checked + span {
+.category-item input[type="checkbox"]:checked ~ span {
     color: #74b9ff;
     font-weight: 600;
 }
@@ -534,16 +534,19 @@ body {
 }
 
 .review-header {
+    display: flex;
+    flex-direction: column;
     text-align: center;
     margin-bottom: 20px;
 }
 
 .review-header h3 {
-    background-color: #ffeaa7;
-    color: #2d3436;
+    background-color: #ffffff;
+    color: #ff6b6b;
     padding: 10px 20px;
     border-radius: 20px;
     display: inline-block;
+    border: 1px solid #ff6b6b;
     margin: 0;
 }
 
@@ -589,8 +592,8 @@ body {
 
 .review-date-container {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    /* flex-direction: column; */
+    justify-content: flex-start;
     align-items: flex-end;
     gap: 5px;
     width: 900px;
@@ -776,4 +779,42 @@ body {
   max-width: 100%;
   max-height: 100%;
   object-fit: cover;
+}
+
+/* 별점 스타일 */
+.rating .star {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+}
+
+
+.rating:hover .star {
+    color: #f7d106; /* 호버 시 별 색상 */
+}
+
+
+.rating:hover .star:hover ~ .star {
+    color: #ddd; /* 호버 시 선택된 별 이후 별 색상 */
+}
+
+.rating .star.selected {
+    color: #f7d106; /* 선택된 별 색상 */
+}
+/* .rating .star.selected, 
+.rating .star:hover,
+.rating .star:hover ~ .star {
+    color: #f7d106;
+} */
+
+/* 리뷰 카드 내 수정/삭제 버튼 링크 */
+.review-actions a {
+    margin-right: 10px;
+    cursor: pointer;
+    color: #007bff; /* 링크 색상 */
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.review-actions a:hover {
+    text-decoration: underline; /* 호버 시 밑줄 표시 */
 }
