@@ -106,14 +106,11 @@
                                 <img th:src="${profileImg}"
                                     alt="프로필">
                                 <p>마이 페이지</p>
-                                <span>></span>
                             </a>
-                            <form th:action="@{/logout}" method="post" class="m-0">
-                                <button type="submit" class="user-sub-menu-link btn btn-link p-0 w-100 text-start"
-                                    style="text-decoration: none;">
+                            <form th:action="@{/logout}" method="post" class="user-sub-menu-form">
+                                <button type="submit" class="user-sub-menu-logout">
                                     <img src="/assets/dist/img/logout.png" alt="">
                                     <p>로그아웃</p>
-                                    <span>></span>
                                 </button>
                             </form>
 

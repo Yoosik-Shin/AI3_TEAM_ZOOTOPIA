@@ -379,12 +379,12 @@
 
 .user-sub-menu-wrap {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 10px);
     left: 10%;
     width: 320px;
     max-height: 0px;
     overflow: hidden;
-    transition: max-height 0.5s;
+    transition: max-height 0.3s ease-in-out, visibility 0.3s ease-in-out;
     box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
 }
 .user-sub-menu-wrap.open-menu {
@@ -396,6 +396,7 @@
     background: #fdfdfd;
     padding: 20px;
     margin: 10px;
+    width: 320px;
 }
 .user-info {
     display: flex;
@@ -417,30 +418,56 @@
     background: #ccc;
     margin: 15px 0 10px;
 }
-.user-sub-menu-link {
+
+.user-sub-menu-form {
+    margin: 0;
+    padding: 0;
+}
+.user-sub-menu-link,
+.user-sub-menu-logout {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    border: none;
     text-decoration: none;
+    background: none;
     color: #5f2121;
-}
-.user-sub-menu-link button {
+    font-weight: 500;
+    margin: 0;
+    padding: 0; 
+    cursor: pointer;
+    /* text-align: left; */
     width: 100%;
+    line-height: 50px;
 }
-.user-sub-menu-link img {
+
+.user-sub-menu-link img,
+.user-sub-menu-logout img {
     width: 40px;
     height: 40px;
     background: #e5e5e5;
     border-radius: 50%;
     padding: 8px;
-    margin-right: 15px;
+    /* margin-right: 15px; */
 }
-.user-sub-menu-link span {
+
+.user-sub-menu-link p,
+.user-sub-menu-logout p {
+    margin: 0;
+}
+
+.user-sub-menu-link span,
+.user-sub-menu-logout span {
     font-size: 22px;
 }
-.user-sub-menu-link:hover span {
+
+.user-sub-menu-link:hover span,
+.user-sub-menu-logout:hover span {
     transform: translateX(5px);
 }
-.user-sub-menu-link:hover p {
+.user-sub-menu-link:hover p,
+.user-sub-menu-logout:hover p {
     font-weight: 600;
 }
 
