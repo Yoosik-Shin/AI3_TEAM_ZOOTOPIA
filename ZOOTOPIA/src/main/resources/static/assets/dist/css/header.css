@@ -357,6 +357,7 @@
 }
 .user-pic {
     width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
 }
@@ -404,6 +405,7 @@
 }
 .user-info img {
     width: 60px;
+    height: 60px;
     border-radius: 50%;
     margin-right: 15px;
 }
@@ -420,7 +422,7 @@
     text-decoration: none;
     color: #5f2121;
 }
-.user-sub-menu-link p {
+.user-sub-menu-link button {
     width: 100%;
 }
 .user-sub-menu-link img {

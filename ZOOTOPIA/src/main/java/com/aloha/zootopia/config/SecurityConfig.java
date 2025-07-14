@@ -71,6 +71,8 @@ public class SecurityConfig {
                                 .requestMatchers("/lost/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
 
+                                 .requestMatchers("/mypage/**").authenticated()
+
                                 .requestMatchers(HttpMethod.GET, "/hospitals/{hospitalId}/reviews").permitAll() // 추가
                                 .anyRequest().permitAll()
                                 );

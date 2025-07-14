@@ -75,7 +75,8 @@
             <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
 
             <!-- 로그인 전 -->
-            <div th:if="${#authentication.name == 'anonymousUser'}" class="header-login-btn-container d-flex align-items-center">
+            <div th:if="${#authentication.name == 'anonymousUser'}"
+                class="header-login-btn-container d-flex align-items-center">
                 <a href="/login" class="header-login-btn btn me-2 btn-signup">로그인</a>
                 <a href="/join" class="header-signup-btn btn btn-outline-danger">회원가입</a>
             </div>
@@ -83,44 +84,43 @@
             <!-- 로그인 후 -->
             <div th:if="${#authentication.name != 'anonymousUser'}" class="d-flex gap-2 align-items-center">
                 <div class="user-menu">
-                    <img src="/assets/dist/img/user.png" class="user-pic" alt="" onclick="toggleUserMenu()">
-        
+                    <img th:src="${profileImg}" class="user-pic"
+                        alt="프로필" onclick="toggleUserMenu()" />
                     <div class="user-sub-menu-wrap" id="userSubMenu">
                         <div class="user-sub-menu">
                             <div class="user-info">
-                                <img src="/img/user.png" alt="">
-                                <h2>useruseruser</h2>
+                                <img th:src="${profileImg}"
+                                    alt="프로필">
+                                <h2 th:text="${nickname}">닉네임</h2>
                             </div>
                             <hr>
-        
-                            <a href="#" class="user-sub-menu-link">
-                                <img src="/img/user.png" alt="">
+
+                            <a th:href="@{/mypage/mypage}" class="user-sub-menu-link">
+                                <img th:src="${profileImg}"
+                                    alt="프로필">
                                 <p>마이 페이지</p>
                                 <span>></span>
                             </a>
-                            <a href="#" class="user-sub-menu-link">
-                                <img src="/img/user.png" alt="">
-                                <p>로그아웃</p>
-                                <span>></span>
-                            </a>
+                            <form th:action="@{/logout}" method="post" class="m-0">
+                                <button type="submit" class="user-sub-menu-link btn btn-link p-0 w-100 text-start"
+                                    style="text-decoration: none;">
+                                    <img src="/assets/dist/img/logout.png" alt="">
+                                    <p>로그아웃</p>
+                                    <span>></span>
+                                </button>
+                            </form>
+
                         </div>
                     </div>
 
                 </div>
                 <!-- User Dropdown Button -->
-                <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
+                <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${nickname} + '님'"></span>
                 <form th:action="@{/logout}" method="post" class="m-0">
                     <button type="submit" class="btn btn-danger">로그아웃</button>
                 </form>
             </div>
         </div>
-
-
-        <!-- 오른쪽: 검색/장바구니/로그인/로그아웃 -->
-        <div class="d-none d-lg-flex align-items-center" style="position: relative; z-index: 1000;">
-            <!-- 아이콘 -->
-            <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
-            <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
 
     </div>
 </nav>

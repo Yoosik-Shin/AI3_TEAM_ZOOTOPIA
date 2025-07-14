@@ -33,4 +33,6 @@ public interface UserService {
     
     int updateUser(Users user) throws Exception;
 
+    void deleteById(Long userId);
+
 }
