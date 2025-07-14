@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,6 +100,14 @@
         .btn-group-sm .btn:hover {
             transform: scale(1.1);
         }
+        .admin-controls .btn {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .admin-controls .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -156,6 +165,14 @@
                             <i class="fas fa-store me-3"></i>ZOOTOPIA 스토어
                         </h1>
                         <p class="lead mb-4">귀여운 반려동물과 함께하는 특별한 순간</p>
+                        
+                        <!-- 관리자 전용 상품 등록 버튼 -->
+                        <div class="admin-controls mb-3" sec:authorize="hasRole('ADMIN')">
+                            <a href="/products/create" class="btn btn-success btn-lg">
+                                <i class="fas fa-plus me-2"></i>상품 등록
+                            </a>
+                        </div>
+                        
                         <div class="d-flex justify-content-center flex-wrap gap-3">
                             <span class="badge stats-badge fs-6">
                                 <i class="fas fa-box me-1"></i>총 <span th:text="${totalProducts ?: 0}">0</span>개 상품

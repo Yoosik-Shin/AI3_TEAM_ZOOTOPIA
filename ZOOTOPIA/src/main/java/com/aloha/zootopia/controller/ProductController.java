@@ -97,7 +97,7 @@ public class ProductController {
             model.addAttribute("currentSearch", search != null ? search : "");
             model.addAttribute("totalProducts", totalProducts);
             
-            return "products/listp_dynamic";
+            return "products/listp";
             
         } catch (Exception e) {
             System.err.println("상품 목록 조회 중 오류 발생: " + e.getMessage());

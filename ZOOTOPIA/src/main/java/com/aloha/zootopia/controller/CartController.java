@@ -376,6 +376,31 @@ public class CartController {
         }
     }
     
+    // 장바구니 전체 비우기
+    @PostMapping("/clear")
+    public Object clearCart(HttpSession session, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
+            if (cartItems != null) {
+                cartItems.clear();
+            }
+            response.put("success", true);
+            response.put("message", "장바구니가 비워졌습니다.");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "장바구니 비우기 중 오류가 발생했습니다.");
+        }
+        
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            return org.springframework.http.ResponseEntity.ok(response);
+        } else {
+            return "redirect:/cart?cleared=" + java.net.URLEncoder.encode((String)response.get("message"), java.nio.charset.StandardCharsets.UTF_8);
+        }
+    }
+
     // 결제 페이지로 이동
     @PostMapping("/checkout")
     public String checkout(
