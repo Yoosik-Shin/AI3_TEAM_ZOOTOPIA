@@ -210,14 +210,25 @@
 }
 
 /* ======================================YS 수정============================ */
+
+.header-logo-container {
+    width: 200px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+.header-logo-container img {
+    width: 100%;
+    height: 60%;
+    object-fit: fill;
+}
+
+
 .header-container {
     position: relative;
     display: flex;
     flex-grow: 1;
 }
-
-
-
 
 .main-menu-container {
     position: relative;
@@ -254,6 +265,7 @@
     text-align: center;
     text-decoration: none;
     color: inherit;
+    font-size: 18px;
 }
 
 #horizontal-underline {
@@ -311,4 +323,126 @@
 
 .sub-menu li a:hover {
     color: #ff6b6b;
+}
+
+
+/* 헤더 로그인 회원가입 버튼 */
+.header-login-btn-container .header-login-btn {
+    background-color: #F27A7A;
+    border: 1px solid #F27A7A;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 60px;
+}
+
+.header-login-btn-container .header-signup-btn {
+    background-color: transparent;
+    border: 1px solid #F27A7A;
+    color: #F27A7A;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 70px;
+}
+
+
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.user-pic {
+    width: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.user-menu ul {
+    width: 100%;
+    text-align: right;
+}
+.user-menu ul li {
+    display: inline-block;
+    list-style: none;
+    margin: 10px 20px;
+}
+.user-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}   
+
+.user-sub-menu-wrap {
+    position: absolute;
+    top: 100%;
+    left: 10%;
+    width: 320px;
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 0.5s;
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+}
+.user-sub-menu-wrap.open-menu {
+    max-height: 400px;
+    opacity: 1;
+    visibility: visible;
+}
+.user-sub-menu {
+    background: #fdfdfd;
+    padding: 20px;
+    margin: 10px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+}
+.user-info h3 {
+    font-weight: 500;
+}
+.user-info img {
+    width: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+.user-info hr {
+    border: 0;
+    height: 1px;
+    width: 100%;
+    background: #ccc;
+    margin: 15px 0 10px;
+}
+.user-sub-menu-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #5f2121;
+}
+.user-sub-menu-link p {
+    width: 100%;
+}
+.user-sub-menu-link img {
+    width: 40px;
+    height: 40px;
+    background: #e5e5e5;
+    border-radius: 50%;
+    padding: 8px;
+    margin-right: 15px;
+}
+.user-sub-menu-link span {
+    font-size: 22px;
+}
+.user-sub-menu-link:hover span {
+    transform: translateX(5px);
+}
+.user-sub-menu-link:hover p {
+    font-weight: 600;
 }

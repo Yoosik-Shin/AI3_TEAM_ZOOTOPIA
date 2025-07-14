@@ -86,7 +86,7 @@ function showSearchModal() {
 }
 
 // Header effects: Underline and active link styling
-
+document.addEventListener("DOMContentLoaded", () => {
     const mainMenuContainer = document.querySelector('.main-menu-container');
     const subMenuPanel = document.querySelector('.sub-menu-panel');
     const horizontalUnderline = document.getElementById('horizontal-underline');
@@ -219,7 +219,7 @@ function showSearchModal() {
     }
 
     initialize();
-
+});
 
 // Debug function to check header elements
 function debugHeader() {
@@ -237,11 +237,6 @@ window.addEventListener('load', function() {
 });
 
 
-// 유저 서브메뉴 패널 오픈
-let usersubMenu = document.getElementById("userSubMenu");
 
-function toggleUserMenu() {
-    userSubMenu.classList.toggle("open-menu");
-}
 
 
