@@ -26,7 +26,7 @@ public class SafeProductController {
             model.addAttribute("productPrice", no * 1000);
             model.addAttribute("productDescription", "This is a safe product " + no);
             
-            return "safe_detail";
+            return "products/detail";
             
         } catch (Exception e) {
             System.err.println("Safe controller error: " + e.getMessage());
@@ -35,7 +35,7 @@ public class SafeProductController {
             model.addAttribute("productName", "Error Product " + no);
             model.addAttribute("productPrice", 0);
             model.addAttribute("productDescription", "Error occurred");
-            return "safe_detail";
+            return "products/detail";
         }
     }
 }

@@ -153,7 +153,7 @@ public class ProductController {
     @GetMapping("/simple/{no}")
     public String simple(@PathVariable int no, Model model) {
         System.out.println("=== 간단 테스트 페이지 호출됨: " + no + " ===");
-        return "product_detail";
+        return "products/detail";
     }
     
     // 최소한의 데이터로 상세 페이지 테스트
@@ -359,7 +359,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     
-//     // 리뷰 작성 기능
+    // 리뷰 작성 기능
 //     @PostMapping("/add-review")
 //     @ResponseBody
 //     public ResponseEntity<Map<String, Object>> addReview(@RequestParam int productNo,
@@ -653,7 +653,7 @@ public class ProductController {
         System.out.println("=== 템플릿 테스트 /template-detail/" + no + " 호출됨 ===");
         model.addAttribute("productNo", no);
         model.addAttribute("productName", "테스트 상품");
-        return "product_detail";
+        return "products/detail";
     }
     
     // 안전한 상품 상세 페이지 (예외 처리 강화)
@@ -821,4 +821,17 @@ public class ProductController {
         
         return result;
     }
+    
+    /*
+     * SafeProductController 마이그레이션 안내:
+     * 
+     * 기존 SafeProductController 엔드포인트 → ProductController 대응 엔드포인트
+     * 
+     * /safe/test                → /products/test (기존 기능 사용)
+     * /safe/detail/{no}         → /products/safe-detail/{no} (기존 기능 사용)
+     * 
+     * 사용자는 /products/safe-detail/{no} 엔드포인트를 사용하시기 바랍니다.
+     */
+    
+    // Safe 기능은 이미 /products/safe-detail/{no} 엔드포인트에 구현되어 있음
 }
