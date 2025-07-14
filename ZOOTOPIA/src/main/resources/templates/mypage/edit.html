@@ -11,7 +11,14 @@
 
 <body>
   <div th:replace="fragments/header :: header"></div>
+
   <div class="container my-5" style="max-width: 700px;">
+    <div class="toMypage">
+      <a th:href="@{/mypage/mypage}" class="d-flex align-items-center mb-1"
+        style="text-decoration: none; color: #F35F4C;">마이페이지
+        <img width="15" height="15" th:src="@{/img/pinkarrow.png}" alt="forward" />
+      </a>
+    </div>
     <h3 class="mb-4">🛠️ 회원 정보 수정</h3>
 
     <!-- 메시지 출력 -->
