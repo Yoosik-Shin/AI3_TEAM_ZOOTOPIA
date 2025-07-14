@@ -5,7 +5,17 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
-    /* z-index: 1000; */
+    z-index: 1000;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.zootopia-header .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .zootopia-brand {
@@ -311,4 +321,44 @@
 
 .sub-menu li a:hover {
     color: #ff6b6b;
+}
+
+/* Global navbar responsive styles for all pages */
+@media (max-width: 650px) {
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
+    .navbar-toggler {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+    }
+    
+    .mobile-right-icons {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    /* Hide desktop navigation completely on mobile */
+    #navbarNavDesktop {
+        display: none;
+    }
+    
+    /* Hide desktop right icons */
+    .d-none.d-md-flex {
+        display: none;
+    }
 }

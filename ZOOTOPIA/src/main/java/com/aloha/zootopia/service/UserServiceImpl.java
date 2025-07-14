@@ -126,8 +126,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int updateUser(Users user) throws Exception {
-    return userMapper.updateUser(user);
+        return userMapper.updateUser(user);
     }
-
 
 }

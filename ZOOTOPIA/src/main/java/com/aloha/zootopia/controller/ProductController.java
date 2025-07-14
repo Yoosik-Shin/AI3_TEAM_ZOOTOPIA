@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -217,30 +218,20 @@ public class ProductController {
 //     }
     
 //     // 상품 등록 페이지
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
     public String createForm(Model model) {
-        // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-        // if (!isAdmin()) {
-        //     model.addAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-        //     return "redirect:/products/list";
-        // }
-        
         model.addAttribute("product", new Product());
         return "products/create";
     }
     
 //     // 상품 등록 처리
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String create(Product product, 
                         @RequestParam(required = false) MultipartFile imageFile,
                         RedirectAttributes redirectAttributes) {
         try {
-            // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-            if (!isAdmin()) {
-                redirectAttributes.addFlashAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-                return "redirect:/products/list";
-            }
-            
             // 이미지 파일 업로드 처리
             if (imageFile != null && !imageFile.isEmpty()) {
                 String imageUrl = fileUploadService.uploadFile(imageFile);
@@ -254,7 +245,7 @@ public class ProductController {
             
             if (result > 0) {
                 redirectAttributes.addFlashAttribute("success", "상품이 성공적으로 등록되었습니다.");
-                return "redirect:/products/list";
+                return "redirect:/products/listp";
             } else {
                 redirectAttributes.addFlashAttribute("error", "상품 등록에 실패했습니다.");
                 return "redirect:/products/create";
@@ -397,16 +388,6 @@ public class ProductController {
 //         }
 //         return ResponseEntity.ok(response);
 //     }
-    
-    // 관리자 권한 확인
-    private boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
-            String username = auth.getName();
-            return "super@admin.com".equals(username);
-        }
-        return false;
-    }
     
     // 더미 데이터 생성 메서드 - 실제 상품 이미지 기반 (CartController에서도 사용)
     public List<Product> createDummyProducts() {
