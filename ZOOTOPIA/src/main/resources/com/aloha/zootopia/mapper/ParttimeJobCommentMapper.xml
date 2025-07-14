@@ -6,11 +6,9 @@
 <mapper namespace="com.aloha.zootopia.mapper.ParttimeJobCommentMapper">
 
   <!-- 댓글 등록 -->
-  <insert id="insertComment">
-    INSERT INTO parttime_job_comment
-    (job_id, user_id, content)
-    VALUES
-    (#{jobId}, #{userId}, #{content})
+  <insert id="insertComment" parameterType="com.aloha.zootopia.domain.ParttimeJobComment">
+    INSERT INTO parttime_job_comment (user_id, writer, content, created_at)
+    VALUES (#{userId}, #{writer}, #{content}, #{createdAt})
   </insert>
 
   <!-- 댓글 조회 -->
@@ -20,8 +18,19 @@
     ORDER BY created_at ASC
   </select>
 
+  <!-- 전체 댓글 조회 (선택) -->
+  <select id="selectAll" resultType="com.aloha.zootopia.domain.ParttimeJobComment">
+    SELECT * FROM parttime_job_comment ORDER BY created_at DESC
+  </select>
+
+  <select id="selectAllPaged" resultType="ParttimeJobComment">
+    SELECT * FROM parttime_job_comment
+    ORDER BY created_at DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
   <!-- 댓글 삭제 -->
-  <delete id="deleteComment">
+  <delete id="deleteComment" parameterType="int">
     DELETE FROM parttime_job_comment
     WHERE comment_id = #{commentId}
   </delete>
@@ -32,5 +41,15 @@
     SET content = #{content}
     WHERE comment_id = #{commentId}
   </update>
+
+  <select id="getAllCommentsPaged" resultType="ParttimeJobComment">
+    SELECT * FROM parttime_job_comment
+    ORDER BY created_at DESC
+    LIMIT #{size} OFFSET #{offset}
+  </select>
+
+  <select id="countAll" resultType="int">
+    SELECT COUNT(*) FROM parttime_job_comment
+  </select>
 
 </mapper>

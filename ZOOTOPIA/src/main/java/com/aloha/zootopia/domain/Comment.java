@@ -25,5 +25,7 @@ public class Comment {
     private String profileImg;   
     private Integer parentId; 
     private List<Comment> replies;
+    private String postTitle;
+    private String postCategory;
     
 }

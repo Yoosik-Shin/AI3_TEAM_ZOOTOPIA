@@ -20,9 +20,10 @@ public class ParttimeJobApplicantServiceImpl implements ParttimeJobApplicantServ
     }
 
     @Override
-    public List<ParttimeJobApplicant> listApplicants(int jobId) {
+    public List<ParttimeJobApplicant> listApplicants(Long jobId) {
         return applicantMapper.selectApplicantsByJobId(jobId);
     }
+
 
     @Override
     public void updateApplicant(ParttimeJobApplicant applicant) {
@@ -32,5 +33,32 @@ public class ParttimeJobApplicantServiceImpl implements ParttimeJobApplicantServ
     @Override
     public void deleteApplicant(int applicantId) {
         applicantMapper.deleteApplicant(applicantId);
+    }
+
+    @Override
+    public ParttimeJobApplicant getApplicant(int applicantId) {
+        return applicantMapper.selectApplicant(applicantId);
+    }
+
+    @Override
+    public boolean hasApplied(Long jobId, Long userId) {
+    return applicantMapper.hasApplied(jobId, userId);
+    }
+
+    @Override
+    public ParttimeJobApplicant getApplicantByJobIdAndUserId(Long jobId, Long userId) {
+    return applicantMapper.getApplicantByJobIdAndUserId(jobId, userId);
+    }
+
+        // ✅ 전체 지원자 수
+    @Override
+    public int countApplicantsByJobId(Long jobId) {
+        return applicantMapper.countApplicantsByJobId(jobId);
+    }
+
+    // ✅ 페이징 지원자 목록
+    @Override
+    public List<ParttimeJobApplicant> getPagedApplicants(Long jobId, int offset, int limit) {
+        return applicantMapper.getPagedApplicants(jobId, offset, limit);
     }
 }

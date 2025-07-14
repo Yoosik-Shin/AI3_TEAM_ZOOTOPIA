@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <title>커뮤니티 목록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/list.css}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/posts_list.css}">
 </head>
 
 <body>
@@ -73,7 +74,7 @@
     <!-- 게시글 리스트 (일반 게시글) -->
     <div class="post-card" th:each="post : ${list}">
       <div class="post-thumbnail">
-        <img th:src="${post.thumbnailUrl != null} ? ${post.thumbnailUrl} : '/img/default-thumbnail.png'" alt="썸네일">
+        <img th:src="${post.thumbnailUrl} ?: '/img/default-thumbnail.png'" onerror="this.onerror=null; this.src='/img/default-thumbnail.png';" alt="썸네일">
       </div>
       <div class="post-info">
         <div class="title-category d-flex align-items-center">
@@ -103,18 +104,15 @@
           </div>
           <div class="post-stats text-center d-flex align-items-center" style="font-size: 12px;">
             <div class="d-flex align-items-center gap-1">
-              <img class="eye" width="17" th:src="@{/img/hit.svg}" style="vertical-align: middle;">
-              <div th:text="${post.viewCount != null ? post.viewCount : 0}">0</div>
+              <i class="bi bi-eye"></i> <span th:text="${post.viewCount}">0</span>
             </div>
             <span class="">&middot;</span>
             <div class="d-flex align-items-center gap-1">
-              <img width="15" th:src="@{/img/comment.png}" style="vertical-align: middle;">
-              <div th:text="${post.commentCount != null ? post.commentCount : 0}">0</div>
+              <i class="bi bi-chat-dots"></i> <span th:text="${post.commentCount}">0</span>
             </div>
             <span class="">&middot;</span>
             <div class="d-flex align-items-center gap-1">
-              <img width="15" th:src="@{/img/pinkheart.png}" style="vertical-align: middle;">
-              <div th:text="${post.likeCount != null ? post.likeCount : 0}">0</div>
+              <i class="bi bi-heart-fill text-danger"></i> <span th:text="${post.likeCount}">0</span>
             </div>
           </div>
         </div>

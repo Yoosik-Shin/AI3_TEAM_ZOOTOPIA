@@ -19,7 +19,18 @@ public interface UserService {
     // 회원 조회
     public Users select(String email) throws Exception;
 
+    // userId로 회원 조회 (추가)
+    public Users getUserById(Long userId) throws Exception;
+
     // 👮‍♀️ 관리자 확인
     public boolean isAdmin() throws Exception;
     
+    boolean checkPassword(Long userId, String rawPassword) throws Exception;
+
+    int updatePassword(Long userId, String newPassword) throws Exception;
+
+    Users findUserById(Long userId) throws Exception;
+    
+    int updateUser(Users user) throws Exception;
+
 }

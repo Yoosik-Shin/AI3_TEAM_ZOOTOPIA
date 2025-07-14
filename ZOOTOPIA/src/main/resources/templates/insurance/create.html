@@ -6,74 +6,111 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>보험상품 등록</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .btn1 {
+      border: 1px solid #F27A7A;
+      background-color: #F27A7A;
+      color: white;
+      border-radius: 6px;
+      min-width: 60px;
+      min-height: 40px;
+    }
+  </style>
 </head>
 <body>
+  <!-- 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
 
-  <div class="container py-5 d-flex justify-content-center mt-5">
-    <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 600px; border-radius: 5px; min-height: 700px;" >
+  <div class="container pt-5 pb-3 d-flex justify-content-center mt-5 mb-1">
+    <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 700px; border-radius: 5px; min-height: 750px;" >
       <h3 class="text-center mb-5 mt-3">보험상품 등록</h3>
-      <form>
+      <form id="productForm" method="post" th:action="@{/insurance/register}">
         <div class="mb-3 row align-items-center">
           <label for="product" class="col-sm-4 col-form-label fw-bold">상품명 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="product">
+            <input type="text" class="form-control" id="product" name="name">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="slogan" class="col-sm-4 col-form-label fw-bold">슬로건 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="slogan" name="slogan">
           </div>
         </div>
         <div class="mb-3 row align-items-center">
           <label for="inrate" class="col-sm-4 col-form-label fw-bold">보장비율 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="inrate">
+            <input type="text" class="form-control" id="inrate" name="coveragePercent">
           </div>
         </div>
         <div class="mb-3 row align-items-center">
           <label for="monthly" class="col-sm-4 col-form-label fw-bold">월 보험료 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="monthly">
+            <input type="text" class="form-control" id="monthly" name="monthlyFeeRange">
           </div>
         </div>
         <div class="mb-3 row align-items-center">
           <label for="maxlimit" class="col-sm-4 col-form-label fw-bold">최대 보장 한도 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="maxlimit">
+            <input type="text" class="form-control" id="maxlimit" name="maxCoverage">
           </div>
         </div>
         <div class="row mb-3 align-items-center">
-        <label for="floatingSelect" class="col-sm-4 col-form-label fw-bold">반려동물 :</label>
+        <label for="species" class="col-sm-4 col-form-label fw-bold">반려동물 :</label>
         <div class="col-sm-8">
-            <select class="form-select" id="floatingSelect" aria-label="반려동물 선택">
+            <select class="form-select" id="species" aria-label="반려동물 선택" name="species">
             <option selected>선택하세요.</option>
-            <option value="1">강아지</option>
-            <option value="2">고양이</option>
-            <option value="2">둘다</option>
+            <option value="dog">강아지</option>
+            <option value="cat">고양이</option>
+            <option value="all">둘다</option>
             </select>
         </div>
         </div>
         <div class="mb-3 row align-items-center">
-          <label for="conditions" class="col-sm-4 col-form-label fw-bold" >가입조건 :</label>
+          <label for="joinCondition" class="col-sm-4 col-form-label fw-bold" >가입조건 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="conditions">
+            <input type="text" class="form-control" id="joinCondition" name="joinCondition">
           </div>
         </div>
         <div class="mb-3 row align-items-center">
-          <label for="guarantee" class="col-sm-4 col-form-labelfw-bold" >보장항목 :</label>
+          <label for="coverageItems" class="col-sm-4 col-form-labelfw-bold" >보장항목 :</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" id="guarantee">
+            <input type="text" class="form-control" id="coverageItems" name="coverageItems">
           </div>
         </div>
         <div class="mb-3 row align-items-center">
-          <label for="caution" class="col-sm-4 col-form-label fw-bold" >유의사항 :</label>
+          <label for="precautions" class="col-sm-4 col-form-label fw-bold" >유의사항 :</label>
           <div class="col-sm-8">
-            <textarea class="form-control" id="caution" rows="2"></textarea>
+            <textarea class="form-control" id="precautions" name="precautions" rows="3"></textarea>
           </div>
         </div>
         <div class="text-center mt-5">
-          <button type="button" class="btn btn-outline-danger">취소</button>
-          <button type="submit" class="btn btn-outline-danger">등록</button>
+          <a href="/insurance/list" class="btn1" style="text-decoration: none; padding: 6px 14px; display: inline-block; line-height: 25px;">취소</a>
+          <button type="submit" class="btn1 ">등록</button>
         </div>
       </form>
     </div>
   </div>
 
+    <div class="text-center mt-3 mb-5">
+      <img th:src="@{/img/zootopialogo.png}" alt="주토피아" style="width: 100px;">
+      <p class="fw-bold mt-2">주토피아 - 반려동물 플랫폼</p>
+      <p class="small">“세상의 모든 반려동물에게 더 나은 보장을!”</p>
+    </div>
+
+  <!-- 푸터 -->
+  <th:block th:replace="fragments/footer :: footer"></th:block>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ 유효성 검사 스크립트 -->
+<script>
+  document.getElementById('productForm').addEventListener('submit', function(e) {
+    const species = document.getElementById('species').value;
+    if (!species) {
+      alert('반려동물 종류를 선택해주세요.');
+      e.preventDefault(); // 폼 전송 중단
+    }
+  });
+</script>
 </body>
 </html>
