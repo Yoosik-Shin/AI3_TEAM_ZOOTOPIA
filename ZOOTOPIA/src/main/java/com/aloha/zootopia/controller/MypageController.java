@@ -17,6 +17,7 @@ import com.aloha.zootopia.service.MypageService;
 import com.aloha.zootopia.service.UserPetService;
 import com.aloha.zootopia.service.UserService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -156,11 +157,28 @@ public class MypageController {
     @GetMapping("/{userId}")
     public String viewOtherUserMypage(@PathVariable Long userId, Model model) throws Exception {
         Users user = userService.findUserById(userId);
-        if (user == null) return "error/404"; // 사용자 없으면 404 페이지로
+        if (user == null) return "error/404"; 
 
         model.addAttribute("user", user);
         model.addAttribute("pets", mypageService.getPets(userId));
         model.addAttribute("myPosts", mypageService.getMyPosts(userId));
-        return "mypage/user"; // 타인용 마이페이지 뷰
+        return "mypage/user"; 
     }
+
+    @PostMapping("/delete")
+    public String deleteAccount(@AuthenticationPrincipal CustomUser user,
+                                HttpSession session,
+                                RedirectAttributes rttr) {
+        try {
+            Long userId = user.getUser().getUserId();
+            userService.deleteById(userId); // 실제 DB에서 삭제 처리
+            session.invalidate(); // 세션 만료 = 로그아웃
+            rttr.addFlashAttribute("msg", "회원 탈퇴가 완료되었습니다.");
+            return "redirect:/";
+        } catch (Exception e) {
+            rttr.addFlashAttribute("error", "탈퇴 중 오류가 발생했습니다.");
+            return "redirect:/mypage/edit";
+        }
+    }
+
 }

@@ -129,5 +129,11 @@ public class UserServiceImpl implements UserService {
     return userMapper.updateUser(user);
     }
 
+    @Override
+    public void deleteById(Long userId) {
+        userMapper.deleteById(userId); // 실제 삭제
+        // 또는 user.setEnabled(0); 저장으로 soft-delete도 가능
+    }
+
 
 }
