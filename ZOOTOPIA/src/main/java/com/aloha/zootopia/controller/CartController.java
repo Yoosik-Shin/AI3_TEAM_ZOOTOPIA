@@ -88,21 +88,24 @@ public class CartController {
             }
             // cart.html에서 요구하는 필드명으로 변환
             List<Map<String, Object>> mappedCartItems = new ArrayList<>();
-            int totalPrice = 0;
+            int totalAmount = 0;
+            int totalQuantity = 0;
             for (Map<String, Object> item : cartItems) {
                 Map<String, Object> mapped = new HashMap<>();
                 mapped.put("productNo", item.get("productNo"));
-                mapped.put("productName", item.get("name"));
-                mapped.put("productPrice", item.get("price"));
+                mapped.put("name", item.get("name"));
+                mapped.put("price", item.get("price"));
                 mapped.put("quantity", item.get("quantity"));
-                mapped.put("productImage", item.get("imageUrl"));
-                mapped.put("productStock", 99); // 임시, 실제 재고 연동 필요시 수정
+                mapped.put("imageUrl", item.get("imageUrl"));
+                mapped.put("category", item.get("category"));
                 mappedCartItems.add(mapped);
-                totalPrice += ((Integer)item.get("price")) * ((Integer)item.get("quantity"));
+                totalAmount += ((Integer)item.get("price")) * ((Integer)item.get("quantity"));
+                totalQuantity += ((Integer)item.get("quantity"));
             }
             model.addAttribute("cartItems", mappedCartItems);
-            model.addAttribute("totalPrice", totalPrice);
-            return "products/cart";
+            model.addAttribute("totalAmount", totalAmount);
+            model.addAttribute("totalQuantity", totalQuantity);
+            return "cart/cart";
         } catch (Exception e) {
             System.err.println("장바구니 조회 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
@@ -314,12 +317,10 @@ public class CartController {
     
     // 장바구니 상품 수량 변경
     @PostMapping("/update")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateQuantity(
+    public String updateQuantity(
         @RequestParam(name = "productNo") int productNo,
         @RequestParam(name = "quantity") int quantity,
         HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
         
         try {
             @SuppressWarnings("unchecked")
@@ -338,17 +339,13 @@ public class CartController {
                 }
             }
             
-            response.put("success", true);
-            response.put("message", "수량이 변경되었습니다.");
+            return "redirect:/cart";
             
         } catch (Exception e) {
             System.err.println("장바구니 수량 변경 중 오류 발생: " + e.getMessage());
             e.printStackTrace();
-            response.put("success", false);
-            response.put("message", "수량 변경 중 오류가 발생했습니다.");
+            return "redirect:/cart?error=update";
         }
-        
-        return ResponseEntity.ok(response);
     }
     
     // 장바구니 상품 삭제

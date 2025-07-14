@@ -11,6 +11,7 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Login CSS only -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <link rel="stylesheet" href="/assets/dist/css/login.css">
     <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
 </head>
@@ -113,11 +114,10 @@
     <!-- footer -->
     <div th:replace="fragments/footer :: footer"></div>
 
-
+    <script th:src="@{/assets/dist/js/header.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Inline Header JavaScript -->
-    
-<script th:src="@{/assets/dist/js/header.js}"></script>
+
+
 </body>
 
 </html>
