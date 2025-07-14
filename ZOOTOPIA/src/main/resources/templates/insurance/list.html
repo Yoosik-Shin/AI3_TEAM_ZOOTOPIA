@@ -8,25 +8,24 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <style>
-    .look {
-      background-color: #F27A7A; 
-      border: 1px solid #F27A7A; 
-      color: white; 
-      padding: 8px 16px; 
-      font-size: 0.9rem; 
-      border-radius: 6px; 
-      text-decoration: none; 
-      white-space: nowrap; 
-      display: inline-block;
-    }
-
     .btn1 {
     border: 1px solid #F27A7A;
     background-color: #F27A7A;
     color: white;
     border-radius: 6px;
     min-width: 60px;
-  }
+    }
+
+    .custom-page {
+    color: #F27A7A !important;
+    border-color: #F27A7A !important;
+    }
+
+    .page-item.active .custom-page {
+    background-color: #F27A7A !important;
+    color: white !important;
+    border-color: #F27A7A !important;
+    }
   </style>
 </head>
 <body>
@@ -45,30 +44,35 @@
           <img th:src="@{/image/insurancelogo.png}" alt="보험 이미지" style="width:340px; height: auto; border-radius: 10px;">
       </div>
       <div>
-      <form method="get" th:action="@{/insurance/list}">
-    <div class="p-4" style="background-color: #ffecec; border-radius: 10px; width: 340px; height: auto;">
-        <p class="text-center fw-bold mb-5">원하는 보험 찾기</p>
-    <div class="d-flex justify-content-center mb-4 gap-2">
-        <button type="submit" name="species" value="dog" class="btn btn-outline-dark btn-sm">강아지</button>
-        <button type="submit" name="species" value="cat" class="btn btn-outline-dark btn-sm">고양이</button>
-    </div>
-    <div class="mb-4">
-        <select class="form-select form-select-sm">
-        <option selected>보험사 선택</option>
-        <option>삼성화재</option>
-        <option>KB</option>
-        <option>메리츠</option>
-    </select>
-    </div>
-    <div class="mb-5 d-flex align-items-center mt-3">
-        <label class="me-2 mb-0" style="width: 60px;">품종 :</label>
-        <input type="text" name="breed" class="form-control form-control-sm" placeholder="예: 푸들">
-    </div>
-    <div class="text-center mt-5">
-        <button type="button" class="btn btn-outline-dark btn-sm px-4">찾기</button>
-    </div>
+        
+  <form th:action="@{/insurance/list}" method="get" >
+  <div class="bg-light p-4 rounded shadow-sm mb-2 mt-2" style="width: 340px; height: 340px; border-radius: 10px;">
+  <!-- 제목 -->
+  <p class="text-center fw-bold mb-4">🐶 원하는 보험 찾기 🐱</p>
+
+  <!-- 동물 버튼 -->
+  <div class="d-flex justify-content-center gap-2 mb-5">
+    <button type="submit" name="species" value="dog" class="btn btn-outline-secondary btn-sm">강아지</button>
+    <button type="submit" name="species" value="cat" class="btn btn-outline-secondary btn-sm">고양이</button>
   </div>
-  </form>
+
+  <!-- 보험사 선택 -->
+  <div class="mb-4">
+    <select name="company" class="form-select form-select-sm">
+      <option value="">보험사 선택</option>
+      <option value="삼성화재">삼성화재</option>
+      <option value="KB">KB</option>
+      <option value="메리츠">메리츠</option>
+    </select>
+  </div>
+
+  <!-- 로고 이미지 -->
+  <div class="text-center mb-3">
+    <img src="/img/zootopialogo.png" alt="주토피아 로고" style="width: 90px;" height="70px" class="mb-1">
+    <p class="small text-muted text-center mt-2 fw-bold">🏡 펫과 함께, 더 나은 내일을</p>
+  </div>
+  </div>
+</form>
   </div>
     </div>
 
@@ -79,7 +83,7 @@
     </div>
 
 <div class="row g-4 justify-content-center mt-4">
-  <div class="col-md-5"
+  <div class="col-md-5 mb-3"
        th:each="product : ${products}">
     <div class="card shadow-sm border-1 p-3"
          style="border-radius: 15px; min-height: 250px;">
@@ -93,7 +97,7 @@
         </p>
         <ul class="list-unstyled mt-1 mb-5">
           <li>💰 <strong>월 보험료:</strong>
-            <span th:text="${product.monthlyFeeRange}"></span>
+            <span th:text="${product.monthlyFeeRange}"></span>원
           </li>
           <li>💰 <strong>월 최대 보장 한도:</strong> 
             <span th:text="${product.maxCoverage}"></span>만원
@@ -104,11 +108,29 @@
         </ul>
         <div class="text-end">
           <a th:href="@{/insurance/read/{productId}(productId=${product.productId})}"
-             class="look">자세히 보기</a>
+             class="btn1 btn-sm" style="display: inline-block; text-decoration: none; padding: 6px 14px;">자세히 보기</a>
         </div>
       </div>
     </div>
   </div>
+
+    <div class="d-flex justify-content-center mt-5">
+    <ul class="pagination pagination-sm">
+      <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+        <a class="page-link custom-page" th:href="@{/insurance/list(page=${currentPage - 1})}">이전</a>
+      </li>
+
+      <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+          th:classappend="${i == currentPage} ? 'active'">
+        <a class="page-link custom-page" th:href="@{/insurance/list(page=${i})}" th:text="${i}"></a>
+      </li>
+
+      <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+        <a class="page-link custom-page" th:href="@{/insurance/list(page=${currentPage + 1})}">다음</a>
+      </li>
+    </ul>
+  </div>
+
   <!-- 상품 등록 버튼 -->
   <div class="text-end mt-5" sec:authorize="hasRole('ADMIN')">
   <a href="/insurance/create" class="btn1 btn-sm" style="text-decoration: none; padding: 6px 12px;">상품등록</a>

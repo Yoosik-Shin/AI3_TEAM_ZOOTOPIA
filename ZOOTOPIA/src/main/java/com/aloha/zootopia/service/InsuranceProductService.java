@@ -11,4 +11,7 @@ public interface InsuranceProductService {
     InsuranceProduct getProduct(int productId);          // 상세
     void updateProduct(InsuranceProduct product);        // 수정
     void deleteProduct(int productId);                   // 삭제
+
+    List<InsuranceProduct> getProductsPaged(int offset, int size);
+    int getTotalCount();
 }
