@@ -218,9 +218,9 @@
     align-items: center;
 }
 .header-logo-container img {
-    width: 100%;
-    height: 60%;
-    object-fit: fill;
+    width: 200px;
+    height: 50px;
+    object-fit: contain;
 }
 
 
@@ -246,7 +246,7 @@
     width: 100%;
     max-width: 1300px; /* Max width for large screens */
     position: relative;
-    gap: 10px; /* 메뉴 아이템 간의 간격 */
+    gap: 25px; /* 메뉴 아이템 간의 간격 */
 }
 
 .main-menu > li {
@@ -254,7 +254,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 130px; /* 고정 너비 설정 */
+    width: 135px; /* 고정 너비 설정 */
     text-align: center;
 }
 
@@ -295,15 +295,15 @@
     justify-content: center; /* 중앙 정렬 */
     padding: 20px 0;
     width: 100%;
-    max-width: 690px;
+    max-width: 750px;
     margin: 0 auto;
-    gap: 10px; /* 메뉴 아이템 간의 간격 */
+    gap: 25px; /* 메뉴 아이템(column) 간의 간격 */
 }
 
 /* CSS hover logic removed - now handled by JavaScript */
 
 .sub-menu-column {
-    width: 130px; /* 메인 메뉴 li의 너비와 동일하게 고정 */
+    width: 135px; /* 메인 메뉴 li의 너비와 동일하게 고정 */
     text-align: center;
 }
 
@@ -311,6 +311,7 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 135px; /* 서브 메뉴 li의 너비 */
 }
 
 .sub-menu li a {
@@ -393,7 +394,7 @@
 }
 .user-sub-menu-wrap.open-menu {
     max-height: 400px;
-    opacity: 1;
+    /* opacity: 1; */
     visibility: visible;
 }
 .user-sub-menu {
