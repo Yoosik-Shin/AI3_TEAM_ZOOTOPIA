@@ -1,10 +1,12 @@
 <!-- header.html -->
+
 <nav th:fragment="header" class="zootopia-header-wrapper navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="header-container container-fluid px-4" style="height: 100px; padding: 10px 0;">
         <!-- Logo -->
         <a class="navbar-brand" href="/" style="text-decoration: none;">
             <div class="header-logo-container">
                 <img src="/assets/dist/img/zootopialogo.png" alt="Zootopia Logo">
+
             </div>
         </a>
 
@@ -50,6 +52,7 @@
                         <li><a href="#">Pet Shop</a></li>
                         <li><a href="#">임시 보호소</a></li>
                     </ul>
+
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
@@ -107,6 +110,7 @@
                             </a>
                         </div>
                     </div>
+
                 </div>
                 <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
                 <form th:action="@{/logout}" method="post" class="m-0">
@@ -114,8 +118,6 @@
                 </form>
             </div>
         </div>
-        
-
 
     </div>
 

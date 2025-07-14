@@ -1,15 +1,23 @@
 package com.aloha.zootopia.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.InsuranceProduct;
@@ -30,9 +38,20 @@ public class InsuranceProductController {
 
     // 보험상품 목록
     @GetMapping("/list")
-    public String list(Model model) {
-        model.addAttribute("products", productService.listProducts());
-        return "insurance/list"; // ex) list.jsp
+    public String list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size,
+            Model model) {
+
+        int offset = (page - 1) * size;
+        List<InsuranceProduct> products = productService.getProductsPaged(offset, size);
+        int totalProducts = productService.getTotalCount();
+        int totalPages = (int) Math.ceil((double) totalProducts / size);
+
+        model.addAttribute("products", products);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        return "insurance/list";
     }
 
     // 보험 상세
@@ -53,17 +72,40 @@ public class InsuranceProductController {
         return "insurance/create"; 
     }
 
-    // 등록처리 (관리자)
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
-    public String register(InsuranceProduct product, RedirectAttributes rttr) {
-        if (product.getSpecies() == null || product.getSpecies().isBlank()) {
-            rttr.addFlashAttribute("errorMessage", "반려동물 종류를 반드시 선택해야 합니다.");
-            return "redirect:/insurance/register";
-        }
+    public String register(@ModelAttribute InsuranceProduct product,
+                        @RequestParam("imageFile") MultipartFile imageFile,
+                        RedirectAttributes rttr) {
+        try {
+            // 1. 유효성 검사
+            if (product.getSpecies() == null || product.getSpecies().isBlank()) {
+                rttr.addFlashAttribute("errorMessage", "반려동물 종류를 반드시 선택해야 합니다.");
+                return "redirect:/insurance/create";
+            }
 
-        productService.registerProduct(product);
-        return "redirect:/insurance/list";
+            // 2. 이미지 파일 저장
+            if (!imageFile.isEmpty()) {
+                String uploadDir = "src/main/resources/static/uploads/";
+                String originalFilename = imageFile.getOriginalFilename();
+                String newFileName = UUID.randomUUID() + "_" + originalFilename;
+
+                Path uploadPath = Paths.get(uploadDir + newFileName);
+                Files.createDirectories(uploadPath.getParent());
+                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+
+                // 3. DB에 저장될 경로 설정
+                product.setImagePath("/uploads/" + newFileName);  // InsuranceProduct에 imagePath 필드 필요
+            }
+
+            // 4. DB 등록
+            productService.registerProduct(product);
+            return "redirect:/insurance/list";
+
+        } catch (Exception e) {
+            rttr.addFlashAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다.");
+            return "redirect:/insurance/create";
+        }
     }
 
     // 수정폼 (관리자)

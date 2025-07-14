@@ -14,4 +14,7 @@ public interface InsuranceProductMapper {
     InsuranceProduct selectProductById(int productId);
     void updateProduct(InsuranceProduct product);
     void deleteProduct(int productId);
+
+    List<InsuranceProduct> selectProductsPaged(int offset, int size);
+    int countAllProducts();
 }

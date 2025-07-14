@@ -24,7 +24,7 @@
   <div class="container pt-5 pb-3 d-flex justify-content-center mt-5 mb-1">
     <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 700px; border-radius: 5px; min-height: 750px;" >
       <h3 class="text-center mb-5 mt-3">보험상품 등록</h3>
-      <form id="productForm" method="post" th:action="@{/insurance/register}">
+      <form id="productForm" method="post" th:action="@{/insurance/register}" enctype="multipart/form-data">
         <div class="mb-3 row align-items-center">
           <label for="product" class="col-sm-4 col-form-label fw-bold">상품명 :</label>
           <div class="col-sm-8">
@@ -83,6 +83,12 @@
           <div class="col-sm-8">
             <textarea class="form-control" id="precautions" name="precautions" rows="3"></textarea>
           </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="imageFile" class="col-sm-4 col-form-label fw-bold">상품 이미지 :</label>
+        <div class="col-sm-8">
+          <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+        </div>
         </div>
         <div class="text-center mt-5">
           <a href="/insurance/list" class="btn1" style="text-decoration: none; padding: 6px 14px; display: inline-block; line-height: 25px;">취소</a>
