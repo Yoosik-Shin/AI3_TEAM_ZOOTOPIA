@@ -17,4 +17,5 @@ public class InsuranceProduct {
     private String coverageItems;         // 보장항목
     private String precautions;           // 유의사항
     private LocalDateTime createdAt;      // 등록일시
+    private String imagePath;             // 이미지 파일 경로
 }

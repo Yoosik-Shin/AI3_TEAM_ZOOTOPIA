@@ -39,4 +39,15 @@ public class InsuranceProductServiceImpl implements InsuranceProductService {
         productMapper.deleteProduct(productId);
     }
     
+    // ✅ 페이징 처리된 상품 목록 조회
+    @Override
+    public List<InsuranceProduct> getProductsPaged(int offset, int size) {
+        return productMapper.selectProductsPaged(offset, size);
+    }
+
+    // ✅ 전체 상품 개수 조회
+    @Override
+    public int getTotalCount() {
+        return productMapper.countAllProducts();
+    }
 }

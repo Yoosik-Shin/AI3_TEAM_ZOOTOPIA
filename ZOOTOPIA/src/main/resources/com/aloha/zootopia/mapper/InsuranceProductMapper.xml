@@ -28,6 +28,18 @@
         ORDER BY created_at DESC
     </select>
 
+    <select id="selectProductsPaged" resultType="com.aloha.zootopia.domain.InsuranceProduct">
+        SELECT *
+        FROM insurance_product
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 개수 조회 -->
+    <select id="countAllProducts" resultType="int">
+        SELECT COUNT(*) FROM insurance_product
+    </select>
+
     <!-- 상세 -->
     <select id="selectProductById" resultType="com.aloha.zootopia.domain.InsuranceProduct">
         SELECT * FROM insurance_product

@@ -32,9 +32,9 @@
 <body class="bg-light">
     <div th:replace="~{fragments/header :: header}"></div>
 
-  <div class="container bg-white p-4 rounded shadow-sm mt-3 mb-3" style="max-width: 900px;">
+  <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-3" style="max-width: 900px;">
     <!-- 상단 보험명 -->
-    <h6 class="fs-5 fw-bold mb-4 text-center">
+    <h6 class="fs-4 fw-bold mb-5 text-center">
       <span class="highlight-circle"></span>
       <span th:text="${product.name}">보험상품명</span>
     </h6>
@@ -69,10 +69,29 @@
       </div>
     </div>
 
-    <!-- 결제 버튼 -->
-    <div class="text-center mb-4">
-      <button class="btn btn-outline-dark px-4">결제하기</button>
+    <div class="row mb-4">
+      <!-- 가운데 정렬 결제하기 버튼 -->
+      <div class="text-center">
+        <button class="btn1">결제하기</button>
+      </div>
+
+      <!-- 오른쪽 끝 수정 버튼 (관리자만 노출) -->
+      <div class="col-auto ms-auto">
+          <!-- ✅ 목록 버튼 (모두에게 노출) -->
+          <a th:href="@{/insurance/list}"
+            class="btn1" style="display: inline-block; text-decoration: none; padding: 6px 12px; ">
+            목록
+          </a>
+          <!-- ✅ 수정 버튼 (관리자만 노출) -->
+          <a th:href="@{/insurance/update/{id}(id=${product.productId})}"
+            class="btn1" style="display: inline-block; text-decoration: none; padding: 6px 12px;" sec:authorize="hasRole('ADMIN')">
+            수정
+          </a>
+      </div>
     </div>
+
+    <!-- 경계선 -->
+    <hr class="my-4">
 
       <!-- Q&A -->
       <div class="d-flex justify-content-between align-items-center mb-3">
