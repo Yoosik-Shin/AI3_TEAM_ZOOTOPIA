@@ -210,6 +210,14 @@
 }
 
 /* ======================================YS 수정============================ */
+.header-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+}
+
+
+
 
 .main-menu-container {
     position: relative;
@@ -264,7 +272,7 @@
     left: 0;
     right: 0;
     background-color: #fff;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
     z-index: 1000;
     overflow: hidden;
     max-height: 0;
@@ -275,7 +283,7 @@
     justify-content: center; /* 중앙 정렬 */
     padding: 20px 0;
     width: 100%;
-    max-width: 1300px;
+    max-width: 690px;
     margin: 0 auto;
     gap: 10px; /* 메뉴 아이템 간의 간격 */
 }
