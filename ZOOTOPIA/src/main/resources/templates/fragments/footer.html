@@ -1,11 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<!-- Footer Fragment -->
+      <!-- Footer Fragment -->
+
 <footer th:fragment="footer" style="background-color: #333; color: #fff; padding: 40px 0; height: 300px; overflow: hidden; position: relative;">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/footer.css}">
 
 
-        <div class="container" style="height: calc(100% - 50px); padding-bottom: 50px;">
+        <div class="footer-container"
+             style="height: calc(100% - 50px); padding-bottom: 50px;">
             <div class="row footer-content gx-4" style="height: 100%;">
                 <!-- 소개 -->
                 <div class="col-md-3 footer-section">
@@ -72,3 +77,6 @@
             </div>
         </div>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+</body>
+</html>

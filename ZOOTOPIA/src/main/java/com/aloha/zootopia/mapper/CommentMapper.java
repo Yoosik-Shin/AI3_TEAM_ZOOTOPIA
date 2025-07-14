@@ -1,25 +1,24 @@
-package com.aloha.zootopia.mapper;
+    package com.aloha.zootopia.mapper;
 
-import com.aloha.zootopia.domain.Comment;
-import org.apache.ibatis.annotations.Mapper;
+    import com.aloha.zootopia.domain.Comment;
+    import org.apache.ibatis.annotations.Mapper;
 
-import java.util.List;
+    import java.util.List;
 
-@Mapper
-public interface CommentMapper {
+    @Mapper
+    public interface CommentMapper {
 
-    /**
-     * 특정 게시글의 댓글 목록 조회
-     */
-    List<Comment> findByPostId(Integer postId);
+        List<Comment> findByPostId(Integer postId);
+        void insert(Comment comment);
+        void softDelete(Integer commentId);
+        void updateContent(Comment comment);
+        Comment findById(Integer commentId);
 
-    /**
-     * 댓글 등록
-     */
-    void insert(Comment comment);
+        List<Comment> findLostByPostId(Integer postId);
+        void insertLost(Comment comment);
+        void softDeleteLost(Integer commentId);
+        void updateLostContent(Comment comment);
+        Comment findLostById(Integer commentId);
+            
 
-    /**
-     * 댓글 논리 삭제 (is_deleted = true)
-     */
-    void softDelete(Integer commentId);
-}
+    }

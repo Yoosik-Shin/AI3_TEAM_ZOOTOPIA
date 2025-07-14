@@ -108,4 +108,26 @@ public class UserServiceImpl implements UserService {
     public Users getUserById(Long userId) throws Exception {
         return userMapper.selectById(userId);
     }
+
+    public boolean checkPassword(Long userId, String rawPassword) throws Exception {
+        Users user = userMapper.findUserById(userId);
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    @Override
+    public int updatePassword(Long userId, String newPassword) throws Exception {
+        String encoded = passwordEncoder.encode(newPassword);
+        return userMapper.updatePassword(userId, encoded); 
+    }
+    @Override
+    public Users findUserById(Long userId) throws Exception {
+        return userMapper.findUserById(userId);
+    }
+
+    @Override
+    public int updateUser(Users user) throws Exception {
+    return userMapper.updateUser(user);
+    }
+
+
 }

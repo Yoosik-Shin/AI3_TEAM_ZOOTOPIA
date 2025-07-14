@@ -1,10 +1,9 @@
 package com.aloha.zootopia.config;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -29,21 +28,21 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 
     @Autowired
-    private DataSource dataSource;
+    private javax.sql.DataSource dataSource;
 
-    // @Autowired 
+    // @Autowired
     // private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserDetailServiceImpl userDetailServiceImpl;
 
-    @Autowired 
+    @Autowired
     private LoginSuccessHandler loginSuccessHandler;
 
-    @Autowired 
+    @Autowired
     private LoginFailureHandler loginFailureHandler;
 
-    @Autowired 
+    @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
 
 
@@ -51,15 +50,37 @@ public class SecurityConfig {
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        http.csrf(csrf -> csrf
+                                .ignoringRequestMatchers("/hospitals/new", "/hospitals/edit")
+        );
+
         // ✅ 인가 설정
         
         http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
+
+
+                                .requestMatchers("/images/**", "/img/**", "/upload/**").permitAll()
+                                .requestMatchers("/hospitals", "/hospitals/detail/**").permitAll()
+
                                 .requestMatchers("/comments/add").authenticated() 
+                                // .requestMatchers("/products/detail/**").authenticated() // 상품 상세 - 임시 비활성화
+                                .requestMatchers("/cart/**").authenticated() // 장바구니 - 로그인 필요
+                                .requestMatchers("/posts/upload/image").permitAll()
+                                .requestMatchers("/lost/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
+
+                                .requestMatchers(HttpMethod.GET, "/hospitals/{hospitalId}/reviews").permitAll() // 추가
                                 .anyRequest().permitAll()
                                 );
+        http.csrf(csrf -> csrf
+            .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
+            .ignoringRequestMatchers("/lost/upload/image") // ✅ CSRF 무시 설정
+        );
+
+                        
+
 
 
 
@@ -75,7 +96,7 @@ public class SecurityConfig {
                                      // .defaultSuccessUrl("/?=true") // 로그인 성공 경로
                                      .successHandler(loginSuccessHandler)      // 로그인 성공 핸들러 설정
                                      .failureHandler(loginFailureHandler)      // 로그인 실패 핸들러 설정
-        
+
                         );
 
         http.exceptionHandling( exception -> exception
@@ -84,16 +105,16 @@ public class SecurityConfig {
                                             // 접근 거부 핸들러 설정
                                             .accessDeniedHandler(customAccessDeniedHandler)
 
-                                );                           
+                                );
 
         // 👩‍💼 사용자 정의 인증
         http.userDetailsService(userDetailServiceImpl);
 
-        // 🔄 자동 로그인
-        http.rememberMe(me -> me
-                .key("aloha")
-                .tokenRepository(tokenRepository())
-                .tokenValiditySeconds(60 * 60 * 24 * 7));
+        // 🔄 자동 로그인 - 임시 비활성화
+        // http.rememberMe(me -> me
+        //         .key("aloha")
+        //         .tokenRepository(tokenRepository())
+        //         .tokenValiditySeconds(60 * 60 * 24 * 7));
 
         // 🔓 로그아웃 설정
         http.logout(logout -> logout
@@ -111,7 +132,7 @@ public class SecurityConfig {
     @Bean
     public PersistentTokenRepository tokenRepository() {
         // JdbcTokenRepositoryImpl : 토큰 저장 데이터 베이스를 등록하는 객체
-        JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl(); 
+        JdbcTokenRepositoryImpl repositoryImpl = new JdbcTokenRepositoryImpl();
         // 토큰 저장소를 사용하는 데이터 소스 지정
         repositoryImpl.setDataSource(dataSource);
         // persistent_logins 테이블 자동 생성
@@ -153,7 +174,7 @@ public class SecurityConfig {
      */
     // @Bean
     // public UserDetailsService userDetailsService() {
-    //     JdbcUserDetailsManager userDetailsManager 
+    //     JdbcUserDetailsManager userDetailsManager
     //             = new JdbcUserDetailsManager(dataSource);
 
     //     // 사용자 인증 쿼리
@@ -179,10 +200,10 @@ public class SecurityConfig {
      * @throws Exception
     */
     @Bean
-    public AuthenticationManager authenticationManager( 
+    public AuthenticationManager authenticationManager(
                                     AuthenticationConfiguration authenticationConfiguration ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    
+
 }
