@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <meta name="_csrf" th:content="${_csrf.token}">
   <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
   <title>보험상품 수정</title>
       <!-- bootstrap css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -33,7 +35,6 @@
   <div class="container pt-5 pb-3 d-flex justify-content-center mt-5 mb-1">
     <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 700px; border-radius: 5px; min-height: 750px;" >
       <h3 class="text-center mb-5 mt-3">보험상품 수정</h3>
-
     
  <!-- 🔁 상품 수정 form -->
     <form th:action="@{/insurance/update}" method="post">
@@ -165,6 +166,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ✅ 유효성 검사 스크립트 -->
+
   <script>
     document.getElementById('productForm').addEventListener('submit', function(e) {
       const species = document.getElementById('species').value;

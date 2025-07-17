@@ -20,8 +20,3 @@ INSERT INTO user_auth (email, auth)
 VALUES ('super@admin.com', 'ROLE_USER')
 ON DUPLICATE KEY UPDATE
 auth = 'ROLE_USER';
-
--- 기존 관리자 계정의 비밀번호를 admin123으로 업데이트 (필요시 실행)
-UPDATE users 
-SET password = '$2a$10$dXJ3SW6G7P0lksqr.G06zuIBhFCVRE8H9c8A0UhPKs2XQ7gQ2K5Jm' 
-WHERE email = 'super@admin.com';

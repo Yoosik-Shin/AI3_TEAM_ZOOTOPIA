@@ -6,6 +6,16 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.zootopia-header .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
 }
 
 .zootopia-brand {
@@ -189,22 +199,303 @@
     .nav-links {
         display: none;
     }
-    
+
     .mobile-menu-toggle {
         display: block;
     }
-    
+
     .header-actions {
         gap: 10px;
     }
-    
+
     .auth-buttons {
         gap: 5px;
     }
-    
+
     .btn-login,
     .btn-signup {
         padding: 5px 12px;
         font-size: 0.8rem;
+    }
+}
+
+/* ======================================YS 수정============================ */
+.header-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+}
+
+
+
+
+.main-menu-container {
+    position: relative;
+    display: flex;
+    flex-grow: 1; /* Allow it to grow and take available space */
+}
+
+/* 메인 메뉴 */
+.main-menu {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 1300px; /* Max width for large screens */
+    position: relative;
+    gap: 10px; /* 메뉴 아이템 간의 간격 */
+}
+
+.main-menu > li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 130px; /* 고정 너비 설정 */
+    text-align: center;
+}
+
+.main-menu > li > a {
+    display: block;
+    white-space: nowrap; /* 글씨가 줄바꿈되지 않도록 */
+    height: 100%;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+#horizontal-underline {
+    position: absolute;
+    height: 4px;
+    background-color: #ff6b6b;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 2;
+    border-radius: 5px;
+    opacity: 0;
+}
+
+/* Sub Menu Panel - The container for all sub-menus */
+.sub-menu-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    padding: 20px 0;
+    width: 100%;
+    max-width: 690px;
+    margin: 0 auto;
+    gap: 10px; /* 메뉴 아이템 간의 간격 */
+}
+
+/* CSS hover logic removed - now handled by JavaScript */
+
+.sub-menu-column {
+    width: 130px; /* 메인 메뉴 li의 너비와 동일하게 고정 */
+    text-align: center;
+}
+
+.sub-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sub-menu li a {
+    text-decoration: none !important;
+    color: #333;
+    padding: 10px 0;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+.sub-menu li a:hover {
+    color: #ff6b6b;
+}
+
+/* User Menu Dropdown Styles */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #f0f0f0;
+}
+
+.user-pic:hover {
+    border-color: #ff6b6b;
+    transform: scale(1.05);
+}
+
+.user-sub-menu-wrap {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.user-sub-menu-wrap.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-sub-menu {
+    padding: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-info h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-sub-menu hr {
+    margin: 0;
+    border: none;
+    height: 1px;
+    background: #eee;
+}
+
+.user-sub-menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.user-sub-menu-link:hover {
+    background: #f8f9fa;
+    color: #ff6b6b;
+    text-decoration: none;
+}
+
+.user-sub-menu-link img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.user-sub-menu-link p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.user-sub-menu-form {
+    margin: 0;
+}
+
+.user-sub-menu-logout {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    color: #333;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-sub-menu-logout:hover {
+    background: #f8f9fa;
+    color: #ff6b6b;
+}
+
+.user-sub-menu-logout img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.user-sub-menu-logout p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Global navbar responsive styles for all pages */
+@media (max-width: 650px) {
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
+    .navbar-toggler {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+    }
+    
+    .mobile-right-icons {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    /* Hide desktop navigation completely on mobile */
+    #navbarNavDesktop {
+        display: none;
+    }
+    
+    /* Hide desktop right icons */
+    .d-none.d-md-flex {
+        display: none;
     }
 }
