@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.aloha.zootopia.config.CustomUserDetails;
 import com.aloha.zootopia.domain.Animal;
 import com.aloha.zootopia.domain.Specialty;
 import com.aloha.zootopia.domain.Hospital;
@@ -240,68 +241,153 @@ public class HospitalController {
     // 리뷰 등록
     @PostMapping("/{hospitalId}/reviews")
     @ResponseBody
-    public ResponseEntity<String> addReview(@PathVariable int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+    public ResponseEntity<String> addReview(@PathVariable int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         log.info("HospitalController - addReview() 진입. hospitalId: {}, hospReview: {}", hospitalId, hospReview); // 추가
-        if (customUser == null) {
-            log.warn("HospitalController - addReview() : Unauthorized access - customUser is null"); // 추가
+        if (customUser == null && customUserDetails == null) {
+            log.warn("HospitalController - addReview() : Unauthorized access - customUser & customUserDeails is null"); // 추가
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-        }
+        } else if (customUser != null && customUserDetails == null) {
         Long userId = customUser.getUser().getUserId();
         hospReview.setUserId(userId);
         hospReview.setHospitalId(hospitalId);
-
+        } else if (customUser == null && customUserDetails != null) {
+        Long socialUserId = customUserDetails.getUser().getUserId();
+        hospReview.setUserId(socialUserId);
+        hospReview.setHospitalId(hospitalId);
+        }
+        
         hospReviewService.addReview(hospReview);
         log.info("HospitalController - addReview() : Review added successfully"); // 추가
         return new ResponseEntity<>("Review added successfully", HttpStatus.CREATED);
     }
 
     // 리뷰 수정
-    @PutMapping("/{hospitalId}/reviews/{reviewId}")
-    @ResponseBody
-    public ResponseEntity<String> updateReview(@PathVariable int hospitalId, @PathVariable int reviewId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
-        log.info("HospitalController - updateReview() 진입. hospitalId: {}, reviewId: {}, hospReview: {}", hospitalId, reviewId, hospReview); // 추가
-        if (customUser == null) {
-            log.warn("HospitalController - updateReview() : Unauthorized access - customUser is null"); // 추가
-            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-        }
-        HospReview existingReview = hospReviewService.getReviewById(reviewId);
-        Long userId = customUser.getUser().getUserId();
+    // @PutMapping("/{hospitalId}/reviews/{reviewId}")
+    // @ResponseBody
+    // public ResponseEntity<String> updateReview(@PathVariable int hospitalId, @PathVariable int reviewId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+    //     log.info("HospitalController - updateReview() 진입. hospitalId: {}, reviewId: {}, hospReview: {}", hospitalId, reviewId, hospReview); // 추가
+    //     if (customUser == null) {
+    //         log.warn("HospitalController - updateReview() : Unauthorized access - customUser is null"); // 추가
+    //         return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+    //     }
+    //     HospReview existingReview = hospReviewService.getReviewById(reviewId);
+    //     Long userId = customUser.getUser().getUserId();
 
-        if (existingReview.getUserId() != userId) {
-            log.warn("HospitalController - updateReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
-            return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
-        }
+    //     if (existingReview.getUserId() != userId) {
+    //         log.warn("HospitalController - updateReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
+    //         return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
+    //     }
 
-        hospReview.setReviewId(reviewId);
-        hospReview.setHospitalId(hospitalId);
-        hospReviewService.updateReview(hospReview);
-        log.info("HospitalController - updateReview() : Review updated successfully"); // 추가
-        return new ResponseEntity<>("Review updated successfully", HttpStatus.OK);
-    }
+    //     hospReview.setReviewId(reviewId);
+    //     hospReview.setHospitalId(hospitalId);
+    //     hospReviewService.updateReview(hospReview);
+    //     log.info("HospitalController - updateReview() : Review updated successfully"); // 추가
+    //     return new ResponseEntity<>("Review updated successfully", HttpStatus.OK);
+    // }
 
     // 리뷰 삭제
-    @DeleteMapping("/{hospitalId}/reviews/{reviewId}")
-    @ResponseBody
-    public ResponseEntity<String> deleteReview(@PathVariable int hospitalId, @PathVariable int reviewId, @AuthenticationPrincipal CustomUser customUser) {
-        log.info("HospitalController - deleteReview() 진입. hospitalId: {}, reviewId: {}", hospitalId, reviewId); // 추가
-        if (customUser == null) {
-            log.warn("HospitalController - deleteReview() : Unauthorized access - customUser is null"); // 추가
-            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-        }
-        HospReview existingReview = hospReviewService.getReviewById(reviewId);
-        Long userId = customUser.getUser().getUserId();
+    // @DeleteMapping("/{hospitalId}/reviews/{reviewId}")
+    // @ResponseBody
+    // public ResponseEntity<String> deleteReview(@PathVariable int hospitalId, @PathVariable int reviewId, @AuthenticationPrincipal CustomUser customUser) {
+    //     log.info("HospitalController - deleteReview() 진입. hospitalId: {}, reviewId: {}", hospitalId, reviewId); // 추가
+    //     if (customUser == null) {
+    //         log.warn("HospitalController - deleteReview() : Unauthorized access - customUser is null"); // 추가
+    //         return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+    //     }
+    //     HospReview existingReview = hospReviewService.getReviewById(reviewId);
+    //     Long userId = customUser.getUser().getUserId();
 
-        if (existingReview.getUserId() != userId) {
-            log.warn("HospitalController - deleteReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
-            return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
-        }
+    //     if (existingReview.getUserId() != userId) {
+    //         log.warn("HospitalController - deleteReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId); // 추가
+    //         return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
+    //     }
 
-        hospReviewService.deleteReview(reviewId);
-        log.info("HospitalController - deleteReview() : Review deleted successfully"); // 추가
-        return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
+    //     hospReviewService.deleteReview(reviewId);
+    //     log.info("HospitalController - deleteReview() : Review deleted successfully"); // 추가
+    //     return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
+    // }
+
+    // 수정&삭제 CustomUserDetails 추가 수정본
+    // 리뷰 수정
+@PutMapping("/{hospitalId}/reviews/{reviewId}")
+@ResponseBody
+public ResponseEntity<String> updateReview(
+    @PathVariable int hospitalId,
+    @PathVariable int reviewId,
+    @RequestBody HospReview hospReview,
+    @AuthenticationPrincipal CustomUser customUser,
+    @AuthenticationPrincipal CustomUserDetails customUserDetails
+) {
+    log.info("HospitalController - updateReview() 진입. hospitalId: {}, reviewId: {}, hospReview: {}", hospitalId, reviewId, hospReview);
+
+    // 인증 체크
+    if (customUser == null && customUserDetails == null) {
+        log.warn("HospitalController - updateReview() : Unauthorized access - customUser & customUserDetails is null");
+        return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
     }
 
+    HospReview existingReview = hospReviewService.getReviewById(reviewId);
 
+    // userId 추출 (둘 중 하나)
+    Long userId = null;
+    if (customUser != null) {
+        userId = customUser.getUser().getUserId();
+    } else if (customUserDetails != null) {
+        userId = customUserDetails.getUser().getUserId();
+    }
+
+    // 인가 체크: 작성자 본인만 수정 가능
+    if (!existingReview.getUserId().equals(userId)) {
+        log.warn("HospitalController - updateReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId);
+        return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
+    }
+
+    hospReview.setReviewId(reviewId);
+    hospReview.setHospitalId(hospitalId);
+    hospReviewService.updateReview(hospReview);
+
+    log.info("HospitalController - updateReview() : Review updated successfully");
+    return new ResponseEntity<>("Review updated successfully", HttpStatus.OK);
+}
+
+// 리뷰 삭제
+@DeleteMapping("/{hospitalId}/reviews/{reviewId}")
+@ResponseBody
+public ResponseEntity<String> deleteReview(
+    @PathVariable int hospitalId,
+    @PathVariable int reviewId,
+    @AuthenticationPrincipal CustomUser customUser,
+    @AuthenticationPrincipal CustomUserDetails customUserDetails
+) {
+    log.info("HospitalController - deleteReview() 진입. hospitalId: {}, reviewId: {}", hospitalId, reviewId);
+
+    // 인증 체크
+    if (customUser == null && customUserDetails == null) {
+        log.warn("HospitalController - deleteReview() : Unauthorized access - customUser & customUserDetails is null");
+        return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+
+    HospReview existingReview = hospReviewService.getReviewById(reviewId);
+
+    // userId 추출 (둘 중 하나)
+    Long userId = null;
+    if (customUser != null) {
+        userId = customUser.getUser().getUserId();
+    } else if (customUserDetails != null) {
+        userId = customUserDetails.getUser().getUserId();
+    }
+
+    // 인가 체크: 작성자 본인만 삭제 가능
+    if (!existingReview.getUserId().equals(userId)) {
+        log.warn("HospitalController - deleteReview() : Forbidden access - userId mismatch. existing: {}, current: {}", existingReview.getUserId(), userId);
+        return new ResponseEntity<>("Forbidden", HttpStatus.FORBIDDEN);
+    }
+
+    hospReviewService.deleteReview(reviewId);
+
+    log.info("HospitalController - deleteReview() : Review deleted successfully");
+    return new ResponseEntity<>("Review deleted successfully", HttpStatus.OK);
+}
 
 
 }

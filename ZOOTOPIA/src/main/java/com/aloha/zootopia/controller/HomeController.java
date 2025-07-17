@@ -2,6 +2,7 @@ package com.aloha.zootopia.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -126,5 +127,19 @@ public class HomeController {
     }
     
     
+    /**
+     * 로그인 성공 후 처리 소셜로그인(네이버)
+     * @param oAuth2User
+     * @return
+     */
+    @GetMapping("/login-success")
+    public String loginSuccess(@AuthenticationPrincipal OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        String name = oAuth2User.getAttribute("name");
+        System.out.println("네이버 사용자 이름: " + name);
+        System.out.println("네이버 이메일: " + email);
+        return "redirect:/";
+    }
+
     
 }

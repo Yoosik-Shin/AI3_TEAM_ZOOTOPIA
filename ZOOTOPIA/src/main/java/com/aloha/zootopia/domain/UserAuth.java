@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserAuth {
-    private int userId;
+    private Long userId;
     private String email;
     private String auth;
 }

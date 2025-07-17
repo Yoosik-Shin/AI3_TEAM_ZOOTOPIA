@@ -1,6 +1,9 @@
 package com.aloha.zootopia.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.aloha.zootopia.domain.UserAuth;
 import com.aloha.zootopia.domain.Users;
+import com.aloha.zootopia.dto.SocialDTO;
 import com.aloha.zootopia.mapper.UserMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +29,14 @@ public class UserServiceImpl implements UserService {
 
     @Autowired PasswordEncoder passwordEncoder;
 
-    @Autowired AuthenticationManager authenticationManager;
+    // @Autowired AuthenticationManager authenticationManager;
+
+    @Autowired
+    private ApplicationContext context;
+    
+
+
+
 
     /**
      * 회원가입
@@ -68,6 +79,7 @@ public class UserServiceImpl implements UserService {
         UsernamePasswordAuthenticationToken token 
             = new UsernamePasswordAuthenticationToken(email, password);
 
+        AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
         // 토큰을 이용하여 인증
         Authentication authentication = authenticationManager.authenticate(token);
 
@@ -133,6 +145,51 @@ public class UserServiceImpl implements UserService {
     public void deleteById(Long userId) {
         userMapper.deleteById(userId); // 실제 삭제
         // 또는 user.setEnabled(0); 저장으로 soft-delete도 가능
+    }
+
+
+
+    // 소셜 로그인 사용자 조회 및 생성
+    @Override
+    @Transactional
+    public Users findOrCreateOAuthUser(SocialDTO dto) {
+        Users user = userMapper.findByProviderAndProviderId(dto.getProvider(), dto.getProviderId());
+        if (user != null) {
+            // 이미 가입된 경우, 권한 정보까지 포함해서 다시 조회
+            try {
+                return userMapper.select(user.getEmail());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        // 신규 소셜 회원 등록
+        Users newUser = Users.builder()
+                .email(dto.getEmail())
+                .nickname(dto.getNickname())
+                .provider(dto.getProvider())
+                .providerId(dto.getProviderId())
+                .password(UUID.randomUUID().toString()) // 소셜 로그인시 랜덤 UUID로 임시 비밀번호 생성
+                .build();
+        userMapper.insertSocialUser(newUser);
+
+        // 권한 등록
+        UserAuth userAuth = new UserAuth();
+        userAuth.setEmail(newUser.getEmail());
+        userAuth.setAuth("ROLE_USER");
+        try {
+            userMapper.insertAuth(userAuth);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 권한 정보까지 포함된 user 객체 다시 조회
+        try {
+            return userMapper.select(newUser.getEmail());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
