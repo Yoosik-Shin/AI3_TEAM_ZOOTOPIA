@@ -4,28 +4,53 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.aloha.zootopia.mapper.InsuranceProductMapper">
 
-    <!-- 등록 -->
-    <select id="getProduct" resultType="com.aloha.zootopia.domain.InsuranceProduct">
-    SELECT 
-        product_id,
-        name,
-        slogan,
-        coverage_percent,
-        monthly_fee_range,
-        max_coverage,
-        species,
-        join_condition,    -- 가입조건
-        coverage_items,    -- 보장항목
-        precautions,       -- 유의사항
-        created_at
-    FROM insurance_product
-    WHERE product_id = #{productId}
-    </select>
+    <!-- 1. 등록 -->
+    <insert id="insertProduct" parameterType="com.aloha.zootopia.domain.InsuranceProduct">
+        INSERT INTO insurance_product (
+            name,
+            slogan,
+            coverage_percent,
+            monthly_fee_range,
+            max_coverage,
+            species,
+            join_condition,
+            coverage_items,
+            precautions,
+            image_path,
+            created_at
+        )
+        VALUES (
+            #{name},
+            #{slogan},
+            #{coveragePercent},
+            #{monthlyFeeRange},
+            #{maxCoverage},
+            #{species},
+            #{joinCondition},
+            #{coverageItems},
+            #{precautions},
+            #{imagePath},
+            NOW()
+        )
+    </insert>
+
 
     <!-- 목록 -->
     <select id="selectAllProducts" resultType="com.aloha.zootopia.domain.InsuranceProduct">
         SELECT * FROM insurance_product
         ORDER BY created_at DESC
+    </select>
+
+    <select id="selectProductsPaged" resultType="com.aloha.zootopia.domain.InsuranceProduct">
+        SELECT *
+        FROM insurance_product
+        ORDER BY created_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 개수 조회 -->
+    <select id="countAllProducts" resultType="int">
+        SELECT COUNT(*) FROM insurance_product
     </select>
 
     <!-- 상세 -->
@@ -34,19 +59,20 @@
         WHERE product_id = #{productId}
     </select>
 
-    <!-- 수정 -->
-    <update id="updateProduct">
+    <!-- 6. 수정 -->
+    <update id="updateProduct" parameterType="com.aloha.zootopia.domain.InsuranceProduct">
         UPDATE insurance_product
         SET
-          name = #{name},
-          slogan=#{slogan},
-          coverage_percent = #{coveragePercent},
-          monthly_fee_range = #{monthlyFeeRange},
-          max_coverage = #{maxCoverage},
-          species = #{species},
-          join_condition = #{joinCondition},
-          coverage_items = #{coverageItems},
-          precautions = #{precautions}
+            name = #{name},
+            slogan = #{slogan},
+            coverage_percent = #{coveragePercent},
+            monthly_fee_range = #{monthlyFeeRange},
+            max_coverage = #{maxCoverage},
+            species = #{species},
+            join_condition = #{joinCondition},
+            coverage_items = #{coverageItems},
+            precautions = #{precautions},
+            image_path = #{imagePath}
         WHERE product_id = #{productId}
     </update>
 

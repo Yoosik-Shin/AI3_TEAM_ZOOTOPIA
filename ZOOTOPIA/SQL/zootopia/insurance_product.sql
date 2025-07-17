@@ -9,7 +9,8 @@ species ENUM('dog', 'cat', 'all') DEFAULT 'all',       -- 보험 대상
 join_condition TEXT,                                   -- 가입조건
 coverage_items TEXT,                                   -- 보장항목
 precautions TEXT,                                      -- 유의사항
-created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+image_path VARCHAR(255)
 );
 
 CREATE TABLE insurance_qna (
@@ -25,3 +26,17 @@ CREATE TABLE insurance_qna (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
     ON DELETE CASCADE
 );
+
+ALTER TABLE insurance_product MODIFY name VARCHAR(255) CHARACTER SET utf8mb4;
+ALTER TABLE insurance_product MODIFY slogan VARCHAR(255) CHARACTER SET utf8mb4;
+
+ALTER TABLE insurance_product CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER DATABASE aloha CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+
+SHOW CREATE TABLE insurance_product;
+
+SELECT DEFAULT_CHARACTER_SET_NAME 
+FROM information_schema.SCHEMATA 
+WHERE SCHEMA_NAME = 'aloha';

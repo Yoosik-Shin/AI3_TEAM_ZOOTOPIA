@@ -8,8 +8,7 @@
             <!-- Logo -->
             <a class="navbar-brand" href="/" style="text-decoration: none;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="/img/zootopialogo.png" alt="Zootopia Logo"
-                    style="width: 120px; height: 100px; object-fit: contain;">
+                    <img src="/img/zootopialogo.png" alt="Zootopia Logo" style="width: 120px; height: 100px;">
 
                 </div>
             </a>
@@ -126,10 +125,10 @@
                 <a href="#" class="text-secondary me-4" style="display: inline-block;"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
 
                 <!-- 로그인 전 버튼들 -->
-                <div th:if="${#authentication.name == 'anonymousUser'}" class="d-flex align-items-center">
-                    <a href="/login" class="btn me-2"
+                <div th:if="${#authentication.name == 'anonymousUser'}" class="header-login-btn-container d-flex align-items-center">
+                    <a href="/login" class="header-login-btn btn me-2"
                        style="background-color: #F27A7A; border: 1px solid #F27A7A; color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 60px;">로그인</a>
-                    <a href="/join" class="btn"
+                    <a href="/join" class="header-signup-btn btn"
                        style="background-color: transparent; border: 1px solid #F27A7A; color: #F27A7A; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 70px;">회원가입</a>
                 </div>
 

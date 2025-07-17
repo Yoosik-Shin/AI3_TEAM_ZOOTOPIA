@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.aloha.zootopia.domain.CustomUser;
+
 import com.aloha.zootopia.domain.Users;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class GlobalControllerAdvice {
                 model.addAttribute("profileImg", user.getProfileImg() != null ? user.getProfileImg() : "/img/default-profile.png");
                 log.info("User added to model: {}", user.getNickname());
             }
+
         }
     }
 }
