@@ -18,7 +18,10 @@
     <!-- Footer CSS -->
     <link rel="stylesheet" href="/assets/dist/css/footer.css">
     <!-- Join CSS only -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <link rel="stylesheet" href="/assets/dist/css/join.css">
+    <!-- Header CSS -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
 
 </head>
 <body class="join-page">
@@ -80,8 +83,9 @@
     </div>
     <div th:replace="fragments/footer :: footer"></div>
 
+    <script th:src="@{/assets/dist/js/header.js}"></script>
     <!-- bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <script th:src="@{/assets/dist/js/header.js}"></script>
 </body>
 </html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>보험상품 수정</title>
+      <!-- bootstrap css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Login CSS only -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
+    <link rel="stylesheet" href="/assets/dist/css/login.css">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
+  <style>
+    .btn1 {
+      border: 1px solid #F27A7A;
+      background-color: #F27A7A;
+      color: white;
+      border-radius: 6px;
+      min-width: 60px;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+  <div class="container pt-5 pb-3 d-flex justify-content-center mt-5 mb-1">
+    <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 700px; border-radius: 5px; min-height: 750px;" >
+      <h3 class="text-center mb-5 mt-3">보험상품 수정</h3>
+      <form id="productForm" method="post" th:action="@{/insurance/update}" enctype="multipart/form-data">
+        <input type="hidden" name="productId" th:value="${product.productId}">
+        <div class="mb-3 row align-items-center">
+          <label for="product" class="col-sm-4 col-form-label fw-bold">상품명 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="product" name="name" th:value="${product.name}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="slogan" class="col-sm-4 col-form-label fw-bold">슬로건 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="slogan" name="slogan" th:value="${product.slogan}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="inrate" class="col-sm-4 col-form-label fw-bold">보장비율 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="inrate" name="coveragePercent" th:value="${product.coveragePercent}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="monthly" class="col-sm-4 col-form-label fw-bold">월 보험료 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="monthly" name="monthlyFeeRange" th:value="${product.monthlyFeeRange}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="maxlimit" class="col-sm-4 col-form-label fw-bold">최대 보장 한도 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="maxlimit" name="maxCoverage" th:value="${product.maxCoverage}">
+          </div>
+        </div>
+        <div class="row mb-3 align-items-center">
+        <label for="species" class="col-sm-4 col-form-label fw-bold">반려동물 :</label>
+        <div class="col-sm-8">
+            <select class="form-select" id="species" aria-label="반려동물 선택" name="species">
+            <option selected>선택하세요.</option>
+            <option value="dog" th:selected="${product.species == 'dog'}">강아지</option>
+            <option value="cat" th:selected="${product.species == 'cat'}">고양이</option>
+            <option value="all" th:selected="${product.species == 'all'}">둘다</option>
+            </select>
+        </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="joinCondition" class="col-sm-4 col-form-label fw-bold" >가입조건 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="joinCondition" name="joinCondition" th:value="${product.joinCondition}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="coverageItems" class="col-sm-4 col-form-labelfw-bold" >보장항목 :</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="coverageItems" name="coverageItems" th:value="${product.coverageItems}">
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="precautions" class="col-sm-4 col-form-label fw-bold" >유의사항 :</label>
+          <div class="col-sm-8">
+            <textarea class="form-control" id="precautions" name="precautions" rows="3" th:text="${product.precautions}"></textarea>
+          </div>
+        </div>
+        <div class="mb-3 row align-items-center">
+          <label for="imageFile" class="col-sm-4 col-form-label fw-bold">상품 이미지 :</label>
+        <div class="col-sm-8">
+          <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*">
+        </div>
+        </div>
+
+        <div class="text-center mt-5">
+          <a th:href="@{/insurance/read/{id}(id=${product.productId})}" class="btn1" style="text-decoration: none; padding: 6px 14px; display: inline-block; line-height: 25px;">취소</a>
+          <button type="submit" class="btn1 ">수정</button>
+        </div>
+      </form>
+      
+      <form th:action="@{/insurance/delete/{id}(id=${product.productId})}"
+              method="post" onsubmit="return confirm('정말 삭제하시겠습니까?')">
+          <div class="text-end">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="btn1 btn-sm">삭제</button>
+          </div>
+      </form>
+    </div>
+  </div>
+
+    <div class="text-center mt-3 mb-5">
+      <img th:src="@{/img/zootopialogo.png}" alt="주토피아" style="width: 100px;">
+      <p class="fw-bold mt-2">주토피아 - 반려동물 플랫폼</p>
+      <p class="small">“세상의 모든 반려동물에게 더 나은 보장을!”</p>
+    </div>
+
+  <!-- 푸터 -->
+  <th:block th:replace="fragments/footer :: footer"></th:block>
+    <script th:src="@{/assets/dist/js/header.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ 유효성 검사 스크립트 -->
+<script>
+  document.getElementById('productForm').addEventListener('submit', function(e) {
+    const species = document.getElementById('species').value;
+    if (!species) {
+      alert('반려동물 종류를 선택해주세요.');
+      e.preventDefault(); // 폼 전송 중단
+    }
+  });
+</script>
+</body>
+</html>
