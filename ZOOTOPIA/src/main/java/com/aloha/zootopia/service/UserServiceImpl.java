@@ -21,11 +21,14 @@ import jakarta.servlet.http.HttpSession;
 @Service("UserService")
 public class UserServiceImpl implements UserService {
 
-    @Autowired UserMapper userMapper;
+    @Autowired 
+    UserMapper userMapper;
 
-    @Autowired PasswordEncoder passwordEncoder;
+    @Autowired 
+    PasswordEncoder passwordEncoder;
 
-    @Autowired AuthenticationManager authenticationManager;
+    @Autowired 
+    AuthenticationManager authenticationManager;
 
     /**
      * 회원가입
@@ -109,6 +112,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(userId);
     }
 
+    @Override
     public boolean checkPassword(Long userId, String rawPassword) throws Exception {
         Users user = userMapper.findUserById(userId);
         return passwordEncoder.matches(rawPassword, user.getPassword());
@@ -119,6 +123,7 @@ public class UserServiceImpl implements UserService {
         String encoded = passwordEncoder.encode(newPassword);
         return userMapper.updatePassword(userId, encoded); 
     }
+    
     @Override
     public Users findUserById(Long userId) throws Exception {
         return userMapper.findUserById(userId);
@@ -129,4 +134,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateUser(user);
     }
 
+    @Override
+    public int deleteUserAuth(String email) throws Exception {
+        return userMapper.deleteUserAuth(email);
+    }
 }

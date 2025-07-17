@@ -204,10 +204,47 @@
     text-decoration: underline;
 }
 
-/* Responsive styles for join page only */
+/* Responsive styles */
 @media (max-width: 650px) {
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
     .join-container {
         width: 90%;
         padding: 20px 30px;
+    }
+    
+    .navbar-toggler {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+    }
+    
+    .mobile-right-icons {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    /* Hide desktop navigation completely on mobile */
+    #navbarNavDesktop {
+        display: none;
+    }
+    
+    /* Hide desktop right icons */
+    .d-none.d-md-flex {
+        display: none;
     }
 }

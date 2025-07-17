@@ -82,4 +82,10 @@
             profile_img = #{profileImg}
         WHERE user_id = #{userId}
     </update>
+
+    <!-- 사용자 권한 삭제 -->
+    <delete id="deleteUserAuth">
+        DELETE FROM user_auth
+        WHERE email = #{email}
+    </delete>
 </mapper>

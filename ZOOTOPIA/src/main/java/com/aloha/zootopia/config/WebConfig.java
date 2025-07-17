@@ -1,6 +1,7 @@
 package com.aloha.zootopia.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
@@ -18,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration          // 빈 등록 설정 클래스 지정
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${file.upload.path}")
+    @Value("${app.file.upload.path}")
     private String uploadPath;
 
     @Bean                   // 빈 등록
@@ -51,10 +52,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/upload/**")
-                    .addResourceLocations("file:///" + uploadPath + "/");
-        }
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/upload/**")
+                .addResourceLocations("file:///" + uploadPath + "/");
+    }
         
     }   
 

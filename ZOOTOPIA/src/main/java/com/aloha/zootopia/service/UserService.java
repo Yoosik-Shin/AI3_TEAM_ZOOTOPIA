@@ -32,5 +32,7 @@ public interface UserService {
     Users findUserById(Long userId) throws Exception;
     
     int updateUser(Users user) throws Exception;
+    
+    int deleteUserAuth(String email) throws Exception;
 
 }

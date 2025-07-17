@@ -28,5 +28,7 @@ public interface UserMapper {
 
 
     int updateUser(Users user);
+    
+    int deleteUserAuth(@Param("email") String email);
 
 }
