@@ -243,5 +243,14 @@ let usersubMenu = document.getElementById("userSubMenu");
 function toggleUserMenu() {
     userSubMenu.classList.toggle("open-menu");
 }
+// 바깥 클릭 시 닫기
+document.addEventListener("click", function(event) {
+    const userMenu = document.querySelector(".user-menu");
+    const submenu = document.getElementById("userSubMenu");
 
+    if (!userMenu.contains(event.target)) {
+        // 클릭한 곳이 user-menu 영역 밖이면 닫음
+        submenu.classList.remove("open-menu");
+    }
+});
 
