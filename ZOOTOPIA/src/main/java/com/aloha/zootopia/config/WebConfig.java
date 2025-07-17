@@ -1,12 +1,9 @@
 package com.aloha.zootopia.config;
 
 import org.springframework.beans.factory.annotation.Value;
-<<<<<<< HEAD
 import org.springframework.lang.NonNull;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-=======
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -55,19 +52,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-<<<<<<< HEAD
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/upload/**")
                 .addResourceLocations("file:///" + uploadPath + "/");
     }
         
-=======
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/upload/**")
-                    .addResourceLocations("file:///C:/upload/");
-                    // .addResourceLocations("file:///" + uploadPath);
-        }
-     
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
     }   
 

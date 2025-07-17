@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 package com.aloha.zootopia.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,4 +29,3 @@ public class GlobalControllerAdvice {
         }
     }
 }
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96

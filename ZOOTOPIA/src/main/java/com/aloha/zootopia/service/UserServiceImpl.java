@@ -134,18 +134,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateUser(user);
     }
 
-<<<<<<< HEAD
     @Override
     public int deleteUserAuth(String email) throws Exception {
         return userMapper.deleteUserAuth(email);
     }
-=======
-
-    @Override
-    public void deleteById(Long userId) {
-        userMapper.deleteById(userId); // 실제 삭제
-        // 또는 user.setEnabled(0); 저장으로 soft-delete도 가능
-    }
-
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
 }
