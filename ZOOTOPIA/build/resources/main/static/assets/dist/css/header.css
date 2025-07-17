@@ -233,7 +233,7 @@
     flex-grow: 1;
 }
 
-.zootopia-header .main-menu {
+.main-menu {
     display: flex;
     justify-content: center;
     list-style: none;
@@ -245,7 +245,7 @@
     gap: 10px;
 }
 
-.zootopia-header .main-menu > li {
+.main-menu > li {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -254,7 +254,7 @@
     text-align: center;
 }
 
-.zootopia-header .main-menu > li > a {
+.main-menu > li > a {
     display: block;
     white-space: nowrap;
     height: 100%;
@@ -264,7 +264,7 @@
     font-size: 18px;
 }
 
-.zootopia-header #horizontal-underline {
+#horizontal-underline {
     position: absolute;
     height: 4px;
     background-color: #ff6b6b;
@@ -275,7 +275,7 @@
 }
 
 /* 서브메뉴 */
-.zootopia-header .sub-menu-panel {
+.sub-menu-panel {
     position: absolute;
     left: 0;
     right: 0;
@@ -296,18 +296,17 @@
     gap: 10px;
 }
 
-.zootopia-header .sub-menu-column {
+.sub-menu-column {
     width: 130px;
     text-align: center;
 }
-
-.zootopia-header .sub-menu {
+.sub-menu {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.zootopia-header .sub-menu li a {
+.sub-menu li a {
     text-decoration: none !important;
     color: #333;
     padding: 10px 0;
@@ -315,7 +314,7 @@
     transition: color 0.2s ease;
 }
 
-.zootopia-header .sub-menu li a:hover {
+.sub-menu li a:hover {
     color: #ff6b6b;
 }
 

@@ -36,7 +36,7 @@
 <body class="bg-light">
     <div th:replace="~{fragments/header :: header}"></div>
 
-  <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-3" style="max-width: 900px;">
+  <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-5" style="max-width: 900px;">
     <!-- 상단 보험명 -->
     <h6 class="fs-4 fw-bold mb-5 text-center">
       <span class="highlight-circle"></span>
@@ -47,7 +47,7 @@
     <div class="d-flex justify-content-center align-items-start my-5 flex-wrap" style="gap: 60px;">
       <!-- 왼쪽: 로고 + 요약 -->
       <div class="text-center">
-        <img th:src="@{${product.imagePath}}" alt="상품 이미지" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
+        <img th:src="${product.imagePath}" alt="상품 이미지" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
         <ul class="list-unstyled small text-start mt-4 mx-auto" style="max-width: 250px;">
           <li>✅ 보장 비율: <span th:text="${product.coveragePercent}">70</span>%</li>
           <li>💰 월 보험료: <span th:text="${product.monthlyFeeRange}">15,000 ~ 40,000원</span></li>
