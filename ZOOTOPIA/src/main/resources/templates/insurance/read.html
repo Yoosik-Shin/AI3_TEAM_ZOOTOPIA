@@ -7,10 +7,14 @@
   <meta name="_csrf_header" th:content="${_csrf.headerName}">
   <title>KB 펫보험 상세</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  >
+    <!-- bootstrap css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Login CSS only -->
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
+    <link rel="stylesheet" href="/assets/dist/css/login.css">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
   <style>
     .highlight-circle {
       display: inline-block;
@@ -43,7 +47,7 @@
     <div class="d-flex justify-content-center align-items-start my-5 flex-wrap" style="gap: 60px;">
       <!-- 왼쪽: 로고 + 요약 -->
       <div class="text-center">
-        <img th:src="@{/image/logo.png}" alt="보험 로고" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
+        <img th:src="@{${product.imagePath}}" alt="상품 이미지" class="img-fluid rounded mb-4" style="width: 350px; height: auto;">
         <ul class="list-unstyled small text-start mt-4 mx-auto" style="max-width: 250px;">
           <li>✅ 보장 비율: <span th:text="${product.coveragePercent}">70</span>%</li>
           <li>💰 월 보험료: <span th:text="${product.monthlyFeeRange}">15,000 ~ 40,000원</span></li>
@@ -162,9 +166,9 @@
 
   
   <div th:replace="~{fragments/footer :: footer}"></div>
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-  ></script>
+    <script th:src="@{/assets/dist/js/header.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('qnaForm');

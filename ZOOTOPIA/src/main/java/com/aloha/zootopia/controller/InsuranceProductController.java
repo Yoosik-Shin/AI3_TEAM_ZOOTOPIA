@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +30,8 @@ import com.aloha.zootopia.service.InsuranceQnaService;
 @RequestMapping("/insurance")
 public class InsuranceProductController {
 
+    @Value("${file.upload.path}")
+    private String uploadDir; 
 
     @Autowired
     private InsuranceProductService productService;
@@ -43,10 +46,11 @@ public class InsuranceProductController {
             @RequestParam(defaultValue = "6") int size,
             Model model) {
 
-        int offset = (page - 1) * size;
+        int offset = Math.max((page - 1) * size, 0);
         List<InsuranceProduct> products = productService.getProductsPaged(offset, size);
         int totalProducts = productService.getTotalCount();
         int totalPages = (int) Math.ceil((double) totalProducts / size);
+        if (totalPages == 0) totalPages = 1;
 
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page);
@@ -72,6 +76,7 @@ public class InsuranceProductController {
         return "insurance/create"; 
     }
 
+    // 등록처리 (관리자)
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
     public String register(@ModelAttribute InsuranceProduct product,
@@ -86,11 +91,11 @@ public class InsuranceProductController {
 
             // 2. 이미지 파일 저장
             if (!imageFile.isEmpty()) {
-                String uploadDir = "src/main/resources/static/uploads/";
-                String originalFilename = imageFile.getOriginalFilename();
-                String newFileName = UUID.randomUUID() + "_" + originalFilename;
+                // String uploadDir = "src/main/resources/static/uploads/";
+                // String originalFilename = imageFile.getOriginalFilename();
+                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
-                Path uploadPath = Paths.get(uploadDir + newFileName);
+                Path uploadPath = Paths.get(uploadDir, newFileName);
                 Files.createDirectories(uploadPath.getParent());
                 Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
 
@@ -100,12 +105,34 @@ public class InsuranceProductController {
 
             // 4. DB 등록
             productService.registerProduct(product);
+            rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 성공적으로 등록되었습니다.");
             return "redirect:/insurance/list";
 
         } catch (Exception e) {
-            rttr.addFlashAttribute("errorMessage", "파일 업로드 중 오류가 발생했습니다.");
+            rttr.addFlashAttribute("errorMessage", "❌ 파일 업로드 중 오류가 발생했습니다.");
             return "redirect:/insurance/create";
         }
+    }
+
+    // 이미지 업로드 전용 (AJAX 호출용)
+    @PostMapping("/upload-image")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String uploadImage(@RequestParam("imageFile") MultipartFile imageFile, Model model) {
+        try {
+            if (!imageFile.isEmpty()) {
+                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadDir + newFileName);
+                Files.createDirectories(uploadPath.getParent());
+                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+
+                String imagePath = "/uploads/" + newFileName;
+                model.addAttribute("imagePath", imagePath); // 뷰로 전송
+                return "insurance/image-upload-success :: result"; // Thymeleaf fragment로 응답
+            }
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "이미지 업로드 실패");
+        }
+        return "insurance/image-upload-fail :: result";
     }
 
     // 수정폼 (관리자)
@@ -119,16 +146,39 @@ public class InsuranceProductController {
     // 수정처리 (관리자)
     @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
-    public String update(InsuranceProduct product) {
-        productService.updateProduct(product);
-        return "redirect:/insurance/detail/" + product.getProductId();
+    public String update(@ModelAttribute InsuranceProduct product,
+                        @RequestParam("imageFile") MultipartFile imageFile,
+                        RedirectAttributes rttr) {
+        try {
+            if (!imageFile.isEmpty()) {
+                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+                Path uploadPath = Paths.get(uploadDir + newFileName);
+                Files.createDirectories(uploadPath.getParent());
+                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+
+                product.setImagePath("/uploads/" + newFileName);
+            }
+
+            productService.updateProduct(product);
+            rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 성공적으로 수정되었습니다.");
+            return "redirect:/insurance/list";
+
+        } catch (Exception e) {
+            rttr.addFlashAttribute("errorMessage", "수정 중 오류 발생");
+            return "redirect:/insurance/update/" + product.getProductId();
+        }
     }
 
     // 삭제 (관리자)
     @PostMapping("/delete/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String delete(@PathVariable int productId) {
-        productService.deleteProduct(productId);
+    public String delete(@PathVariable int productId, RedirectAttributes rttr) {
+        try {
+            productService.deleteProduct(productId);
+            rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 삭제되었습니다.");
+        } catch (Exception e) {
+            rttr.addFlashAttribute("errorMessage", "❌ 삭제 중 오류가 발생했습니다.");
+        }
         return "redirect:/insurance/list";
     }
 }
