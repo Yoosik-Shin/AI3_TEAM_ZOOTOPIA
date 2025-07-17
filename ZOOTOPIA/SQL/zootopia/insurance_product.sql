@@ -27,3 +27,16 @@ CREATE TABLE insurance_qna (
     ON DELETE CASCADE
 );
 
+ALTER TABLE insurance_product MODIFY name VARCHAR(255) CHARACTER SET utf8mb4;
+ALTER TABLE insurance_product MODIFY slogan VARCHAR(255) CHARACTER SET utf8mb4;
+
+ALTER TABLE insurance_product CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER DATABASE aloha CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+
+SHOW CREATE TABLE insurance_product;
+
+SELECT DEFAULT_CHARACTER_SET_NAME 
+FROM information_schema.SCHEMATA 
+WHERE SCHEMA_NAME = 'aloha';
