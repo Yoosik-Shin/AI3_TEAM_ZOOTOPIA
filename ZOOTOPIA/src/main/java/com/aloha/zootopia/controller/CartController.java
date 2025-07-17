@@ -378,7 +378,7 @@ public class CartController {
     
     // 장바구니 전체 비우기
     @PostMapping("/clear")
-    public Object clearCart(HttpSession session, HttpServletRequest request) {
+    public Object clearAllCart(HttpSession session, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
             @SuppressWarnings("unchecked")

@@ -1,5 +1,8 @@
 package com.aloha.zootopia.controller;
 
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,9 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/debug")
@@ -46,7 +46,7 @@ public class DebugController {
      */
     @GetMapping("/auth")
     @ResponseBody
-    public String checkCurrentUserAuth() {
+    public String getCurrentUserAuth() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
         if (auth == null) {

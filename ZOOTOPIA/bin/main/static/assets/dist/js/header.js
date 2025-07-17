@@ -44,7 +44,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize header components
     initializeHeaderButtons();
     highlightCurrentPage();
+    initializeUserMenu();
 });
+
+// Initialize user menu functionality
+function initializeUserMenu() {
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const userMenu = document.querySelector('.user-menu');
+        const userSubMenu = document.getElementById('userSubMenu');
+        
+        if (userMenu && userSubMenu && !userMenu.contains(event.target)) {
+            userSubMenu.classList.remove('active');
+        }
+    });
+
+    // Close dropdown when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const userSubMenu = document.getElementById('userSubMenu');
+            if (userSubMenu) {
+                userSubMenu.classList.remove('active');
+            }
+        }
+    });
+}
+
+// User Menu Toggle Function
+function toggleUserMenu() {
+    const userSubMenu = document.getElementById('userSubMenu');
+    if (userSubMenu) {
+        userSubMenu.classList.toggle('active');
+    }
+}
 
 // Initialize header buttons visibility
 function initializeHeaderButtons() {
