@@ -35,4 +35,6 @@ public interface UserService {
     
     int deleteUserAuth(String email) throws Exception;
 
+    void deleteById(Long userId);
+
 }

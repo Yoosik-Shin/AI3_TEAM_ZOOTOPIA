@@ -155,7 +155,12 @@ public class PostController {
      * 게시글 작성 폼
      */
     @GetMapping("/create")
-    public String createForm(Model model) {
+    public String createForm(@AuthenticationPrincipal CustomUser user, Model model, RedirectAttributes ra) {
+
+        if (user == null) {
+            ra.addFlashAttribute("error", "로그인 후 이용 가능합니다.");
+            return "redirect:/login";
+        }
         model.addAttribute("post", new Posts());
         return "posts/create";
     }

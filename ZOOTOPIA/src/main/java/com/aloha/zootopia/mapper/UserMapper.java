@@ -31,4 +31,6 @@ public interface UserMapper {
     
     int deleteUserAuth(@Param("email") String email);
 
+    int deleteById(Long userId);
+
 }

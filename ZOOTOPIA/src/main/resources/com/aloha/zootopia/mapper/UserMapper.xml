@@ -83,9 +83,14 @@
         WHERE user_id = #{userId}
     </update>
 
+<<<<<<< HEAD
     <!-- 사용자 권한 삭제 -->
     <delete id="deleteUserAuth">
         DELETE FROM user_auth
         WHERE email = #{email}
+=======
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM users WHERE user_id = #{userId}
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
     </delete>
 </mapper>

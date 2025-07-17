@@ -5,7 +5,11 @@
         <!-- Logo -->
         <a class="navbar-brand" href="/" style="text-decoration: none;">
             <div class="header-logo-container">
+<<<<<<< HEAD
                 <img src="/assets/dist/img/zootopialogo.png" alt="Zootopia Logo" style="width: 150px;">
+=======
+                <img src="/assets/dist/img/zootopialogo.png" alt="Zootopia Logo">
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
 
             </div>
         </a>
@@ -40,11 +44,18 @@
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
+<<<<<<< HEAD
                         <li><a href="/products/listp">스토어</a></li>
                         <li><a href="/products/listp?category=용품">우리애 굿즈</a></li>
                         <li><a href="/products/listp?category=사료">우리애 먹일거</a></li>
                         <li><a href="/products/listp?category=장난감">우리애 놀거</a></li>
                         <li><a href="/products/listp?category=산책">우리애 산책</a></li>
+=======
+                        <li><a href="#">우리애 굿즈</a></li>
+                        <li><a href="#">우리애 먹일거</a></li>
+                        <li><a href="#">우리애 놀거</a></li>
+                        <li><a href="#">우리애 산책</a></li>
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
                     </ul>
 
                 </div>
@@ -93,19 +104,33 @@
             <div th:if="${#authentication.name != 'anonymousUser'}" class="d-flex gap-2 align-items-center">
                 <!-- User Dropdown Button -->
                 <div class="user-menu">
+<<<<<<< HEAD
                     <img th:src="${user?.profileImg ?: '/img/default-profile.png'}" class="user-pic"
+=======
+                    <img th:src="${profileImg}" class="user-pic"
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
                         alt="프로필" onclick="toggleUserMenu()" />
                     <div class="user-sub-menu-wrap" id="userSubMenu">
                         <div class="user-sub-menu">
                             <div class="user-info">
+<<<<<<< HEAD
                                 <img th:src="${user?.profileImg ?: '/img/default-profile.png'}"
                                     alt="프로필">
                                 <h2 th:text="${user?.nickname ?: #authentication.name}">닉네임</h2>
+=======
+                                <img th:src="${profileImg}"
+                                    alt="프로필">
+                                <h2 th:text="${nickname}">닉네임</h2>
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
                             </div>
                             <hr>
 
                             <a th:href="@{/mypage/mypage}" class="user-sub-menu-link">
+<<<<<<< HEAD
                                 <img th:src="${user?.profileImg ?: '/img/default-profile.png'}"
+=======
+                                <img th:src="${profileImg}"
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
                                     alt="프로필">
                                 <p>마이 페이지</p>
                             </a>
@@ -122,7 +147,11 @@
                 </div>
 
                 <!-- User Dropdown Button -->
+<<<<<<< HEAD
                 <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + (${user?.nickname} ?: ${#authentication.name}) + '님'"></span>
+=======
+                <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${nickname} + '님'"></span>
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
 
                 
 
@@ -131,12 +160,28 @@
                 </form>
             </div>
         </div>
+<<<<<<< HEAD
 
     </div>
 
 </nav>
 
 
+=======
+
+
+        <!-- 오른쪽: 검색/장바구니/로그인/로그아웃 -->
+        <div class="d-none d-lg-flex align-items-center" style="position: relative; z-index: 1000;">
+            <!-- 아이콘 -->
+            <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
+            <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
+
+    </div>
+
+</nav>
+
+
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
     <!-- Offcanvas -->
     <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
@@ -168,7 +213,11 @@
             </div>
             <!-- 로그아웃 버튼 (모바일용) -->
             <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name != 'anonymousUser'}">
+<<<<<<< HEAD
                 <span class="text-muted small" th:text="'환영합니다, ' + (${user?.nickname} ?: ${#authentication.name}) + '님'"></span>
+=======
+                <span class="text-muted small" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
+>>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
                 <form th:action="@{/logout}" method="post" class="m-0">
                     <button type="submit" class="btn btn-outline-danger btn-sm w-100">로그아웃</button>
                 </form>

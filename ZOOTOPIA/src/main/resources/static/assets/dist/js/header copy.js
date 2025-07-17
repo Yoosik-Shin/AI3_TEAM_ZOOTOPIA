@@ -44,39 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize header components
     initializeHeaderButtons();
     highlightCurrentPage();
-    initializeUserMenu();
 });
-
-// Initialize user menu functionality
-function initializeUserMenu() {
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(event) {
-        const userMenu = document.querySelector('.user-menu');
-        const userSubMenu = document.getElementById('userSubMenu');
-        
-        if (userMenu && userSubMenu && !userMenu.contains(event.target)) {
-            userSubMenu.classList.remove('active');
-        }
-    });
-
-    // Close dropdown when pressing Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const userSubMenu = document.getElementById('userSubMenu');
-            if (userSubMenu) {
-                userSubMenu.classList.remove('active');
-            }
-        }
-    });
-}
-
-// User Menu Toggle Function
-function toggleUserMenu() {
-    const userSubMenu = document.getElementById('userSubMenu');
-    if (userSubMenu) {
-        userSubMenu.classList.toggle('active');
-    }
-}
 
 // Initialize header buttons visibility
 function initializeHeaderButtons() {
@@ -118,7 +86,7 @@ function showSearchModal() {
 }
 
 // Header effects: Underline and active link styling
-
+document.addEventListener("DOMContentLoaded", () => {
     const mainMenuContainer = document.querySelector('.main-menu-container');
     const subMenuPanel = document.querySelector('.sub-menu-panel');
     const horizontalUnderline = document.getElementById('horizontal-underline');
@@ -251,7 +219,7 @@ function showSearchModal() {
     }
 
     initialize();
-
+});
 
 // Debug function to check header elements
 function debugHeader() {
@@ -269,20 +237,6 @@ window.addEventListener('load', function() {
 });
 
 
-// 유저 서브메뉴 패널 오픈
-let usersubMenu = document.getElementById("userSubMenu");
 
-function toggleUserMenu() {
-    userSubMenu.classList.toggle("open-menu");
-}
-// 바깥 클릭 시 닫기
-document.addEventListener("click", function(event) {
-    const userMenu = document.querySelector(".user-menu");
-    const submenu = document.getElementById("userSubMenu");
 
-    if (!userMenu.contains(event.target)) {
-        // 클릭한 곳이 user-menu 영역 밖이면 닫음
-        submenu.classList.remove("open-menu");
-    }
-});
 
