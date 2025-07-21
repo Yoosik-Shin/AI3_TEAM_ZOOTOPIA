@@ -59,7 +59,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/user", "/user/**").hasAnyRole("USER","ADMIN")
-
+                                .requestMatchers("/products/create", "/products/create/**").hasRole("ADMIN") // 상품 등록은 관리자만
 
                                 .requestMatchers("/images/**", "/img/**", "/upload/**").permitAll()
                                 .requestMatchers("/hospitals", "/hospitals/detail/**").permitAll()

@@ -1,89 +1,178 @@
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<body>
-    <!-- Header Fragment -->
-    <nav th:fragment="header" class="navbar navbar-expand-lg navbar-light bg-white border-bottom" style="height: 120px; padding: 10px 0;">
-        <div class="container-fluid px-4">
-            <!-- Logo -->
-            <a class="navbar-brand" href="/" style="text-decoration: none;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="/img/zootopialogo.png" alt="Zootopia Logo" 
-                         style="width: 150px; height: 150px; object-fit: contain;">
-                       
-                </div>
-            </a>
+<!-- header.html -->
 
-            <!-- Mobile Toggle Button -->
-            <!-- <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button> -->
+<nav th:fragment="header" class="zootopia-header-wrapper navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="header-container container-fluid px-4" style="height: 100px; padding: 10px 0;">
+        <!-- Logo -->
+        <a class="navbar-brand" href="/" style="text-decoration: none;">
+            <div class="header-logo-container">
+                <img src="/assets/dist/img/zootopialogo.png" alt="Zootopia Logo" style="width: 150px;">
 
-            <!-- Navigation - Center (Desktop) -->
-            <div class="navbar-nav mx-auto d-none d-lg-flex">
-                <a class="nav-link" href="/" style="padding: 8px 16px;">홈</a>
-                <a class="nav-link" href="/products/listp" style="padding: 8px 16px;">스토어</a>
-                <a class="nav-link" href="#" style="padding: 8px 16px;">내 주변 찾기</a>
-                <a class="nav-link" href="#" style="padding: 8px 16px;">서비스</a>
-                <a class="nav-link" th:href="@{/posts/list}" style="padding: 8px 16px;">커뮤니티</a>
             </div>
+        </a>
 
-            <!-- Mobile Navigation Menu -->
-            <!-- <div class="collapse navbar-collapse d-lg-none" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">홈</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products/listp">스토어</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">내 주변 찾기</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">서비스</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">커뮤니티</a>
-                    </li>
-                </ul> -->
-                <!-- 모바일 로그인/로그아웃 버튼 -->
-                <!-- <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name == 'anonymousUser'}">
-                    <a href="/login" class="btn btn-outline-primary btn-sm">로그인</a>
-                    <a href="/join" class="btn btn-primary btn-sm">회원가입</a>
-                </div>
-                <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name != 'anonymousUser'}">
-                    <span class="text-muted small" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
-                    <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">로그아웃</button>
-                    </form>
-                </div>
-            </div> -->
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <!-- Right Side - Icons and Login Buttons (Desktop) -->
-            <div class="d-none d-lg-flex align-items-center" style="position: relative; z-index: 1000;">
-                <!-- Search and Cart Icons -->
-                <a href="#" class="text-secondary me-3" style="display: inline-block;"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
-                <a href="#" class="text-secondary me-4" style="display: inline-block;"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
-                
-                <!-- 로그인 전 버튼들 -->
-                <div th:if="${#authentication.name == 'anonymousUser'}" class="d-flex align-items-center">
-                    <a href="/login" class="btn me-2" 
-                       style="background-color: #F27A7A; border: 1px solid #F27A7A; color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 60px;">로그인</a>
-                    <a href="/join" class="btn" 
-                       style="background-color: transparent; border: 1px solid #F27A7A; color: #F27A7A; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; text-decoration: none; white-space: nowrap; display: inline-block; min-width: 70px;">회원가입</a>
+        <!-- 메인 메뉴 -->
+        <div class="main-menu-container">
+            <ul class="main-menu navbar-nav mx-auto d-none d-lg-flex">
+                <div id="horizontal-underline"></div>
+                <li><a class="nav-link" href="#">홈</a></li>
+                <li><a class="nav-link" href="/products/listp">스토어</a></li>
+                <li><a class="nav-link" href="#">내 주변 찾기</a></li>
+                <li><a class="nav-link" href="#">서비스</a></li>
+                <li><a class="nav-link" th:href="@{/posts/list}">커뮤니티</a></li>
+            </ul>
+
+            <!-- 서브메뉴 -->
+            <div class="sub-menu-panel">
+                <div class="sub-menu-column">
+                    <ul class="sub-menu">
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                        <li><a href="#"></a></li>
+                    </ul>
+
                 </div>
-                
-                <!-- 로그인 후 버튼들 -->
-                <div th:if="${#authentication.name != 'anonymousUser'}" class="d-flex align-items-center">
-                    <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${#authentication.name} + '님'"></span>
-                    <form th:action="@{/logout}" method="post" class="m-0">
-                        <button type="submit" class="btn" 
-                                style="background-color: #F27A7A; border: 1px solid #F27A7A; color: white; padding: 8px 16px; font-size: 0.9rem; border-radius: 6px; white-space: nowrap; min-width: 70px;">로그아웃</button>
-                    </form>
+                <div class="sub-menu-column">
+                    <ul class="sub-menu">
+                        <li><a href="#">우리애 굿즈</a></li>
+                        <li><a href="#">우리애 먹일거</a></li>
+                        <li><a href="#">우리애 놀거</a></li>
+                        <li><a href="#">우리애 산책</a></li>
+                    </ul>
+
+                </div>
+                <div class="sub-menu-column">
+                    <ul class="sub-menu">
+                        <li><a href="#">동물원 / 아쿠아리움</a></li>
+                        <li><a href="#">병원 찾기</a></li>
+                        <li><a href="#">Pet Shop</a></li>
+                        <li><a href="#">임시 보호소</a></li>
+                    </ul>
+
+                </div>
+                <div class="sub-menu-column">
+                    <ul class="sub-menu">
+
+                        <li><a th:href="@{/insurance/list}">보험</a></li>
+                        <li><a th:href="@{/parttime/list}">펫 시터</a></li>
+                        <li><a href="/hospitals">추천 병원</a></li>
+                        <li><a href="/service/funeral/procedure">Crossing Rainbow</a></li>
+                    </ul>
+                </div>
+                <div class="sub-menu-column">
+                    <ul class="sub-menu">
+                        <li><a th:href="@{/posts/list}">커뮤니티</a></li>
+                        <li><a th:href="@{/showoff/list}">자랑게시판</a></li>
+                        <li><a th:href="@{/lost/list}">유실동물게시판</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </nav>
-</body>
-</html>
+
+        <!-- 오른쪽: 검색/장바구니/로그인/로그아웃 -->
+        <div class="d-none d-lg-flex align-items-center" style="position: relative; z-index: 1000;">
+            <!-- 아이콘 -->
+            <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
+            <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
+
+            <!-- 로그인 전 -->
+            <div th:if="${#authentication.name == 'anonymousUser'}"
+                class="header-login-btn-container d-flex align-items-center">
+                <a href="/login" class="header-login-btn btn me-2 btn-signup">로그인</a>
+                <a href="/join" class="header-signup-btn btn btn-outline-danger">회원가입</a>
+            </div>
+
+            <!-- 로그인 후 -->
+            <div th:if="${#authentication.name != 'anonymousUser'}" class="d-flex gap-2 align-items-center">
+                <!-- User Dropdown Button -->
+                <div class="user-menu">
+                    <img th:src="${user?.profileImg ?: '/img/default-profile.png'}" class="user-pic"
+                        alt="프로필" onclick="toggleUserMenu()" />
+                    <div class="user-sub-menu-wrap" id="userSubMenu">
+                        <div class="user-sub-menu">
+                            <div class="user-info">
+                                <img th:src="${user?.profileImg ?: '/img/default-profile.png'}"
+                                    alt="프로필">
+                                <h2 th:text="${user?.nickname ?: #authentication.name}">닉네임</h2>
+                            </div>
+                            <hr>
+
+                            <a th:href="@{/mypage/mypage}" class="user-sub-menu-link">
+                                <img th:src="${user?.profileImg ?: '/img/default-profile.png'}"
+                                    alt="프로필">
+                                <p>마이 페이지</p>
+                            </a>
+                            <form th:action="@{/logout}" method="post" class="user-sub-menu-form">
+                                <button type="submit" class="user-sub-menu-logout">
+                                    <img src="/assets/dist/img/logout.png" alt="">
+                                    <p>로그아웃</p>
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- User Dropdown Button -->
+                <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + (${user?.nickname} ?: ${#authentication.name}) + '님'"></span>
+
+                
+
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-danger">로그아웃</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</nav>
+
+
+    <!-- Offcanvas -->
+    <div class="offcanvas offcanvas-end d-lg-none" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">홈</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products/listp">스토어</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">내 주변 찾기</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">서비스</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/posts/list}">커뮤니티</a>
+                </li>
+            </ul>
+            <!-- 로그인/회원가입 버튼 (모바일용) -->
+            <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name == 'anonymousUser'}">
+                <a href="/login" class="btn btn-outline-primary btn-sm">로그인</a>
+                <a href="/join" class="btn btn-primary btn-sm">회원가입</a>
+            </div>
+            <!-- 로그아웃 버튼 (모바일용) -->
+            <div class="d-flex flex-column gap-2 mt-3" th:if="${#authentication.name != 'anonymousUser'}">
+                <span class="text-muted small" th:text="'환영합니다, ' + (${user?.nickname} ?: ${#authentication.name}) + '님'"></span>
+                <form th:action="@{/logout}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+

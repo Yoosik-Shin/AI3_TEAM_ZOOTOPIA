@@ -120,9 +120,11 @@
         th:classappend="${commentItem.parentId != null} ? ' comment-reply ms-5' : ''">
         <div class="d-flex justify-content-between">
           <div class="d-flex align-items-center mb-1">
-            <img
-              th:src="${commentItem != null and commentItem.profileImg != null} ? ${commentItem.profileImg} : '/img/default-profile.png'"
-              class="profile-img rounded-circle me-2" alt="프로필" width="30" height="30">
+            <a th:href="@{'/mypage/' + ${post.user.userId}}">
+              <img
+                th:src="${commentItem != null and commentItem.profileImg != null} ? ${commentItem.profileImg} : '/img/default-profile.png'"
+                class="profile-img rounded-circle me-2" alt="프로필" width="30" height="30">
+            </a>
             <div class="fw-semibold me-2" th:text="${commentItem.nickname}">작성자</div>
             <div class="text-muted small" th:text="${#dates.format(commentItem.createdAt, 'yy-MM-dd HH:mm')}">작성일</div>
             <span class="text-muted small"
