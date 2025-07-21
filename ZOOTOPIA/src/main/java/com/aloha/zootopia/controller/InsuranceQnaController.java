@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.aloha.zootopia.domain.CustomUser;
 import com.aloha.zootopia.domain.InsuranceQna;
 import com.aloha.zootopia.domain.InsuranceQnaResponse;
 import com.aloha.zootopia.service.InsuranceQnaService;
@@ -50,8 +51,11 @@ public class InsuranceQnaController {
     @PostMapping("/register-ajax")
     @PreAuthorize("hasRole('USER')")
     @ResponseBody
-    public List<InsuranceQnaResponse> registerAjax(InsuranceQna qna, @AuthenticationPrincipal User user) {
-    qna.setUserId(Integer.parseInt(user.getUsername()));
+    public List<InsuranceQnaResponse> registerAjax(InsuranceQna qna, @AuthenticationPrincipal CustomUser customUser) {
+
+    long userId = customUser.getUser().getUserId(); // ← 여기가 핵심
+    qna.setUserId(userId);
+
     qnaService.registerQuestion(qna);
 
     return qnaService.getQnaList(qna.getProductId())
@@ -65,9 +69,9 @@ public class InsuranceQnaController {
                 dto.setAnswer(e.getAnswer());
                 dto.setUserId(e.getUserId());
                 dto.setCreatedAt(
-                    e.getCreatedAt() != null 
-                        ? e.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-                        : ""
+                        e.getCreatedAt() != null
+                                ? e.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
+                                : ""
                 );
                 return dto;
             })
