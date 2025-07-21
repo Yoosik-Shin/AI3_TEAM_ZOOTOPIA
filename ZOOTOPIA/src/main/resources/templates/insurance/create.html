@@ -9,8 +9,77 @@
     <link rel="stylesheet" href="/assets/dist/css/product-detail.css">
 </head>
 <body>
+
+  <!-- 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+  <div class="container pt-5 pb-3 d-flex justify-content-center mt-5 mb-1">
+    <div style="border: 1px solid #ffecec; padding: 20px; background-color: white; width: 100%; max-width: 700px; border-radius: 5px; min-height: 750px;" >
+      <h3 class="text-center mb-5 mt-3">보험상품 등록</h3>
+
+    <!-- ✅ 텍스트 입력 폼 -->
+    <form th:action="@{/insurance/register}" method="post">
+      <input type="hidden" name="imagePath" th:value="${imagePath}">
+
+      <div class="mb-3">
+        <label class="form-label">상품명</label>
+        <input type="text" class="form-control" name="name" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">슬로건</label>
+        <input type="text" class="form-control" name="slogan">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">보장비율</label>
+        <input type="number" class="form-control" name="coveragePercent" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">월 보험료</label>
+        <input type="text" class="form-control" name="monthlyFeeRange" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">최대 보장 한도</label>
+        <input type="number" class="form-control" name="maxCoverage" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">반려동물</label>
+        <select class="form-select" name="species" required>
+          <option value="dog">강아지</option>
+          <option value="cat">고양이</option>
+          <option value="all">둘 다</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">가입 조건</label>
+        <input type="text" class="form-control" name="joinCondition">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">보장 항목</label>
+        <input type="text" class="form-control" name="coverageItems">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">유의사항</label>
+        <textarea class="form-control" name="precautions" rows="3"></textarea>
+      </div>
+
+      <div class="text-center mt-4 mb-4 d-flex justify-content-center gap-3">
+        <a href="/insurance/list" class="btn1" style="display: inline-block; text-decoration: none; padding: 6px 14px;">취소</a>
+        <button type="submit" class="btn1">상품 등록</button>
+      </div>
+    </form>
+
+=======
     <!-- Header -->
     <div th:replace="fragments/header :: header"></div>
+
     
     <!-- Main Content -->
     <main class="container mt-5">
