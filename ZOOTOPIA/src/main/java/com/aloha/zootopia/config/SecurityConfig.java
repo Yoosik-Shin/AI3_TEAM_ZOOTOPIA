@@ -151,7 +151,10 @@ public class SecurityConfig {
         // persistent_logins 테이블 자동 생성
         // repositoryImpl.setCreateTableOnStartup(true);
         try {
-            repositoryImpl.getJdbcTemplate().execute(JdbcTokenRepositoryImpl.CREATE_TABLE_SQL);
+            org.springframework.jdbc.core.JdbcTemplate jdbcTemplate = repositoryImpl.getJdbcTemplate();
+            if (jdbcTemplate != null) {
+                jdbcTemplate.execute(JdbcTokenRepositoryImpl.CREATE_TABLE_SQL);
+            }
         } catch (Exception e) {
             log.error("persistent_logins 테이블이 이미 생성되었습니다.");
         }
