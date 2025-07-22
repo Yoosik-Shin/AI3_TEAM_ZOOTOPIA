@@ -155,7 +155,6 @@ public class UserServiceImpl implements UserService {
     public Users findOrCreateOAuthUser(SocialDTO dto) {
         Users user = userMapper.findByProviderAndProviderId(dto.getProvider(), dto.getProviderId());
         if (user != null) {
-            // 이미 가입된 경우, 권한 정보까지 포함해서 다시 조회
             try {
                 return userMapper.select(user.getEmail());
             } catch (Exception e) {
@@ -163,28 +162,19 @@ public class UserServiceImpl implements UserService {
                 return null;
             }
         }
-        // 신규 소셜 회원 등록
         Users newUser = Users.builder()
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .provider(dto.getProvider())
                 .providerId(dto.getProviderId())
-                .password(UUID.randomUUID().toString()) // 소셜 로그인시 랜덤 UUID로 임시 비밀번호 생성
+                .password(passwordEncoder.encode(UUID.randomUUID().toString())) 
                 .build();
-        userMapper.insertSocialUser(newUser);
-
-        // 권한 등록
-        UserAuth userAuth = new UserAuth();
-        userAuth.setEmail(newUser.getEmail());
-        userAuth.setAuth("ROLE_USER");
         try {
+            userMapper.join(newUser);
+            UserAuth userAuth = new UserAuth();
+            userAuth.setEmail(newUser.getEmail());
+            userAuth.setAuth("ROLE_USER");
             userMapper.insertAuth(userAuth);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 권한 정보까지 포함된 user 객체 다시 조회
-        try {
             return userMapper.select(newUser.getEmail());
         } catch (Exception e) {
             e.printStackTrace();

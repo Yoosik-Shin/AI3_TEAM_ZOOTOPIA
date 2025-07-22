@@ -1,3 +1,4 @@
+/*
 package com.aloha.zootopia.config;
 
 import java.util.Map;
@@ -40,3 +41,4 @@ public class CustomUserDetails extends User implements OAuth2User {
         return user.getUserId();
     }
 }
+*/
