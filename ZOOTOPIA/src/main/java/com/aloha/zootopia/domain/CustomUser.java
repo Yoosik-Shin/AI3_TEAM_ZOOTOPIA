@@ -75,4 +75,14 @@ public class CustomUser implements UserDetails, OAuth2User {
     public Long getUserId() {
         return user.getUserId();
     }
+
+
+    public boolean hasRole(String roleName) {
+        return this.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + roleName));
+    }
+        
+
+
 }
+
