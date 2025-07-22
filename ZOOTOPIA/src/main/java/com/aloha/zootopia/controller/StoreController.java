@@ -11,6 +11,6 @@ public class StoreController {
     @GetMapping("/products")
     public String products() {
         System.out.println("=== StoreController /store/products 호출됨 ===");
-        return "products/listp_standalone";
+        return "products/listp";
     }
 }
