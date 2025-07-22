@@ -304,7 +304,7 @@
     justify-content: center;
     padding: 20px 0;
     width: 100%;
-    max-width: 750px;
+    max-width: 780px;
     margin: 0 auto;
     gap: 25px; /* 메뉴 아이템(column) 간의 간격 */
 }

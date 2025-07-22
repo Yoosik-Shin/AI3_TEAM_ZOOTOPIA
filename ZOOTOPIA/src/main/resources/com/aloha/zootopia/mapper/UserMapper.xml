@@ -37,10 +37,10 @@
     </insert>
 
     <!-- 회원 권한 등록 -->
-    <insert id="insertAuth">
+    <!-- <insert id="insertAuth">
         INSERT INTO user_auth ( email, auth )
         VALUES ( #{email}, #{auth} )
-    </insert>
+    </insert> -->
 
     <!-- 사용자 단건 조회 (by email) -->
     <select id="select" resultMap="UserMap">
@@ -93,4 +93,36 @@
         DELETE FROM users WHERE user_id = #{userId}
 >>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
     </delete>
+
+
+    <!-- 소셜 로그인 사용자 정보 조회 -->
+
+    <select id="findByProviderAndProviderId" resultMap="userWithRoles">
+        SELECT u.*, a.auth 
+        FROM users u
+        LEFT JOIN user_auth a ON u.user_id = a.user_id
+        WHERE u.provider = #{provider} AND u.provider_id = #{providerId}
+    </select>
+
+    <insert id="insertSocialUser" parameterType="com.aloha.zootopia.domain.Users">
+        INSERT INTO users (email, nickname, provider, provider_id, enabled, password)
+        VALUES (#{email}, #{nickname}, #{provider}, #{providerId}, 1, #{password})
+    </insert>
+
+    <insert id="insertAuth" parameterType="com.aloha.zootopia.domain.UserAuth">
+        INSERT INTO user_auth (email, auth) VALUES (#{email}, #{auth})
+    </insert>
+
+    <resultMap id="userWithRoles" type="com.aloha.zootopia.domain.Users">
+        <id property="userId" column="user_id"/>
+        <result property="email" column="email"/>
+        <result property="nickname" column="nickname"/>
+        <result property="provider" column="provider"/>
+        <result property="providerId" column="provider_id"/>
+        <collection property="authList" ofType="com.aloha.zootopia.domain.UserAuth">
+            <result property="auth" column="auth"/>
+        </collection>
+    </resultMap>
+
+
 </mapper>

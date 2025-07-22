@@ -1,5 +1,7 @@
 package com.aloha.zootopia.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,5 +34,18 @@ public interface UserMapper {
     int deleteUserAuth(@Param("email") String email);
 
     int deleteById(Long userId);
+
+
+    // 소셜 로그인 사용자 조회 (provider/providerId 조합)
+    Users findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
+
+    // 소셜 신규 회원 등록
+    int insertSocialUser(Users user);
+
+    // 권한 등록
+    // int insertAuth(UserAuth userAuth);
+
+    List<UserAuth> findAuthByUserId(Long userId);
+
 
 }
