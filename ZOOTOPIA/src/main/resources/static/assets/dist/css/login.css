@@ -148,8 +148,10 @@
 }
 
 .social-btn.kakao {
-    background: #FEE500;
-    color: #000;
+    /* background: #FEE500; */
+    /* color: #000; */
+    background: #0000006b;
+    color: #cfcfcfea;
 }
 
 .social-btn.naver {
@@ -158,7 +160,8 @@
 }
 
 .social-btn.facebook {
-    background: #4267B2;
+    /* background: #4267B2; */
+    background: #0000006b;
 }
 
 .social-btn:hover {

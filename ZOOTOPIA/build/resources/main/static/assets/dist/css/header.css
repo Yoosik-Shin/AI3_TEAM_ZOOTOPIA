@@ -8,7 +8,7 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-<<<<<<< HEAD
+
     height: 100px;
     display: flex;
     align-items: center;
@@ -19,8 +19,7 @@
     align-items: center;
     justify-content: space-between;
     height: 100%;
-=======
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
+
 }
 
 .zootopia-header .zootopia-brand {
@@ -293,7 +292,7 @@
     left: 0;
     right: 0;
     background-color: #fff;
-    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -2px #ff6b6b48;
     z-index: 1000;
     overflow: hidden;
     max-height: 0;
@@ -332,14 +331,14 @@
     color: #ff6b6b;
 }
 
-<<<<<<< HEAD
+
 /* User Menu Dropdown Styles */
 .user-menu {
     position: relative;
     display: inline-block;
 }
 
-=======
+
 
 
 /* 헤더 로그인 회원가입 버튼 */
@@ -377,13 +376,12 @@
     align-items: center;
     cursor: pointer;
 }
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
+
 .user-pic {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-<<<<<<< HEAD
     transition: all 0.3s ease;
     border: 2px solid #f0f0f0;
 }
@@ -549,7 +547,7 @@
         display: none;
     }
 }
-=======
+
 }
 .user-menu ul {
     width: 100%;
@@ -569,12 +567,12 @@
 .user-sub-menu-wrap {
     position: absolute;
     top: calc(100% + 10px);
-    left: 10%;
-    width: 320px;
+    left: -30px;
+    width: 320px;            
     max-height: 0px;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out, visibility 0.3s ease-in-out;
-    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -4px #ff6b6b48;
 }
 .user-sub-menu-wrap.open-menu {
     max-height: 400px;
@@ -621,7 +619,7 @@
     border: none;
     text-decoration: none;
     background: none;
-    color: #5f2121;
+    color: #000000;
     font-weight: 500;
     margin: 0;
     padding: 0; 
@@ -660,4 +658,9 @@
     font-weight: 600;
 }
 
->>>>>>> c8ee7c40081d546f03f4264704fd987d1bd05d96
+
+ /* Custom Gap */
+.gap-310px {
+  gap: 330px;
+}
+
