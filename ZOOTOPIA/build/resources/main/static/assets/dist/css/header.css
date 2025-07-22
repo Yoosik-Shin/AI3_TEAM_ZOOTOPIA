@@ -280,7 +280,7 @@
     left: 0;
     right: 0;
     background-color: #fff;
-    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -2px #ff6b6b48;
     z-index: 1000;
     overflow: hidden;
     max-height: 0;
@@ -380,12 +380,12 @@
 .user-sub-menu-wrap {
     position: absolute;
     top: calc(100% + 10px);
-    left: 10%;
-    width: 320px;
+    left: -30px;
+    width: 320px;            
     max-height: 0px;
     overflow: hidden;
     transition: max-height 0.3s ease-in-out, visibility 0.3s ease-in-out;
-    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -4px #ff6b6b48;
 }
 .user-sub-menu-wrap.open-menu {
     max-height: 400px;
@@ -432,7 +432,7 @@
     border: none;
     text-decoration: none;
     background: none;
-    color: #5f2121;
+    color: #000000;
     font-weight: 500;
     margin: 0;
     padding: 0; 
@@ -471,3 +471,7 @@
     font-weight: 600;
 }
 
+ /* Custom Gap */
+.gap-310px {
+  gap: 330px;
+}
