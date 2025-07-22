@@ -1,5 +1,6 @@
 package com.aloha.zootopia.controller;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -76,64 +77,54 @@ public class InsuranceProductController {
         return "insurance/create"; 
     }
 
-    // 등록처리 (관리자)
+    // 보험 상품 등록
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
-    public String register(@ModelAttribute InsuranceProduct product,
-                        @RequestParam("imageFile") MultipartFile imageFile,
-                        RedirectAttributes rttr) {
+    public String register(@ModelAttribute InsuranceProduct product, RedirectAttributes rttr) {
         try {
-            // 1. 유효성 검사
             if (product.getSpecies() == null || product.getSpecies().isBlank()) {
-                rttr.addFlashAttribute("errorMessage", "반려동물 종류를 반드시 선택해야 합니다.");
+                rttr.addFlashAttribute("errorMessage", "반려동물 종류를 선택하세요.");
                 return "redirect:/insurance/create";
             }
 
-            // 2. 이미지 파일 저장
-            if (!imageFile.isEmpty()) {
-                // String uploadDir = "src/main/resources/static/uploads/";
-                // String originalFilename = imageFile.getOriginalFilename();
-                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-
-                Path uploadPath = Paths.get(uploadDir, newFileName);
-                Files.createDirectories(uploadPath.getParent());
-                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-
-                // 3. DB에 저장될 경로 설정
-                product.setImagePath("/uploads/" + newFileName);  // InsuranceProduct에 imagePath 필드 필요
-            }
-
-            // 4. DB 등록
             productService.registerProduct(product);
-            rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 성공적으로 등록되었습니다.");
+            rttr.addFlashAttribute("successMessage", "✅ 등록 완료");
             return "redirect:/insurance/list";
 
         } catch (Exception e) {
-            rttr.addFlashAttribute("errorMessage", "❌ 파일 업로드 중 오류가 발생했습니다.");
+            rttr.addFlashAttribute("errorMessage", "❌ 오류 발생: " + e.getMessage());
             return "redirect:/insurance/create";
         }
     }
 
-    // 이미지 업로드 전용 (AJAX 호출용)
+
+    // ✅ 이미지 업로드 (전통적 방식)
     @PostMapping("/upload-image")
     @PreAuthorize("hasRole('ADMIN')")
-    public String uploadImage(@RequestParam("imageFile") MultipartFile imageFile, Model model) {
+    public String uploadImage(@RequestParam("imageFile") MultipartFile imageFile,
+                            RedirectAttributes redirectAttributes) {
         try {
             if (!imageFile.isEmpty()) {
-                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-                Path uploadPath = Paths.get(uploadDir + newFileName);
-                Files.createDirectories(uploadPath.getParent());
-                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+                String fileName = UUID.randomUUID() + "_" +
+                        imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
 
-                String imagePath = "/uploads/" + newFileName;
-                model.addAttribute("imagePath", imagePath); // 뷰로 전송
-                return "insurance/image-upload-success :: result"; // Thymeleaf fragment로 응답
+                Path targetPath = Paths.get(uploadDir, fileName);
+                Files.createDirectories(targetPath.getParent());
+                Files.copy(imageFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+                String imagePath = "/upload/" + fileName;
+                redirectAttributes.addFlashAttribute("imagePath", imagePath);
+                redirectAttributes.addFlashAttribute("successMessage", "✅ 이미지 업로드 성공");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "❌ 이미지 파일이 비어 있습니다.");
             }
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "이미지 업로드 실패");
+        } catch (IOException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "❌ 업로드 실패: " + e.getMessage());
         }
-        return "insurance/image-upload-fail :: result";
+
+        return "redirect:/insurance/create";
     }
+
 
     // 수정폼 (관리자)
     @GetMapping("/update/{productId}")
@@ -147,26 +138,14 @@ public class InsuranceProductController {
     @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public String update(@ModelAttribute InsuranceProduct product,
-                        @RequestParam("imageFile") MultipartFile imageFile,
-                        RedirectAttributes rttr) {
+                         RedirectAttributes rttr) {
         try {
-            if (!imageFile.isEmpty()) {
-                String newFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-                Path uploadPath = Paths.get(uploadDir + newFileName);
-                Files.createDirectories(uploadPath.getParent());
-                Files.copy(imageFile.getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-
-                product.setImagePath("/uploads/" + newFileName);
-            }
-
             productService.updateProduct(product);
-            rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 성공적으로 수정되었습니다.");
-            return "redirect:/insurance/list";
-
+            rttr.addFlashAttribute("successMessage", "✅ 수정 완료");
         } catch (Exception e) {
-            rttr.addFlashAttribute("errorMessage", "수정 중 오류 발생");
-            return "redirect:/insurance/update/" + product.getProductId();
+            rttr.addFlashAttribute("errorMessage", "❌ 수정 실패: " + e.getMessage());
         }
+        return "redirect:/insurance/list";
     }
 
     // 삭제 (관리자)

@@ -1,3 +1,4 @@
+-- Active: 1745931868686@@127.0.0.1@3306@aloha
 CREATE TABLE insurance_product (
 product_id INT AUTO_INCREMENT PRIMARY KEY,             -- 상품 고유번호
 name VARCHAR(100) NOT NULL,

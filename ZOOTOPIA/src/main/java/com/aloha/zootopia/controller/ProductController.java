@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -86,7 +87,7 @@ public class ProductController {
             pagination.setCategory(category);
             
             // 카테고리 목록 (실제 더미 데이터에 있는 카테고리로 수정)
-            List<String> categories = java.util.Arrays.asList("전체", "사료", "용품");
+            List<String> categories = java.util.Arrays.asList("전체", "사료", "용품", "장난감", "산책");
             
             // 모델에 데이터 추가
             model.addAttribute("products", products);
@@ -96,7 +97,7 @@ public class ProductController {
             model.addAttribute("currentSearch", search != null ? search : "");
             model.addAttribute("totalProducts", totalProducts);
             
-            return "products/listp_dynamic";
+            return "products/listp";
             
         } catch (Exception e) {
             System.err.println("상품 목록 조회 중 오류 발생: " + e.getMessage());
@@ -217,30 +218,20 @@ public class ProductController {
 //     }
     
 //     // 상품 등록 페이지
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/create")
     public String createForm(Model model) {
-        // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-        // if (!isAdmin()) {
-        //     model.addAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-        //     return "redirect:/products/list";
-        // }
-        
         model.addAttribute("product", new Product());
         return "products/create";
     }
     
 //     // 상품 등록 처리
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String create(Product product, 
                         @RequestParam(required = false) MultipartFile imageFile,
                         RedirectAttributes redirectAttributes) {
         try {
-            // 관리자 권한 확인 (임시로 주석 처리 - 테스트용)
-            if (!isAdmin()) {
-                redirectAttributes.addFlashAttribute("error", "관리자만 상품을 등록할 수 있습니다.");
-                return "redirect:/products/list";
-            }
-            
             // 이미지 파일 업로드 처리
             if (imageFile != null && !imageFile.isEmpty()) {
                 String imageUrl = fileUploadService.uploadFile(imageFile);
@@ -254,7 +245,7 @@ public class ProductController {
             
             if (result > 0) {
                 redirectAttributes.addFlashAttribute("success", "상품이 성공적으로 등록되었습니다.");
-                return "redirect:/products/list";
+                return "redirect:/products/listp";
             } else {
                 redirectAttributes.addFlashAttribute("error", "상품 등록에 실패했습니다.");
                 return "redirect:/products/create";
@@ -398,16 +389,6 @@ public class ProductController {
 //         return ResponseEntity.ok(response);
 //     }
     
-    // 관리자 권한 확인
-    private boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
-            String username = auth.getName();
-            return "super@admin.com".equals(username);
-        }
-        return false;
-    }
-    
     // 더미 데이터 생성 메서드 - 실제 상품 이미지 기반 (CartController에서도 사용)
     public List<Product> createDummyProducts() {
         List<Product> dummyList = new java.util.ArrayList<>();
@@ -432,14 +413,14 @@ public class ProductController {
         addProduct(dummyList, 15, "고양이 위생패드", "용품", "고양이가 편안하게 쉴 수 있는 위생패드입니다.", 25000, "/assets/dist/img/products/productcathygienepad.png");
         addProduct(dummyList, 16, "고양이 물그릇", "용품", "고양이 전용 물그릇입니다. 물이 흘러넘치지 않도록 설계되었습니다.", 12000, "/assets/dist/img/products/productcatwaterbowl.png");
         addProduct(dummyList, 17, "개 식기", "용품", "개 전용 식기입니다. 크기별로 다양하게 준비되어 있습니다.", 20000, "/assets/dist/img/products/productdogbowl.png");
-        addProduct(dummyList, 18, "개 하네스", "용품", "산책 시 사용하는 개 하네스입니다. 편안하고 안전합니다.", 35000, "/assets/dist/img/products/productdogharness.png");
+        addProduct(dummyList, 18, "개 하네스", "산책", "산책 시 사용하는 개 하네스입니다. 편안하고 안전합니다.", 35000, "/assets/dist/img/products/productdogharness.png");
         addProduct(dummyList, 19, "개 위생패드", "용품", "개가 편안하게 쉴 수 있는 위생패드입니다.", 28000, "/assets/dist/img/products/productdoghygienepad.png");
         addProduct(dummyList, 20, "개 물그릇", "용품", "개 전용 물그릇입니다. 넘어지지 않도록 바닥에 미끄럼 방지 처리가 되어 있습니다.", 15000, "/assets/dist/img/products/productdogwaterbowl.png");
-        addProduct(dummyList, 21, "위생 플라스틱 봉투", "용품", "산책 시 사용하는 배변봉투입니다. 친환경 소재로 만들어졌습니다.", 8000, "/assets/dist/img/products/producthygieneplasticbag.png");
+        addProduct(dummyList, 21, "위생 플라스틱 봉투", "산책", "산책 시 사용하는 배변봉투입니다. 친환경 소재로 만들어졌습니다.", 8000, "/assets/dist/img/products/producthygieneplasticbag.png");
         addProduct(dummyList, 22, "위생 화장실", "용품", "반려동물 전용 화장실입니다. 냄새 차단과 청소가 쉬운 디자인으로 제작되었습니다.", 45000, "/assets/dist/img/products/producthygienetoilet.png");
         addProduct(dummyList, 23, "펫 침대", "용품", "반려동물이 편안하게 잠들 수 있는 침대입니다.", 65000, "/assets/dist/img/products/productpetbed.png");
         addProduct(dummyList, 24, "펫 케이지", "용품", "반려동물용 케이지입니다. 안전하고 통풍이 잘 됩니다.", 120000, "/assets/dist/img/products/productpetcage.png");
-        addProduct(dummyList, 25, "펫 캐리어", "용품", "반려동물과 함께 외출할 때 사용하는 캐리어입니다.", 85000, "/assets/dist/img/products/productpetcarriage.png");
+        addProduct(dummyList, 25, "펫 캐리어", "산책", "반려동물과 함께 외출할 때 사용하는 캐리어입니다.", 85000, "/assets/dist/img/products/productpetcarriage.png");
         addProduct(dummyList, 26, "펫 빗", "용품", "반려동물의 털을 정리하는 빗입니다.", 22000, "/assets/dist/img/products/productpetcomb.png");
         addProduct(dummyList, 27, "펫 쿠션", "용품", "반려동물이 편안하게 쉴 수 있는 쿠션입니다.", 35000, "/assets/dist/img/products/productpetcousion.png");
         addProduct(dummyList, 28, "펫 발톱깎이", "용품", "반려동물의 발톱을 안전하게 깎을 수 있는 도구입니다.", 15000, "/assets/dist/img/products/productpetcutter.png");
@@ -447,6 +428,20 @@ public class ProductController {
         addProduct(dummyList, 30, "펫 하우스", "용품", "반려동물을 위한 집입니다. 실내외 모두 사용 가능합니다.", 150000, "/assets/dist/img/products/productpethouse.png");
         addProduct(dummyList, 31, "펫 목걸이", "용품", "반려동물용 목걸이입니다. 이름표를 달 수 있습니다.", 25000, "/assets/dist/img/products/productpetnecklace.png");
         addProduct(dummyList, 32, "펫 샴푸", "용품", "반려동물 전용 샴푸입니다. 피부에 자극이 적습니다.", 28000, "/assets/dist/img/products/productpetshampoo.png");
+        
+        // 장난감 상품들 추가
+        addProduct(dummyList, 33, "강아지 공", "장난감", "강아지가 좋아하는 탱탱볼입니다. 씹어도 안전합니다.", 12000, "/assets/dist/img/products/toydogball.png");
+        addProduct(dummyList, 34, "고양이 낚시대", "장난감", "고양이와 함께 놀 수 있는 낚시대 장난감입니다.", 15000, "/assets/dist/img/products/toycatfishingrod.png");
+        addProduct(dummyList, 35, "펫 로프", "장난감", "반려동물과 줄다리기를 할 수 있는 로프입니다.", 8000, "/assets/dist/img/products/toypetrope.png");
+        addProduct(dummyList, 36, "스마트 레이저 포인터", "장난감", "고양이가 좋아하는 레이저 포인터입니다.", 18000, "/assets/dist/img/products/toylaserpointer.png");
+        addProduct(dummyList, 37, "츄잉 본", "장난감", "개가 씹어도 안전한 뼈 모양 장난감입니다.", 20000, "/assets/dist/img/products/toychewingbone.png");
+        
+        // 산책 상품들 추가
+        addProduct(dummyList, 38, "강아지 목줄", "산책", "산책 시 사용하는 강아지 목줄입니다.", 22000, "/assets/dist/img/products/walkdogleash.png");
+        addProduct(dummyList, 39, "LED 목걸이", "산책", "야간 산책 시 안전을 위한 LED 목걸이입니다.", 25000, "/assets/dist/img/products/walklednecklace.png");
+        addProduct(dummyList, 40, "펫 운동화", "산책", "반려동물 발가락 보호를 위한 운동화입니다.", 35000, "/assets/dist/img/products/walkpetshoes.png");
+        addProduct(dummyList, 41, "휴대용 물병", "산책", "산책 시 사용하는 반려동물 전용 물병입니다.", 18000, "/assets/dist/img/products/walkwaterbottle.png");
+        addProduct(dummyList, 42, "산책 가방", "산책", "산책 시 필요한 용품을 담을 수 있는 가방입니다.", 32000, "/assets/dist/img/products/walkpetbag.png");
         
         return dummyList;
     }

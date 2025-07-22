@@ -9,6 +9,6 @@ public class InsuranceQnaResponse {
     private String species;
     private String question;
     private String answer;
-    private int userId;
+    private long userId;
     private String createdAt;  // 문자열로 포맷
 }

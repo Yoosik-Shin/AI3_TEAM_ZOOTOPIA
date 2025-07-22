@@ -243,7 +243,7 @@ public class ParttimeJobController {
 
     // 수정 처리
     @PostMapping("/update")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public String updateJob(ParttimeJob job, @AuthenticationPrincipal CustomUser user) {
         Long currentUserId = user.getUserId();
         ParttimeJob existingJob = jobService.getJob(job.getJobId());
