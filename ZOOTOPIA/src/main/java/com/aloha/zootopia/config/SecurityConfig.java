@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import com.aloha.zootopia.security.CustomAccessDeniedHandler;
+import com.aloha.zootopia.security.CustomLogoutSuccessHandler;
 import com.aloha.zootopia.security.LoginFailureHandler;
 import com.aloha.zootopia.security.LoginSuccessHandler;
 import com.aloha.zootopia.service.UserDetailServiceImpl;
@@ -45,10 +46,16 @@ public class SecurityConfig {
     @Autowired
     private CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    @Autowired
+    private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
 
     // 🔐 스프링 시큐리티 설정 메소드
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomOAuth2UserService customOAuth2UserService) throws Exception {
 
         http.csrf(csrf -> csrf
                                 .ignoringRequestMatchers("/hospitals/new", "/hospitals/edit")
@@ -71,19 +78,24 @@ public class SecurityConfig {
                                 .requestMatchers("/lost/upload/image").permitAll()
                                 .requestMatchers("/images/**", "/**").permitAll()
 
-                                 .requestMatchers("/mypage/**").authenticated()
+                                .requestMatchers("/mypage/**").authenticated()
 
                                 .requestMatchers(HttpMethod.GET, "/hospitals/{hospitalId}/reviews").permitAll() // 추가
+
+                                .requestMatchers("/", "/login", "/css/**", "/js/**", "/img/**").permitAll() // 🔐 OAuth2 로그인 설정 (네이버)
                                 .anyRequest().permitAll()
                                 );
+        // 🔐 OAuth2 로그인 설정 (네이버)
+        http.oauth2Login(oauth2 -> oauth2
+                            .loginPage("/login") // 사용자 정의 로그인 페이지
+                            .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                            .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 경로
+            );
         http.csrf(csrf -> csrf
             .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
             .ignoringRequestMatchers("/lost/upload/image") // ✅ CSRF 무시 설정
-        );
-
-                        
-
-
+            );
 
 
         // 🔐 폼 로그인
@@ -121,10 +133,9 @@ public class SecurityConfig {
         // 🔓 로그아웃 설정
         http.logout(logout -> logout
                             .logoutUrl("/logout")   // 로그아웃 요청 경로
-                            .logoutSuccessUrl("/login?logout=true") // 로그아웃 성공 시 URL
                             .invalidateHttpSession(true)        // 세션 초기화
                             .deleteCookies("remember-id")       // 로그아웃 시, 아이디저장 쿠키 삭제
-                            // .logoutSuccessHandler(null)         // 로그아웃 성공 핸들러 설정
+                            .logoutSuccessHandler(customLogoutSuccessHandler) // ✅ 커스텀 핸들러 등록
                     );
 
         return http.build();

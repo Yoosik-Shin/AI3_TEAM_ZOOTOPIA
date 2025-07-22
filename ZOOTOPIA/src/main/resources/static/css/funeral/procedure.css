@@ -3,26 +3,42 @@
     a { text-decoration: none; color: black; }  
 
     body {
-        background-image: url('/img/background/funeral_background.jpg'); /* 이미지 경로 */
-        background-size: 1920px 2500px;  /* 화면에 꽉 차게 */
+        background-image: url('/img/background/funeral_background1.jpg'); /* 이미지 경로 */
+        background-size: cover;  /* 화면에 꽉 차게 */
+        background-position: center;
         background-repeat: no-repeat; /* 반복 안 함 */
+        background-attachment: fixed;
     }
+
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(110, 110, 110, 0.733); /* 어두운 반투명 레이어 */
+        z-index: -1;
+}
+
 
     .procedure-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 350px;
+        margin-top: 150px;
     }
     .main-content {
         display: flex;
         flex-direction: column;
         box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
-        background-color: rgba(0, 0, 0, 0.04);
+        background-color: rgba(255, 255, 255, 0.247);
         justify-content: center;
         align-items: center;
         padding-left: 25px;
         padding-right: 25px;
+        padding-bottom: 25px;
+        margin-bottom: 150px;
         width: 730px;
         user-select: none;
     }

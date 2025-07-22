@@ -283,7 +283,11 @@
     justify-content: center; /* 중앙 정렬 */
     padding: 20px 0;
     width: 100%;
+
+    max-width: 780px;
+
     max-width: 690px;
+
     margin: 0 auto;
     gap: 10px; /* 메뉴 아이템 간의 간격 */
 }

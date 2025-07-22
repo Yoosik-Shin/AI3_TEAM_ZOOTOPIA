@@ -46,7 +46,7 @@
                     <button type="submit" style="display:none;">검색</button>
                 </form>
                 <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-left: auto;">
-                    <a th:href="@{/hospitals/new}" class="btn btn-primary" style="white-space: nowrap;">병원 등록</a>
+                    <a th:href="@{/hospitals/create}" class="btn btn-primary" style="white-space: nowrap;">병원 등록</a>
                 </div>
             </div>
 
