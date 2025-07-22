@@ -25,17 +25,17 @@ import jakarta.servlet.http.HttpSession;
 @Service("UserService")
 public class UserServiceImpl implements UserService {
 
-    @Autowired UserMapper userMapper;
+    @Autowired 
+    UserMapper userMapper;
 
-    @Autowired PasswordEncoder passwordEncoder;
+    @Autowired 
+    PasswordEncoder passwordEncoder;
+
 
     // @Autowired AuthenticationManager authenticationManager;
 
     @Autowired
     private ApplicationContext context;
-    
-
-
 
 
     /**
@@ -121,6 +121,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(userId);
     }
 
+    @Override
     public boolean checkPassword(Long userId, String rawPassword) throws Exception {
         Users user = userMapper.findUserById(userId);
         return passwordEncoder.matches(rawPassword, user.getPassword());
@@ -131,6 +132,7 @@ public class UserServiceImpl implements UserService {
         String encoded = passwordEncoder.encode(newPassword);
         return userMapper.updatePassword(userId, encoded); 
     }
+    
     @Override
     public Users findUserById(Long userId) throws Exception {
         return userMapper.findUserById(userId);
@@ -141,14 +143,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateUser(user);
     }
 
-
     @Override
-    public void deleteById(Long userId) {
-        userMapper.deleteById(userId); // 실제 삭제
-        // 또는 user.setEnabled(0); 저장으로 soft-delete도 가능
+    public int deleteUserAuth(String email) throws Exception {
+        return userMapper.deleteUserAuth(email);
     }
-
-
 
 
     // 소셜 로그인 사용자 조회 및 생성
@@ -157,7 +155,6 @@ public class UserServiceImpl implements UserService {
     public Users findOrCreateOAuthUser(SocialDTO dto) {
         Users user = userMapper.findByProviderAndProviderId(dto.getProvider(), dto.getProviderId());
         if (user != null) {
-            // 이미 가입된 경우, 권한 정보까지 포함해서 다시 조회
             try {
                 return userMapper.select(user.getEmail());
             } catch (Exception e) {
@@ -165,28 +162,19 @@ public class UserServiceImpl implements UserService {
                 return null;
             }
         }
-        // 신규 소셜 회원 등록
         Users newUser = Users.builder()
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .provider(dto.getProvider())
                 .providerId(dto.getProviderId())
-                .password(UUID.randomUUID().toString()) // 소셜 로그인시 랜덤 UUID로 임시 비밀번호 생성
+                .password(passwordEncoder.encode(UUID.randomUUID().toString())) 
                 .build();
-        userMapper.insertSocialUser(newUser);
-
-        // 권한 등록
-        UserAuth userAuth = new UserAuth();
-        userAuth.setEmail(newUser.getEmail());
-        userAuth.setAuth("ROLE_USER");
         try {
+            userMapper.join(newUser);
+            UserAuth userAuth = new UserAuth();
+            userAuth.setEmail(newUser.getEmail());
+            userAuth.setAuth("ROLE_USER");
             userMapper.insertAuth(userAuth);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 권한 정보까지 포함된 user 객체 다시 조회
-        try {
             return userMapper.select(newUser.getEmail());
         } catch (Exception e) {
             e.printStackTrace();

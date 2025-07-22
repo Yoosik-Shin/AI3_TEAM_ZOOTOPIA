@@ -98,9 +98,8 @@
     cursor: pointer;
 }
 
-/* 로그인 버튼 - 로그인 페이지 내에서만 적용되도록 범위 제한 */
-.login-page .login-container .btn-login,
-.login-page .login-container button.btn.btn-primary.btn-login {
+/* 로그인 버튼 - Bootstrap 덮어쓰기 */
+.login-page .btn-login {
     background: #ff7b7b;
     border: none;
     border-radius: 8px;
@@ -115,15 +114,13 @@
     box-shadow: none;
 }
 
-.login-page .login-container .btn-login:hover,
-.login-page .login-container button.btn.btn-primary.btn-login:hover {
+.login-page .btn-login:hover {
     background: #ff6666;
     color: white;
     border: none;
 }
 
-.login-page .login-container .btn-login:focus,
-.login-page .login-container button.btn.btn-primary.btn-login:focus {
+.login-page .btn-login:focus {
     background: #ff6666;
     color: white;
     border: none;
@@ -151,8 +148,10 @@
 }
 
 .social-btn.kakao {
-    background: #FEE500;
-    color: #000;
+    /* background: #FEE500; */
+    /* color: #000; */
+    background: #0000006b;
+    color: #cfcfcfea;
 }
 
 .social-btn.naver {
@@ -161,7 +160,8 @@
 }
 
 .social-btn.facebook {
-    background: #4267B2;
+    /* background: #4267B2; */
+    background: #0000006b;
 }
 
 .social-btn:hover {
@@ -190,12 +190,4 @@
     font-size: 0.85rem;
     margin: 20px 0 10px 0;
     display: block;
-}
-
-/* Mobile responsive design for login container only */
-@media (max-width: 650px) {
-    .login-container {
-        width: 90%;
-        padding: 20px 30px;
-    }
 }

@@ -43,8 +43,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize header components
     initializeHeaderButtons();
-    highlightCurrentPage();
+    initializeUserMenu();
+    initialize(); // Call initialize here
+
 });
+
+// Initialize user menu functionality
+function initializeUserMenu() {
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const userMenu = document.querySelector('.user-menu');
+        const userSubMenu = document.getElementById('userSubMenu');
+        
+        if (userMenu && userSubMenu && !userMenu.contains(event.target)) {
+            userSubMenu.classList.remove('active');
+        }
+    });
+
+    // Close dropdown when pressing Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const userSubMenu = document.getElementById('userSubMenu');
+            if (userSubMenu) {
+                userSubMenu.classList.remove('active');
+            }
+        }
+    });
+}
+
+// User Menu Toggle Function
+function toggleUserMenu() {
+    const userSubMenu = document.getElementById('userSubMenu');
+    if (userSubMenu) {
+        userSubMenu.classList.toggle('active');
+    }
+}
 
 // Initialize header buttons visibility
 function initializeHeaderButtons() {
@@ -172,7 +205,28 @@ function showSearchModal() {
             }
         });
 
-        // If no specific page is matched, default to the first menu item
+        // If no specific page is matched, check sub-menu items
+        if (!foundActive) {
+            const subMenuItems = document.querySelectorAll('.sub-menu li a');
+            subMenuItems.forEach(subLink => {
+                try {
+                    if (new URL(subLink.href).pathname === currentPath) {
+                        const parentMenuId = subLink.dataset.parentMenu;
+                        if (parentMenuId) {
+                            const parentMenuItem = document.getElementById(parentMenuId).querySelector('a');
+                            if (parentMenuItem) {
+                                activeLink = parentMenuItem;
+                                foundActive = true;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // In case of invalid href, just ignore
+                }
+            });
+        }
+
+        // If no specific page is matched, default to the first main menu item
         if (!foundActive && mainMenuItems.length > 0) {
             activeLink = mainMenuItems[0];
         }
@@ -202,9 +256,19 @@ function showSearchModal() {
             });
         });
 
-        // Add mouseover and mouseout listeners for sub-menu items
+        // Add click, mouseover and mouseout listeners for sub-menu items
         const subMenuItems = document.querySelectorAll('.sub-menu li a');
         subMenuItems.forEach(item => {
+            item.addEventListener("click", (e) => {
+                const parentMenuId = e.currentTarget.dataset.parentMenu;
+                if (parentMenuId) {
+                    const parentMenuItem = document.getElementById(parentMenuId).querySelector('a');
+                    if (parentMenuItem) {
+                        activeLink = parentMenuItem;
+                        setActiveStyles(activeLink);
+                    }
+                }
+            });
             item.addEventListener("mouseover", (e) => {
                 moveUnderline(e.currentTarget);
                 e.currentTarget.style.color = '#ff6b6b'; // Change color on hover
@@ -217,8 +281,6 @@ function showSearchModal() {
             });
         });
     }
-
-    initialize();
 
 
 // Debug function to check header elements
@@ -237,8 +299,9 @@ window.addEventListener('load', function() {
 });
 
 
+
 // 유저 서브메뉴 패널 오픈
-let usersubMenu = document.getElementById("userSubMenu");
+let userSubMenu = document.getElementById("userSubMenu");
 
 function toggleUserMenu() {
     userSubMenu.classList.toggle("open-menu");
@@ -253,4 +316,3 @@ document.addEventListener("click", function(event) {
         submenu.classList.remove("open-menu");
     }
 });
-

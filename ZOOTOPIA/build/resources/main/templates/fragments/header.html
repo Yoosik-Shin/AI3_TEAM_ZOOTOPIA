@@ -1,7 +1,7 @@
 <!-- header.html -->
 
 <nav th:fragment="header" class="zootopia-header-wrapper navbar navbar-expand-lg navbar-light bg-white border-bottom">
-    <div class="header-container container-fluid px-4" style="height: 100px; padding: 10px 0;">
+    <div class="header-container container-fluid px-4 d-flex justify-content-end gap-310px" style="height: 100px; padding: 10px 0;">
         <!-- Logo -->
         <a class="navbar-brand" href="/" style="text-decoration: none;">
             <div class="header-logo-container">
@@ -11,8 +11,8 @@
         </a>
 
         <!-- Mobile Toggle Button -->
-        <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler d-lg-none ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -20,56 +20,53 @@
         <div class="main-menu-container">
             <ul class="main-menu navbar-nav mx-auto d-none d-lg-flex">
                 <div id="horizontal-underline"></div>
-                <li><a class="nav-link" href="#">홈</a></li>
-                <li><a class="nav-link" href="/products/listp">스토어</a></li>
-                <li><a class="nav-link" href="#">내 주변 찾기</a></li>
-                <li><a class="nav-link" href="#">서비스</a></li>
-                <li><a class="nav-link" th:href="@{/posts/list}">커뮤니티</a></li>
+                <li id="main-menu-home"><a class="nav-link" href="/">홈</a></li>
+                <li id="main-menu-store"><a class="nav-link" href="/products/listp">스토어</a></li>
+                <li id="main-menu-map"><a class="nav-link" th:href="@{/map/map}">내 주변 찾기</a></li>
+                <li id="main-menu-service"><a class="nav-link" th:href="@{/insurance/list}">서비스</a></li>
+                <li id="main-menu-community"><a class="nav-link" th:href="@{/posts/list}">커뮤니티</a></li>
             </ul>
 
             <!-- 서브메뉴 -->
             <div class="sub-menu-panel">
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
-                        <li><a href="#"></a></li>
+                        <li><a href="#" data-parent-menu="main-menu-home"></a></li>
+                        <li><a href="#" data-parent-menu="main-menu-home"></a></li>
+                        <li><a href="#" data-parent-menu="main-menu-home"></a></li>
+                        <li><a href="#" data-parent-menu="main-menu-home"></a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">우리애 굿즈</a></li>
-                        <li><a href="#">우리애 먹일거</a></li>
-                        <li><a href="#">우리애 놀거</a></li>
-                        <li><a href="#">우리애 산책</a></li>
+                        <li><a href="#" data-parent-menu="main-menu-store">우리애 굿즈</a></li>
+                        <li><a href="#" data-parent-menu="main-menu-store">우리애 먹일거</a></li>
+                        <li><a href="#" data-parent-menu="main-menu-store">우리애 놀거</a></li>
+                        <li><a href="#" data-parent-menu="main-menu-store">우리애 산책</a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a href="#">동물원 / 아쿠아리움</a></li>
-                        <li><a href="#">병원 찾기</a></li>
-                        <li><a href="#">Pet Shop</a></li>
-                        <li><a href="#">임시 보호소</a></li>
+                        <li><a th:href="@{/map/map}" data-parent-menu="main-menu-map">지도</a></li>
                     </ul>
 
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
 
-                        <li><a th:href="@{/insurance/list}">보험</a></li>
-                        <li><a th:href="@{/parttime/list}">펫 시터</a></li>
-                        <li><a href="/hospitals">추천 병원</a></li>
-                        <li><a href="/service/funeral/procedure">Crossing the<br>Rainbow Bridge</a></li>
+                        <li><a th:href="@{/insurance/list}" data-parent-menu="main-menu-service">보험</a></li>
+                        <li><a th:href="@{/parttime/list}" data-parent-menu="main-menu-service">펫 시터</a></li>
+                        <li><a href="/hospitals" data-parent-menu="main-menu-service">추천 병원</a></li>
+                        <li><a href="/service/funeral/procedure" data-parent-menu="main-menu-service">Crossing Rainbow</a></li>
                     </ul>
                 </div>
                 <div class="sub-menu-column">
                     <ul class="sub-menu">
-                        <li><a th:href="@{/posts/list}">커뮤니티</a></li>
-                        <li><a th:href="@{/showoff/list}">자랑게시판</a></li>
-                        <li><a th:href="@{/lost/list}">유실동물게시판</a></li>
+                        <li><a th:href="@{/posts/list}" data-parent-menu="main-menu-community">커뮤니티</a></li>
+                        <li><a th:href="@{/showoff/list}" data-parent-menu="main-menu-community">자랑게시판</a></li>
+                        <li><a th:href="@{/lost/list}" data-parent-menu="main-menu-community">유실동물게시판</a></li>
                     </ul>
                 </div>
             </div>
@@ -78,8 +75,8 @@
         <!-- 오른쪽: 검색/장바구니/로그인/로그아웃 -->
         <div class="d-none d-lg-flex align-items-center" style="position: relative; z-index: 1000;">
             <!-- 아이콘 -->
-            <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
-            <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a>
+            <!-- <a href="#" class="text-secondary me-3"><i class="fas fa-search" style="font-size: 1.1rem;"></i></a>
+            <a href="#" class="text-secondary me-4"><i class="fas fa-shopping-cart" style="font-size: 1.1rem;"></i></a> -->
 
             <!-- 로그인 전 -->
             <div th:if="${#authentication.name == 'anonymousUser'}"
@@ -99,7 +96,7 @@
                             <div class="user-info">
                                 <img th:src="${profileImg}"
                                     alt="프로필">
-                                <h2 th:text="${nickname}">닉네임</h2>
+                                <h5 th:text="${nickname}">닉네임</h5>
                             </div>
                             <hr>
 
@@ -122,18 +119,17 @@
 
                 <!-- User Dropdown Button -->
                 <span class="text-muted me-3" style="font-size: 0.9rem;" th:text="'환영합니다, ' + ${nickname} + '님'"></span>
-
                 
-
                 <form th:action="@{/logout}" method="post" class="m-0">
                     <button type="submit" class="btn btn-sm btn-danger">로그아웃</button>
                 </form>
+                
+                
             </div>
         </div>
 
     </div>
 
-</nav>
 
 
     <!-- Offcanvas -->
@@ -151,10 +147,10 @@
                     <a class="nav-link" href="/products/listp">스토어</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">내 주변 찾기</a>
+                    <a class="nav-link" th:href="@{/map/map}">내 주변 찾기</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">서비스</a>
+                    <a class="nav-link" th:href="@{/insurance/list}">서비스</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/posts/list}">커뮤니티</a>
@@ -175,4 +171,3 @@
         </div>
     </div>
 </nav>
-

@@ -50,8 +50,9 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
         }
 
         super.onAuthenticationSuccess(request, response, authentication);
-    }
 
-    
-    
+        log.info("인증 객체 타입: {}", authentication.getClass().getName());
+        log.info("인증 객체 Principal: {}", authentication.getPrincipal());
+        log.info("SecurityContextHolder 인증: {}", org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication());
+    }
 }
