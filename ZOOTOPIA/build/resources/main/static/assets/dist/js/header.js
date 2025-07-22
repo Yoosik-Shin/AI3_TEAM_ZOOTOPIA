@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeHeaderButtons();
     initializeUserMenu();
     initialize(); // Call initialize here
+
 });
 
 // Initialize user menu functionality
