@@ -191,13 +191,5 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    public void deleteById(Long userId) {
-        try {
-            userMapper.deleteById(userId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }
