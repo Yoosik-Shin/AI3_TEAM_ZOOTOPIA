@@ -25,17 +25,17 @@ import jakarta.servlet.http.HttpSession;
 @Service("UserService")
 public class UserServiceImpl implements UserService {
 
-    @Autowired UserMapper userMapper;
+    @Autowired 
+    UserMapper userMapper;
 
-    @Autowired PasswordEncoder passwordEncoder;
+    @Autowired 
+    PasswordEncoder passwordEncoder;
+
 
     // @Autowired AuthenticationManager authenticationManager;
 
     @Autowired
     private ApplicationContext context;
-    
-
-
 
 
     /**
@@ -121,6 +121,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectById(userId);
     }
 
+    @Override
     public boolean checkPassword(Long userId, String rawPassword) throws Exception {
         Users user = userMapper.findUserById(userId);
         return passwordEncoder.matches(rawPassword, user.getPassword());
@@ -131,6 +132,7 @@ public class UserServiceImpl implements UserService {
         String encoded = passwordEncoder.encode(newPassword);
         return userMapper.updatePassword(userId, encoded); 
     }
+    
     @Override
     public Users findUserById(Long userId) throws Exception {
         return userMapper.findUserById(userId);
@@ -141,14 +143,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.updateUser(user);
     }
 
-
     @Override
-    public void deleteById(Long userId) {
-        userMapper.deleteById(userId); // 실제 삭제
-        // 또는 user.setEnabled(0); 저장으로 soft-delete도 가능
+    public int deleteUserAuth(String email) throws Exception {
+        return userMapper.deleteUserAuth(email);
     }
-
-
 
 
     // 소셜 로그인 사용자 조회 및 생성
