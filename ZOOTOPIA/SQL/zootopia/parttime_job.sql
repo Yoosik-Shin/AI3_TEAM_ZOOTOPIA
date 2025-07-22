@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS `parttime_job`;
+
 CREATE TABLE parttime_job (
 job_id BIGINT AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(100) NOT NULL,

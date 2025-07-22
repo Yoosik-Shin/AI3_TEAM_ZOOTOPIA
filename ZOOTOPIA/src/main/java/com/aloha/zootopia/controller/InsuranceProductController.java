@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -87,6 +89,11 @@ public class InsuranceProductController {
                 return "redirect:/insurance/create";
             }
 
+            if (product.getImagePath() == null || product.getImagePath().isBlank()) {
+                rttr.addFlashAttribute("errorMessage", "이미지를 먼저 업로드하세요.");
+                return "redirect:/insurance/create";
+            }
+
             productService.registerProduct(product);
             rttr.addFlashAttribute("successMessage", "✅ 등록 완료");
             return "redirect:/insurance/list";
@@ -98,11 +105,12 @@ public class InsuranceProductController {
     }
 
 
-    // ✅ 이미지 업로드 (전통적 방식)
-    @PostMapping("/upload-image")
+
+    // ✅ 이미지 업로드 (AJAX 방식)
+    @PostMapping("/upload-image-ajax")
     @PreAuthorize("hasRole('ADMIN')")
-    public String uploadImage(@RequestParam("imageFile") MultipartFile imageFile,
-                            RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public Map<String, String> uploadImageAjax(@RequestParam("imageFile") MultipartFile imageFile) {
         try {
             if (!imageFile.isEmpty()) {
                 String fileName = UUID.randomUUID() + "_" +
@@ -113,16 +121,13 @@ public class InsuranceProductController {
                 Files.copy(imageFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
                 String imagePath = "/upload/" + fileName;
-                redirectAttributes.addFlashAttribute("imagePath", imagePath);
-                redirectAttributes.addFlashAttribute("successMessage", "✅ 이미지 업로드 성공");
+                return Map.of("success", "true", "imagePath", imagePath);
             } else {
-                redirectAttributes.addFlashAttribute("errorMessage", "❌ 이미지 파일이 비어 있습니다.");
+                return Map.of("success", "false", "message", "이미지 파일이 비어 있습니다.");
             }
         } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "❌ 업로드 실패: " + e.getMessage());
+            return Map.of("success", "false", "message", "업로드 실패: " + e.getMessage());
         }
-
-        return "redirect:/insurance/create";
     }
 
 

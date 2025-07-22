@@ -1,9 +1,9 @@
 package com.aloha.zootopia.controller;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -12,13 +12,16 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.aloha.zootopia.domain.CustomUser;
+import com.aloha.zootopia.domain.InsuranceProduct;
 import com.aloha.zootopia.domain.InsuranceQna;
 import com.aloha.zootopia.domain.InsuranceQnaResponse;
+import com.aloha.zootopia.service.InsuranceProductService;
 import com.aloha.zootopia.service.InsuranceQnaService;
 
 @Controller
@@ -28,21 +31,49 @@ public class InsuranceQnaController {
     @Autowired
     private InsuranceQnaService qnaService;
 
+    @Autowired
+    private InsuranceProductService productService;
+
 
     // 특정 보험상품 Q&A 목록
-    @GetMapping("/{productId}")
-    public String list(@PathVariable int productId, Model model) {
-        model.addAttribute("qnaList", qnaService.getQnaList(productId));
-        model.addAttribute("productId", productId);
-        model.addAttribute("qna", new InsuranceQna());
-        return "insurance/qnaList";  // 예: qnaList.jsp
+    @GetMapping("/read/{productId}")
+    public String read(@PathVariable int productId,
+                       @AuthenticationPrincipal CustomUser customUser,
+                       Model model) {
+
+        InsuranceProduct product = productService.getProduct(productId);
+        model.addAttribute("product", product);
+
+        if (customUser != null) {
+            long userId = customUser.getUser().getUserId();
+            boolean isAdmin = customUser.getAuthorities().stream()
+                                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            model.addAttribute("loginUserId", userId);
+            model.addAttribute("isAdmin", isAdmin);
+        }
+
+        return "insurance/read";
+    }
+
+    // AJAX: QnA 리스트 조회
+    @GetMapping("/list")
+    @ResponseBody
+    public List<InsuranceQnaResponse> listQna(@RequestParam int productId,
+                                              @AuthenticationPrincipal CustomUser user) {
+        long loginUserId = user != null ? user.getUser().getUserId() : -1;
+        boolean isAdmin = user != null && user.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        return qnaService.getQnaList(productId).stream()
+                .map(q -> InsuranceQnaResponse.from(q, loginUserId, isAdmin))
+                .toList();
     }
 
     // 질문 등록
     @PostMapping("/register")
     @PreAuthorize("hasRole('USER')")
-    public String register(InsuranceQna qna, @AuthenticationPrincipal User user) {
-        qna.setUserId(Integer.parseInt(user.getUsername()));
+    public String register(InsuranceQna qna, @AuthenticationPrincipal CustomUser customUser) {
+        qna.setUserId(Integer.parseInt(customUser.getUsername()));
         qnaService.registerQuestion(qna);
         return "redirect:/insurance/qna/" + qna.getProductId();
     }
@@ -51,31 +82,28 @@ public class InsuranceQnaController {
     @PostMapping("/register-ajax")
     @PreAuthorize("hasRole('USER')")
     @ResponseBody
-    public List<InsuranceQnaResponse> registerAjax(InsuranceQna qna, @AuthenticationPrincipal CustomUser customUser) {
+    public ResponseEntity<?> registerAjax(@RequestBody InsuranceQna qna,
+                                        @AuthenticationPrincipal CustomUser customUser) {
+        try {
+            if (customUser == null) {
+                return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            }
 
-    long userId = customUser.getUser().getUserId(); // ← 여기가 핵심
-    qna.setUserId(userId);
+            long loginUserId = customUser.getUser().getUserId();
+            boolean isAdmin = customUser.getAuthorities().stream()
+                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-    qnaService.registerQuestion(qna);
+            qna.setUserId(loginUserId);
+            qnaService.registerQuestion(qna);
 
-    return qnaService.getQnaList(qna.getProductId())
-            .stream()
-            .map(e -> {
-                InsuranceQnaResponse dto = new InsuranceQnaResponse();
-                dto.setQnaId(e.getQnaId());
-                dto.setProductId(e.getProductId());
-                dto.setSpecies(e.getSpecies());
-                dto.setQuestion(e.getQuestion());
-                dto.setAnswer(e.getAnswer());
-                dto.setUserId(e.getUserId());
-                dto.setCreatedAt(
-                        e.getCreatedAt() != null
-                                ? e.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-                                : ""
-                );
-                return dto;
-            })
-            .toList();
+            List<InsuranceQnaResponse> list = qnaService.getQnaList(qna.getProductId()).stream()
+                .map(q -> InsuranceQnaResponse.from(q, loginUserId, isAdmin))
+                .toList();
+
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("❌ 서버 오류: " + e.getMessage());
+        }
     }
 
 
@@ -94,38 +122,63 @@ public class InsuranceQnaController {
     }
 
     // 질문 수정 처리
-    @PostMapping("/edit")
+    @PostMapping("/edit-ajax")
     @PreAuthorize("hasRole('USER')")
-    public String updateQuestion(InsuranceQna qna,
-                                 @AuthenticationPrincipal User user) {
+    @ResponseBody
+    public List<InsuranceQnaResponse> editAjax(@RequestBody InsuranceQna qna,
+                                            @AuthenticationPrincipal CustomUser user) {
         InsuranceQna origin = qnaService.getQna(qna.getQnaId());
-        if (origin.getUserId() != Integer.parseInt(user.getUsername())) {
-            throw new SecurityException("작성자만 수정 가능합니다.");
+
+        if (origin.getUserId() != user.getUser().getUserId()) {
+            throw new SecurityException("본인만 수정할 수 있습니다.");
         }
+
+        qna.setUserId(user.getUser().getUserId());
         qnaService.updateQnaQuestion(qna);
-        return "redirect:/insurance/qna/" + qna.getProductId();
+
+        return qnaService.getQnaList(qna.getProductId()).stream()
+                .map(q -> InsuranceQnaResponse.from(q, user.getUser().getUserId(), false))  // isAdmin은 false
+                .toList();
     }
 
-    // 답변 등록/수정 (관리자만)
+    // AJAX: 답변 등록/수정 (관리자)
     @PostMapping("/answer")
     @PreAuthorize("hasRole('ADMIN')")
-    public String answer(InsuranceQna qna) {
+    @ResponseBody
+    public List<InsuranceQnaResponse> answerAjax(@RequestBody InsuranceQna qna,
+                                                 @AuthenticationPrincipal CustomUser user) {
         qnaService.answerQna(qna);
-        return "redirect:/insurance/qna/" + qna.getProductId();
+
+        long loginUserId = user.getUser().getUserId();
+        boolean isAdmin = true;
+
+        return qnaService.getQnaList(qna.getProductId()).stream()
+                .map(q -> InsuranceQnaResponse.from(q, loginUserId, isAdmin))
+                .toList();
     }
 
-    // 질문 삭제
-    @PostMapping("/delete/{qnaId}")
+    // AJAX: 질문 삭제
+    @PostMapping("/delete-ajax/{qnaId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public String delete(@PathVariable int qnaId,
-                         @RequestParam int productId,
-                         @AuthenticationPrincipal User user) {
+    @ResponseBody
+    public List<InsuranceQnaResponse> deleteAjax(@PathVariable int qnaId,
+                                                 @RequestParam int productId,
+                                                 @AuthenticationPrincipal CustomUser user) {
         InsuranceQna qna = qnaService.getQna(qnaId);
-        if (qna.getUserId() != Integer.parseInt(user.getUsername())
-                && !user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        long loginId = user.getUser().getUserId();
+
+        boolean isWriter = qna.getUserId() == loginId;
+        boolean isAdmin = user.getUser().getAuthList().stream()
+                .anyMatch(auth -> auth.getAuth().equals("ROLE_ADMIN"));
+
+        if (!isWriter && !isAdmin) {
             throw new SecurityException("작성자 또는 관리자만 삭제 가능합니다.");
         }
+
         qnaService.deleteQna(qnaId);
-        return "redirect:/insurance/qna/" + productId;
-    }  
+
+        return qnaService.getQnaList(productId).stream()
+                .map(q -> InsuranceQnaResponse.from(q, loginId, isAdmin))
+                .toList();
+    }
 }

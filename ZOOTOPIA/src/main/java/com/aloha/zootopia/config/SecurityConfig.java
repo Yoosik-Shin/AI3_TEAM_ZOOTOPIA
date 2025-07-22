@@ -90,7 +90,7 @@ public class SecurityConfig {
                             .loginPage("/login") // 사용자 정의 로그인 페이지
                             .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
-                            .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 경로
+                            .successHandler(loginSuccessHandler) // ✅ 소셜 로그인 성공 핸들러 추가
             );
         http.csrf(csrf -> csrf
             .ignoringRequestMatchers("/posts/upload/image") // ✅ CSRF 무시 설정
@@ -125,16 +125,17 @@ public class SecurityConfig {
         http.userDetailsService(userDetailServiceImpl);
 
         // 🔄 자동 로그인 - 임시 비활성화
-        // http.rememberMe(me -> me
-        //         .key("aloha")
-        //         .tokenRepository(tokenRepository())
-        //         .tokenValiditySeconds(60 * 60 * 24 * 7));
+        http.rememberMe(me -> me
+                .key("aloha")
+                .tokenRepository(tokenRepository())
+                .tokenValiditySeconds(60 * 60 * 24 * 7));
 
         // 🔓 로그아웃 설정
         http.logout(logout -> logout
                             .logoutUrl("/logout")   // 로그아웃 요청 경로
                             .invalidateHttpSession(true)        // 세션 초기화
                             .deleteCookies("remember-id")       // 로그아웃 시, 아이디저장 쿠키 삭제
+                            .logoutSuccessUrl("/login?logout=true") // 로그아웃 성공 시 URL
                             .logoutSuccessHandler(customLogoutSuccessHandler) // ✅ 커스텀 핸들러 등록
                     );
 
@@ -182,7 +183,6 @@ public class SecurityConfig {
     //     return new InMemoryUserDetailsManager( user, admin );
     //     // return new JdbcUserDetailsManager( ... );
     // }
-
 
     /**
      * 🍃 JDBC 인증 방식 빈 등록
