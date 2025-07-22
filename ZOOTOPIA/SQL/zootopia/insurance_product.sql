@@ -28,3 +28,4 @@ CREATE TABLE insurance_qna (
     ON DELETE CASCADE
 );
 
+ALTER TABLE insurance_qna CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

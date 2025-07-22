@@ -24,7 +24,7 @@ public class ParttimeJobApplicantController {
 
 
     @PostMapping("/apply")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String apply(ParttimeJobApplicant applicant,
                         @AuthenticationPrincipal CustomUser user,
                         RedirectAttributes redirectAttributes) {
@@ -51,7 +51,7 @@ public class ParttimeJobApplicantController {
     }
 
     @PostMapping("/delete/{applicantId}/job/{jobId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String delete(@PathVariable int applicantId,
                         @PathVariable Long jobId,
                         @AuthenticationPrincipal CustomUser user) {
@@ -67,7 +67,7 @@ public class ParttimeJobApplicantController {
     }
 
     @GetMapping("/list/{jobId}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public String listApplicants(@PathVariable Long jobId, Model model) {
         model.addAttribute("applicants", applicantService.listApplicants(jobId));
         return "parttime/applicants";

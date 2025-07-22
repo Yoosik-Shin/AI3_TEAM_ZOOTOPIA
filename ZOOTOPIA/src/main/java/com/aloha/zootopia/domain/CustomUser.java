@@ -70,6 +70,9 @@ public class CustomUser implements UserDetails {
         return user.getUserId();
     }
 
- 
-    
+    public boolean hasRole(String roleName) {
+        return this.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + roleName));
+    }
+        
 }
