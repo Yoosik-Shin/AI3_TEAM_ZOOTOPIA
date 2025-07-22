@@ -28,5 +28,6 @@ public class Users {
     private String provider;  // "naver" 등 소셜 구분자
     private String providerId;
     
+    @Builder.Default
     private List<UserAuth> authList = new java.util.ArrayList<>();
 }
