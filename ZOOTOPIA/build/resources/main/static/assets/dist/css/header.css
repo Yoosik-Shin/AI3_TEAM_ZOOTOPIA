@@ -8,6 +8,18 @@
     position: sticky;
     top: 0;
     z-index: 1000;
+
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.zootopia-header .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+
 }
 
 .zootopia-header .zootopia-brand {
@@ -320,6 +332,14 @@
 }
 
 
+/* User Menu Dropdown Styles */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+
+
 
 /* 헤더 로그인 회원가입 버튼 */
 .header-login-btn-container .header-login-btn {
@@ -356,11 +376,178 @@
     align-items: center;
     cursor: pointer;
 }
+
 .user-pic {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #f0f0f0;
+}
+
+.user-pic:hover {
+    border-color: #ff6b6b;
+    transform: scale(1.05);
+}
+
+.user-sub-menu-wrap {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.user-sub-menu-wrap.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-sub-menu {
+    padding: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-info h2 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-sub-menu hr {
+    margin: 0;
+    border: none;
+    height: 1px;
+    background: #eee;
+}
+
+.user-sub-menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
+.user-sub-menu-link:hover {
+    background: #f8f9fa;
+    color: #ff6b6b;
+    text-decoration: none;
+}
+
+.user-sub-menu-link img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.user-sub-menu-link p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.user-sub-menu-form {
+    margin: 0;
+}
+
+.user-sub-menu-logout {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    color: #333;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-sub-menu-logout:hover {
+    background: #f8f9fa;
+    color: #ff6b6b;
+}
+
+.user-sub-menu-logout img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.user-sub-menu-logout p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Global navbar responsive styles for all pages */
+@media (max-width: 650px) {
+    .navbar-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+    }
+    
+    .navbar-toggler {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    .navbar-collapse {
+        margin-top: 10px;
+    }
+    
+    .mobile-right-icons {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 20;
+    }
+    
+    /* Hide desktop navigation completely on mobile */
+    #navbarNavDesktop {
+        display: none;
+    }
+    
+    /* Hide desktop right icons */
+    .d-none.d-md-flex {
+        display: none;
+    }
+}
+
 }
 .user-menu ul {
     width: 100%;
@@ -471,7 +658,9 @@
     font-weight: 600;
 }
 
+
  /* Custom Gap */
 .gap-310px {
   gap: 330px;
 }
+
