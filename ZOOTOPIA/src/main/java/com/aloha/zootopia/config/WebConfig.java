@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration          // 빈 등록 설정 클래스 지정
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${app.file.upload.path}")
+    @Value("${file.upload.path}")
     private String uploadPath;
 
     @Bean                   // 빈 등록

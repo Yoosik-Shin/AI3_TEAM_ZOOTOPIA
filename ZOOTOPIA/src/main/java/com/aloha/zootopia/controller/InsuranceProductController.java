@@ -88,7 +88,6 @@ public class InsuranceProductController {
                 rttr.addFlashAttribute("errorMessage", "반려동물 종류를 선택하세요.");
                 return "redirect:/insurance/create";
             }
-
             if (product.getImagePath() == null || product.getImagePath().isBlank()) {
                 rttr.addFlashAttribute("errorMessage", "이미지를 먼저 업로드하세요.");
                 return "redirect:/insurance/create";
@@ -97,7 +96,6 @@ public class InsuranceProductController {
             productService.registerProduct(product);
             rttr.addFlashAttribute("successMessage", "✅ 등록 완료");
             return "redirect:/insurance/list";
-
         } catch (Exception e) {
             rttr.addFlashAttribute("errorMessage", "❌ 오류 발생: " + e.getMessage());
             return "redirect:/insurance/create";
@@ -107,26 +105,26 @@ public class InsuranceProductController {
 
 
     // ✅ 이미지 업로드 (AJAX 방식)
-    @PostMapping("/upload-image-ajax")
+    @PostMapping("/upload-image")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     public Map<String, String> uploadImageAjax(@RequestParam("imageFile") MultipartFile imageFile) {
         try {
             if (!imageFile.isEmpty()) {
                 String fileName = UUID.randomUUID() + "_" +
-                        imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
+                    imageFile.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "_");
 
                 Path targetPath = Paths.get(uploadDir, fileName);
                 Files.createDirectories(targetPath.getParent());
                 Files.copy(imageFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
                 String imagePath = "/upload/" + fileName;
-                return Map.of("success", "true", "imagePath", imagePath);
+                return Map.of("imagePath", imagePath);  // ✅ success 대신 단일 반환
             } else {
-                return Map.of("success", "false", "message", "이미지 파일이 비어 있습니다.");
+                return Map.of("message", "이미지 파일이 비어 있습니다.");
             }
         } catch (IOException e) {
-            return Map.of("success", "false", "message", "업로드 실패: " + e.getMessage());
+            return Map.of("message", "업로드 실패: " + e.getMessage());
         }
     }
 

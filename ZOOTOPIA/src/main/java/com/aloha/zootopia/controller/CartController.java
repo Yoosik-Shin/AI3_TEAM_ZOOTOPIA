@@ -351,7 +351,7 @@ public class CartController {
             System.out.println("=== 🎯 장바구니 최종 총 개수: " + cartItems.size());
             System.out.println("=== 🔄 장바구니 페이지로 리다이렉트 진행...");
             
-            return "redirect:/cart?success=장바구니에 상품이 추가되었습니다.";
+            return "redirect:/cart?added=true";
         } catch (Exception e) {
             System.err.println("=== ❌ 장바구니 추가 중 오류: " + e.getMessage());
             e.printStackTrace();
