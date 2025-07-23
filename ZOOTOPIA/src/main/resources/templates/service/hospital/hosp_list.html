@@ -25,7 +25,7 @@
         <!-- 메인 컨텐츠 -->
         <div class="main-content">
             <div class="search-and-button-container d-flex justify-content-center align-items-center" style="margin-bottom: 20px;">
-                <form th:action="@{/hospitals}" method="get" class="search-con" style="flex-grow: 1; justify-content: center;">
+                <form th:action="@{/service/hospitals}" method="get" class="search-con" style="flex-grow: 1; justify-content: center;">
                     <div th:each="animal : ${animalList}" >
                         <input
                         type="checkbox"
@@ -45,7 +45,7 @@
                     <button type="submit" style="display:none;">검색</button>
                 </form>
                 <div sec:authorize="hasAuthority('ROLE_ADMIN')" style="margin-left: auto;">
-                    <a th:href="@{/hospitals/create}" class="hosp btn btn-primary" style="white-space: nowrap;">병원 등록</a>
+                    <a th:href="@{/service/hospitals/create}" class="hosp btn btn-primary" style="white-space: nowrap;">병원 등록</a>
                 </div>
             </div>
 
@@ -57,7 +57,7 @@
                     <!-- <div th:each="hospital : ${hospitals}" class="hospital-card"
                         th:onclick="|location.href='@{/hospitals/{id}(id=${hospital.hospitalId})}'|">                    -->
                     <div th:each="hospital : ${hospitalList}" class="hospital-card"
-                        th:onclick="|location.href='@{/hospitals/detail/{id}(id=${hospital.hospitalId})}'|">
+                        th:onclick="|location.href='@{/service/hospitals/detail/{id}(id=${hospital.hospitalId})}'|">
                     <div class="hospital-image">
                         <img th:src="${hospital.thumbnailImageUrl != null and hospital.thumbnailImageUrl != '' ? hospital.thumbnailImageUrl : '/img/default-hospital.png'}" alt="병원 이미지" class="card-image">
                     </div>
@@ -75,19 +75,19 @@
             <div class="pagination-container">
                 <div class="pagination">
                     <!-- 맨앞으로 -->
-                    <a th:if="${pageInfo.pageNum > 1}" th:href="@{/hospitals(pageNum=1, animal=${selectedAnimalsString})}" class="page-link">&laquo;</a>
+                    <a th:if="${pageInfo.pageNum > 1}" th:href="@{/service/hospitals(pageNum=1, animal=${selectedAnimalsString})}" class="page-link">&laquo;</a>
                     <!-- 이전 -->
-                    <a th:if="${pageInfo.hasPreviousPage}" th:href="@{/hospitals(pageNum=${pageInfo.pageNum - 1}, animal=${selectedAnimalsString})}" class="page-link">&lt;</a>
+                    <a th:if="${pageInfo.hasPreviousPage}" th:href="@{/service/hospitals(pageNum=${pageInfo.pageNum - 1}, animal=${selectedAnimalsString})}" class="page-link">&lt;</a>
                     <!-- 페이지 번호 -->
                     <span th:each="i : ${#numbers.sequence(pageInfo.startPage, pageInfo.endPage)}">
-                        <a th:href="@{/hospitals(pageNum=${i}, animal=${selectedAnimalsString})}"
+                        <a th:href="@{/service/hospitals(pageNum=${i}, animal=${selectedAnimalsString})}"
                             th:class="'page-link' + (${i} == ${pageInfo.pageNum} ? ' active' : '')"
                             th:text="${i}">1</a>
                     </span>
                     <!-- 다음 -->
-                    <a th:if="${pageInfo.hasNextPage}" th:href="@{/hospitals(pageNum=${pageInfo.pageNum + 1}, animal=${selectedAnimalsString})}" class="page-link">&gt;</a>
+                    <a th:if="${pageInfo.hasNextPage}" th:href="@{/service/hospitals(pageNum=${pageInfo.pageNum + 1}, animal=${selectedAnimalsString})}" class="page-link">&gt;</a>
                     <!-- 맨뒤로 -->
-                    <a th:if="${pageInfo.hasLastPage}" th:href="@{/hospitals(pageNum=${pageInfo.pages}, animal=${selectedAnimalsString})}" class="page-link">&raquo;</a>
+                    <a th:if="${pageInfo.hasLastPage}" th:href="@{/service/hospitals(pageNum=${pageInfo.pages}, animal=${selectedAnimalsString})}" class="page-link">&raquo;</a>
                 </div>
             </div>
         </div>

@@ -90,7 +90,7 @@
 
             <!-- 관리자용 버튼 -->
             <div class="mb-3" style="text-align: right; margin-top: 20px;" sec:authorize="hasAuthority('ROLE_ADMIN')">
-                <a th:href="@{/hospitals/edit/{id}(id=${hospital.hospitalId})}" class="hosp btn btn-primary">수정하기</a>
+                <a th:href="@{/service/hospitals/edit/{id}(id=${hospital.hospitalId})}" class="hosp btn btn-primary">수정하기</a>
             </div>
 
             <!-- 병원 리뷰 섹션 -->
@@ -147,7 +147,7 @@
         // 리뷰 목록 로드
         async function loadReviews() {
             try {
-                const response = await fetch(`/hospitals/${hospitalId}/reviews`);
+                const response = await fetch(`/service/hospitals/${hospitalId}/reviews`);
                 if (!response.ok) throw new Error('리뷰를 불러오는데 실패했습니다.');
 
                 const reviews = await response.json();
@@ -241,8 +241,8 @@
                 }
 
                 const url = reviewId
-                    ? `/hospitals/${hospitalId}/reviews/${reviewId}`
-                    : `/hospitals/${hospitalId}/reviews`;
+                    ? `/service/hospitals/${hospitalId}/reviews/${reviewId}`
+                    : `/service/hospitals/${hospitalId}/reviews`;
                 const method = reviewId ? 'PUT' : 'POST';
 
                 // CSRF 토큰 가져오기
@@ -303,7 +303,7 @@
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
             try {
-                const response = await fetch(`/hospitals/${hospitalId}/reviews/${id}`, {
+                const response = await fetch(`/service/hospitals/${hospitalId}/reviews/${id}`, {
                     method: 'DELETE',
                     headers: {
                         [csrfHeader]: csrfToken // CSRF 토큰 추가

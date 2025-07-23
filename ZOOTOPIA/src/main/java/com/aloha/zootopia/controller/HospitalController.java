@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-@RequestMapping("/hospitals")
+@RequestMapping("/service/hospitals")
 public class HospitalController {
 
     @Autowired
@@ -216,7 +216,7 @@ public class HospitalController {
             e.printStackTrace(); // Log the exception
             redirectAttributes.addFlashAttribute("error", "Failed to delete hospital: " + e.getMessage());
         }
-        return "redirect:/hospitals"; // Redirect to hospital list page
+        return "redirect:/service/hospitals"; // Redirect to hospital list page
     }
 
 
