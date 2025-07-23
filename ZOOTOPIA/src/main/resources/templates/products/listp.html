@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZOOTOPIA 스토어</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Header CSS -->
+    <link rel="stylesheet" href="/assets/dist/css/header.css">
+    <!-- Footer CSS -->
+    <link rel="stylesheet" href="/assets/dist/css/footer.css">
     <link rel="stylesheet" href="/assets/dist/css/products.css">
-    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <style>
         .product-card {
             transition: all 0.3s ease;
@@ -96,6 +100,14 @@
         .btn-group-sm .btn:hover {
             transform: scale(1.1);
         }
+        .admin-controls .btn {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .admin-controls .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -144,20 +156,6 @@
 
     <!-- 메인 컨테이너 -->
     <div class="container mt-4">
-        
-        <!-- Flash 메시지 -->
-        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
-            <span th:text="${success}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        
-        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            <span th:text="${error}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        
         <!-- 페이지 헤더 -->
         <div class="page-header">
             <div class="container">
@@ -169,7 +167,7 @@
                         <p class="lead mb-4">귀여운 반려동물과 함께하는 특별한 순간</p>
                         
                         <!-- 관리자 전용 상품 등록 버튼 -->
-                        <div class="admin-controls mb-3" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                        <div class="admin-controls mb-3" sec:authorize="hasRole('ADMIN')">
                             <a href="/products/create" class="btn btn-success btn-lg">
                                 <i class="fas fa-plus me-2"></i>상품 등록
                             </a>
@@ -185,6 +183,28 @@
                             <span class="badge stats-badge fs-6" th:if="${currentSearch != null and !currentSearch.isEmpty()}">
                                 <i class="fas fa-search me-1"></i>검색: <span th:text="${currentSearch}"></span>
                             </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상태 정보 (간소화) -->
+        <div class="row mb-4" th:if="${false}">
+            <div class="col-12">
+                <div class="alert alert-success d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <div>
+                        <strong>스토어 페이지가 정상적으로 로드되었습니다!</strong>
+                        <div class="mt-1">
+                            <small class="text-muted">
+                                현재 카테고리: <span class="badge bg-primary" th:text="${currentCategory}">전체</span>
+                                <span th:if="${currentSearch != null and !currentSearch.isEmpty()}" class="ms-2">
+                                    검색어: <span class="badge bg-info" th:text="${currentSearch}"></span>
+                                </span>
+                                페이지: <span class="badge bg-secondary" th:text="${pagination != null ? pagination.page : 1}">1</span>
+                                총 상품 수: <span class="badge bg-warning text-dark" th:text="${totalProducts ?: 0}">0</span>
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -216,26 +236,6 @@
                        th:classappend="${currentCategory == '전체'} ? 'active' : ''">
                         <i class="fas fa-th-large me-1"></i>전체
                     </a>
-                    <a href="/products/listp?category=개" class="btn category-btn"
-                       th:classappend="${currentCategory == '개'} ? 'active' : ''">
-                        <i class="fas fa-dog me-1"></i>개
-                    </a>
-                    <a href="/products/listp?category=고양이" class="btn category-btn"
-                       th:classappend="${currentCategory == '고양이'} ? 'active' : ''">
-                        <i class="fas fa-cat me-1"></i>고양이
-                    </a>
-                    <a href="/products/listp?category=새" class="btn category-btn"
-                       th:classappend="${currentCategory == '새'} ? 'active' : ''">
-                        <i class="fas fa-dove me-1"></i>새
-                    </a>
-                    <a href="/products/listp?category=물고기" class="btn category-btn"
-                       th:classappend="${currentCategory == '물고기'} ? 'active' : ''">
-                        <i class="fas fa-fish me-1"></i>물고기
-                    </a>
-                    <a href="/products/listp?category=기타" class="btn category-btn"
-                       th:classappend="${currentCategory == '기타'} ? 'active' : ''">
-                        <i class="fas fa-paw me-1"></i>기타
-                    </a>
                     <a href="/products/listp?category=사료" class="btn category-btn"
                        th:classappend="${currentCategory == '사료'} ? 'active' : ''">
                         <i class="fas fa-bowl-food me-1"></i>사료
@@ -243,6 +243,14 @@
                     <a href="/products/listp?category=용품" class="btn category-btn"
                        th:classappend="${currentCategory == '용품'} ? 'active' : ''">
                         <i class="fas fa-shopping-bag me-1"></i>용품
+                    </a>
+                    <a href="/products/listp?category=장난감" class="btn category-btn"
+                       th:classappend="${currentCategory == '장난감'} ? 'active' : ''">
+                        <i class="fas fa-dice me-1"></i>장난감
+                    </a>
+                    <a href="/products/listp?category=산책" class="btn category-btn"
+                       th:classappend="${currentCategory == '산책'} ? 'active' : ''">
+                        <i class="fas fa-walking me-1"></i>산책
                     </a>
                 </div>
             </div>
@@ -383,11 +391,11 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/assets/dist/js/header.js}"></script>
     
+    <!-- Header JS -->
+    <script src="/assets/dist/js/header.js"></script>
     
     <!-- 동적 기능 스크립트 -->
     <script src="/assets/dist/js/products.js"></script>
-
 </body>
 </html>
