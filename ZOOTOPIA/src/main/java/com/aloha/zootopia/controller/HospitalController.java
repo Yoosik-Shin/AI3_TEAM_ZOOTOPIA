@@ -208,15 +208,15 @@ public class HospitalController {
 
     // 병원 삭제 처리
     @PostMapping("/delete/{id}")
-    public String deleteHospital(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    @ResponseBody
+    public ResponseEntity<String> deleteHospital(@PathVariable("id") Integer id) {
         try {
             hospitalService.deleteHospital(id);
-            redirectAttributes.addFlashAttribute("message", "Hospital deleted successfully!");
+            return new ResponseEntity<>("{\"status\": \"success\", \"message\": \"병원 삭제 성공!\"}", HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace(); // Log the exception
-            redirectAttributes.addFlashAttribute("error", "Failed to delete hospital: " + e.getMessage());
+            return new ResponseEntity<>("{\"status\": \"error\", \"message\": \"병원 삭제 실패: " + e.getMessage() + "\"}", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return "redirect:/service/hospitals"; // Redirect to hospital list page
     }
 
 
