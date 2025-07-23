@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +10,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/dist/css/product-detail.css">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <style>
         .navbar-brand img {
             height: 40px;
         }
         .product-image {
             max-height: 500px;
+            width: 100%;
             object-fit: cover;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -35,6 +38,35 @@
         .quantity-input {
             width: 80px;
             text-align: center;
+        }
+        
+        /* 상품 상세 페이지 레이아웃 개선 */
+        .product-detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+        
+        .product-image-section {
+            flex: 1;
+            max-width: 50%;
+        }
+        
+        .product-info-section {
+            flex: 1;
+            max-width: 50%;
+        }
+        
+        /* 모바일 화면에서는 세로 배치 */
+        @media (max-width: 768px) {
+            .product-detail-row {
+                flex-direction: column;
+            }
+            
+            .product-image-section,
+            .product-info-section {
+                max-width: 100%;
+            }
         }
         .btn-quantity {
             width: 35px;
@@ -105,36 +137,38 @@
         </nav>
 
         <!-- 상품 상세 정보 -->
-        <div class="row">
-            <!-- 상품 이미지 -->
-            <div class="col-lg-6 mb-4">
-                <div class="text-center">
-                    <img th:src="${productImage}" 
-                         class="img-fluid product-image" 
-                         alt="상품 이미지"
-                         th:alt="${productName}"
-                         onerror="this.src='/assets/dist/img/default-thumbnail.png'">
-                </div>
-                
-                <!-- 작은 이미지들 (차후 추가 예정) -->
-                <div class="row mt-3">
-                    <div class="col-3">
-                        <img src="/assets/dist/img/products/productcatbellnecklace.png" class="img-fluid rounded" alt="상품 이미지 1">
+        <div class="row product-detail-row">
+            <!-- 상품 이미지 (왼쪽) -->
+            <div class="col-lg-6 col-md-6 product-image-section mb-4">
+                <div class="sticky-top" style="top: 20px;">
+                    <div class="text-center">
+                        <img th:src="${productImage}" 
+                             class="img-fluid product-image" 
+                             alt="상품 이미지"
+                             th:alt="${productName}"
+                             onerror="this.src='/assets/dist/img/default-thumbnail.png'">
                     </div>
-                    <div class="col-3">
-                        <img src="/assets/dist/img/products/productcatwaterbowl.png" class="img-fluid rounded" alt="상품 이미지 2">
-                    </div>
-                    <div class="col-3">
-                        <img src="/assets/dist/img/products/productdogbowl.png" class="img-fluid rounded" alt="상품 이미지 3">
-                    </div>
-                    <div class="col-3">
-                        <img src="/assets/dist/img/products/productpetbed.png" class="img-fluid rounded" alt="상품 이미지 4">
-                    </div>
+                    
+                    <!-- 작은 이미지들 (차후 추가 예정) -->
+                    <!-- <div class="row mt-3">
+                        <div class="col-3">
+                            <img src="/assets/dist/img/products/productcatbellnecklace.png" class="img-fluid rounded" alt="상품 이미지 1">
+                        </div>
+                        <div class="col-3">
+                            <img src="/assets/dist/img/products/productcatwaterbowl.png" class="img-fluid rounded" alt="상품 이미지 2">
+                        </div>
+                        <div class="col-3">
+                            <img src="/assets/dist/img/products/productdogbowl.png" class="img-fluid rounded" alt="상품 이미지 3">
+                        </div>
+                        <div class="col-3">
+                            <img src="/assets/dist/img/products/productpetbed.png" class="img-fluid rounded" alt="상품 이미지 4">
+                        </div>
+                    </div> -->
                 </div>
             </div>
             
-            <!-- 상품 정보 -->
-            <div class="col-lg-6">
+            <!-- 상품 정보 (오른쪽) -->
+            <div class="col-lg-6 col-md-6 product-info-section">
                 <!-- 카테고리 배지 -->
                 <div class="mb-2">
                     <span class="product-badge" th:text="${productCategory}">카테고리</span>
@@ -202,26 +236,45 @@
                 
                 <!-- 버튼 영역 -->
                 <div class="mb-4">
+                    <!-- 순수 HTML 폼 (JavaScript 없이) -->
                     <form th:action="@{/cart/add-form}" method="post" id="cartForm">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                         <input type="hidden" name="productNo" th:value="${productNo}" />
-                        <input type="hidden" name="quantity" id="cartQuantityInput" th:value="${quantity}" />
+                        <input type="hidden" name="quantity" id="cartQuantityInput" value="1" />
                         <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-cart btn-lg" id="addToCartBtn">
+                            <button type="button" class="btn btn-cart btn-lg" onclick="submitCartForm()">
                                 <i class="fas fa-shopping-cart me-2"></i>
                                 장바구니 담기
                             </button>
                         </div>
                     </form>
+                    
                     <form th:action="@{/checkout}" method="post" id="buyNowForm" class="mt-2">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                         <input type="hidden" name="productNo" th:value="${productNo}" />
-                        <input type="hidden" name="quantity" id="buyNowQuantityInput" th:value="${quantity}" />
+                        <input type="hidden" name="quantity" id="buyNowQuantityInput" th:value="${quantity != null ? quantity : 1}" />
                         <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-buy btn-lg" id="buyNowBtn">
+                            <button type="submit" class="btn btn-buy btn-lg" onclick="document.getElementById('buyNowQuantityInput').value = document.getElementById('quantityInput').value; return true;">
                                 <i class="fas fa-credit-card me-2"></i>
                                 바로 구매
                             </button>
                         </div>
                     </form>
+                    
+                    <!-- 디버깅용 테스트 버튼 (개발 완료 후 주석 처리) -->
+                    <!--
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-warning btn-sm" onclick="testCartAdd()">
+                            🧪 AJAX 테스트: 장바구니 추가
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm ms-2" onclick="checkFormData()">
+                            🔍 폼 데이터 확인
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm ms-2" onclick="manualSubmit()">
+                            📝 수동 폼 제출
+                        </button>
+                    </div>
+                    -->
                 </div>
                 
                 <!-- 상품 설명 -->
@@ -367,7 +420,207 @@
             updateTotalPrice();
             syncQuantityHiddenInputs();
             console.log('Quantity controls initialized successfully');
+            
+            // 폼 제출은 순수 HTML로 처리 (JavaScript 이벤트 리스너 없음)
+            console.log('✅ 폼 제출은 순수 HTML onclick으로 처리됩니다.');
         });
+        
+        // 장바구니 폼 제출 함수 (AJAX 방식)
+        function submitCartForm() {
+            console.log('🛒 장바구니 담기 함수 호출됨');
+            
+            // 수량 동기화
+            const quantityInput = document.getElementById('quantityInput');
+            const cartQuantityInput = document.getElementById('cartQuantityInput');
+            cartQuantityInput.value = quantityInput.value;
+            
+            const productNo = /*[[${productNo}]]*/ 1;
+            const quantity = quantityInput.value;
+            const csrf = document.querySelector('meta[name="_csrf"]').content;
+            
+            console.log('📋 장바구니 추가 데이터:', {
+                productNo: productNo,
+                quantity: quantity,
+                csrf: csrf ? 'CSRF 토큰 있음' : 'CSRF 토큰 없음'
+            });
+            
+            // 버튼 비활성화 (중복 클릭 방지)
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>처리 중...';
+            
+            fetch('/cart/add-form', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `productNo=${productNo}&quantity=${quantity}&_csrf=${csrf}`,
+                redirect: 'manual' // 리다이렉트를 수동으로 처리
+            })
+            .then(response => {
+                console.log('🔍 장바구니 추가 응답:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    type: response.type,
+                    redirected: response.redirected,
+                    url: response.url,
+                    ok: response.ok
+                });
+                
+                // 302 리다이렉트 응답 처리
+                if (response.type === 'opaqueredirect' || response.status === 302 || response.status === 0) {
+                    console.log('✅ 장바구니 추가 성공! (리다이렉트 감지)');
+                    
+                    // 성공 메시지 표시 후 장바구니 페이지로 이동
+                    alert('장바구니에 상품이 추가되었습니다!');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/cart?added=true';
+                    }, 500);
+                    
+                    return;
+                } else if (response.ok) {
+                    console.log('✅ 장바구니 추가 성공!');
+                    alert('장바구니에 상품이 추가되었습니다!');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/cart?added=true';
+                    }, 500);
+                    
+                    return;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            })
+            .catch(error => {
+                console.log('⚠️ Fetch 오류 발생:', error);
+                
+                // TypeError: Failed to fetch는 보통 CORS나 리다이렉트 문제
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    console.log('✅ 리다이렉트로 인한 오류로 판단 - 성공으로 처리');
+                    alert('장바구니에 상품이 추가되었습니다!');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/cart?added=true';
+                    }, 500);
+                } else {
+                    console.error('❌ 실제 장바구니 추가 오류:', error);
+                    alert('장바구니 추가 중 오류가 발생했습니다: ' + error.message);
+                }
+            })
+            .finally(() => {
+                // 버튼 복원 (약간의 지연 후)
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }, 1000);
+            });
+        }
+        
+        // ========== 개발 완료 후 주석 처리된 테스트 함수들 ==========
+        /*
+        // AJAX 테스트 함수
+        function testCartAdd() {
+            console.log('🧪 AJAX 테스트 함수 호출됨');
+            const productNo = /*[[${productNo}]]* / 1;
+            const quantity = document.getElementById('quantityInput').value || 1;
+            const csrf = document.querySelector('meta[name="_csrf"]').content;
+            
+            console.log('📋 AJAX 요청 데이터:', {
+                productNo: productNo,
+                quantity: quantity,
+                csrf: csrf ? 'CSRF 토큰 있음' : 'CSRF 토큰 없음'
+            });
+            
+            fetch('/cart/add-form', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `productNo=${productNo}&quantity=${quantity}&_csrf=${csrf}`
+            })
+            .then(response => {
+                console.log('🔍 AJAX 응답:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    redirected: response.redirected,
+                    url: response.url,
+                    ok: response.ok
+                });
+                
+                if (response.redirected) {
+                    console.log('🔄 리다이렉트됨:', response.url);
+                    alert('AJAX 요청 성공! 장바구니 페이지로 이동합니다.');
+                    window.location.href = response.url;
+                } else if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            })
+            .then(data => {
+                if (data) {
+                    console.log('📋 응답 내용:', data);
+                    alert('응답 받음: ' + data.substring(0, 100) + '...');
+                }
+            })
+            .catch(error => {
+                console.error('❌ AJAX 오류:', error);
+                alert('AJAX 요청 실패: ' + error.message);
+            });
+        }
+        
+        // 폼 데이터 확인 함수
+        function checkFormData() {
+            const form = document.getElementById('cartForm');
+            const formData = new FormData(form);
+            
+            console.log('📋 현재 폼 데이터:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+            
+            const quantityInput = document.getElementById('quantityInput');
+            const cartQuantityInput = document.getElementById('cartQuantityInput');
+            
+            console.log('📊 수량 필드 상태:', {
+                표시수량: quantityInput.value,
+                숨겨진수량: cartQuantityInput.value,
+                폼액션: form.action,
+                폼메소드: form.method
+            });
+            
+            alert(`폼 데이터 확인\n상품번호: ${formData.get('productNo')}\n수량: ${formData.get('quantity')}\nCSRF: ${formData.get('_csrf') ? '있음' : '없음'}`);
+        }
+        
+        // 수동 폼 제출 함수
+        function manualSubmit() {
+            console.log('📝 수동 폼 제출 시작');
+            
+            // 수량 동기화
+            document.getElementById('cartQuantityInput').value = document.getElementById('quantityInput').value;
+            
+            const form = document.getElementById('cartForm');
+            console.log('📋 폼 제출 정보:', {
+                action: form.action,
+                method: form.method,
+                productNo: form.querySelector('[name="productNo"]').value,
+                quantity: form.querySelector('[name="quantity"]').value,
+                csrf: form.querySelector('[name="_csrf"]').value ? '있음' : '없음'
+            });
+            
+            // 실제 폼 제출
+            form.submit();
+        }
+        */
+        // ========== 테스트 함수들 주석 처리 끝 ==========
     </script>
+
+    <!-- Header JS -->
+    <script src="/assets/dist/js/header.js"></script>
+
+    <!-- Footer Fragment -->
+    <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

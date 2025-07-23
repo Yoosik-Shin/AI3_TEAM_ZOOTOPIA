@@ -1,6 +1,7 @@
 package com.aloha.zootopia.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.aloha.zootopia.domain.InsuranceProduct;
 
@@ -14,4 +15,7 @@ public interface InsuranceProductService {
 
     List<InsuranceProduct> getProductsPaged(int offset, int size);
     int getTotalCount();
+
+    List<InsuranceProduct> getFilteredProducts(Map<String, Object> filters, int offset, int limit);
+    int countFilteredProducts(Map<String, Object> filters);
 }

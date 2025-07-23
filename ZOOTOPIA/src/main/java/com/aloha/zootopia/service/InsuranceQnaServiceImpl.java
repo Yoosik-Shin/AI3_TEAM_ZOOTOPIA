@@ -44,4 +44,14 @@ public class InsuranceQnaServiceImpl implements InsuranceQnaService {
         qnaMapper.deleteQna(qnaId);
     }
     
+    @Override
+    public List<InsuranceQna> getQnaListPaged(int productId, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return qnaMapper.getQnaListPaged(productId, offset, pageSize);
+    }
+    
+    @Override
+    public int countByProduct(int productId) {
+        return qnaMapper.countQnaByProduct(productId);
+    }
 }

@@ -1,6 +1,7 @@
 package com.aloha.zootopia.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,5 +50,17 @@ public class InsuranceProductServiceImpl implements InsuranceProductService {
     @Override
     public int getTotalCount() {
         return productMapper.countAllProducts();
+    }
+
+        @Override
+    public List<InsuranceProduct> getFilteredProducts(Map<String, Object> filters, int offset, int limit) {
+        filters.put("offset", offset);
+        filters.put("limit", limit);
+        return productMapper.selectFilteredProducts(filters);
+    }
+
+    @Override
+    public int countFilteredProducts(Map<String, Object> filters) {
+        return productMapper.countFilteredProducts(filters);
     }
 }

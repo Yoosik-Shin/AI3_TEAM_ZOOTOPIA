@@ -78,30 +78,51 @@ public class CartController {
     // 장바구니 페이지
     @GetMapping("")
     public String cart(HttpSession session, Model model) {
-        System.out.println("=== CartController /cart 호출됨 ===");
+        System.out.println("=== 🛒 장바구니 페이지 호출됨 ===");
         try {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
+            
+            System.out.println("=== 📋 세션에서 가져온 cartItems: " + cartItems);
+            
             if (cartItems == null) {
                 cartItems = new ArrayList<>();
                 session.setAttribute("cartItems", cartItems);
+                System.out.println("=== ⚠️ cartItems가 null이어서 빈 리스트 생성 ===");
+            } else {
+                System.out.println("=== 📊 cartItems 개수: " + cartItems.size());
             }
+            
             // cart.html에서 요구하는 필드명으로 변환
             List<Map<String, Object>> mappedCartItems = new ArrayList<>();
             int totalAmount = 0;
             int totalQuantity = 0;
+            
             for (Map<String, Object> item : cartItems) {
+                System.out.println("=== 장바구니 아이템 처리: " + item);
                 Map<String, Object> mapped = new HashMap<>();
+                
+                // 저장된 필드명에 따라 적절히 매핑 (productName/name, productPrice/price 등)
                 mapped.put("productNo", item.get("productNo"));
-                mapped.put("name", item.get("name"));
-                mapped.put("price", item.get("price"));
+                mapped.put("name", item.get("productName") != null ? item.get("productName") : item.get("name"));
+                mapped.put("price", item.get("productPrice") != null ? item.get("productPrice") : item.get("price"));
                 mapped.put("quantity", item.get("quantity"));
-                mapped.put("imageUrl", item.get("imageUrl"));
+                mapped.put("imageUrl", item.get("productImage") != null ? item.get("productImage") : item.get("imageUrl"));
                 mapped.put("category", item.get("category"));
+                
                 mappedCartItems.add(mapped);
-                totalAmount += ((Integer)item.get("price")) * ((Integer)item.get("quantity"));
-                totalQuantity += ((Integer)item.get("quantity"));
+                
+                Integer price = (Integer) mapped.get("price");
+                Integer quantity = (Integer) mapped.get("quantity");
+                if (price != null && quantity != null) {
+                    totalAmount += price * quantity;
+                    totalQuantity += quantity;
+                }
             }
+            
+            System.out.println("=== 매핑된 cartItems: " + mappedCartItems);
+            System.out.println("=== totalAmount: " + totalAmount + ", totalQuantity: " + totalQuantity);
+            
             model.addAttribute("cartItems", mappedCartItems);
             model.addAttribute("totalAmount", totalAmount);
             model.addAttribute("totalQuantity", totalQuantity);
@@ -269,30 +290,44 @@ public class CartController {
         @RequestParam(name = "quantity") int quantity,
         HttpSession session) {
         try {
+            System.out.println("=== 🛒 장바구니 추가 요청 수신됨! ===");
+            System.out.println("=== 요청 파라미터: productNo=" + productNo + ", quantity=" + quantity);
+            
             // 상품 정보 조회
             List<Product> allProducts = createDummyProducts();
             Product product = allProducts.stream()
                 .filter(p -> p.getNo() == productNo)
                 .findFirst()
                 .orElse(null);
+                
             if (product == null) {
+                System.out.println("=== ❌ 상품을 찾을 수 없음: productNo=" + productNo);
                 return "redirect:/products/detail/" + productNo + "?error=notfound";
             }
+            
+            System.out.println("=== ✅ 찾은 상품: " + product.getName() + " (가격: " + product.getPrice() + ")");
+            
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
             if (cartItems == null) {
                 cartItems = new ArrayList<>();
                 session.setAttribute("cartItems", cartItems);
+                System.out.println("=== 🆕 새로운 장바구니 생성");
+            } else {
+                System.out.println("=== 📋 기존 장바구니 아이템 수: " + cartItems.size());
             }
+            
             boolean found = false;
             for (Map<String, Object> item : cartItems) {
                 if ((Integer) item.get("productNo") == productNo) {
                     int currentQuantity = (Integer) item.get("quantity");
                     item.put("quantity", currentQuantity + quantity);
                     found = true;
+                    System.out.println("=== 🔄 기존 상품 수량 업데이트: " + (currentQuantity + quantity));
                     break;
                 }
             }
+            
             if (!found) {
                 Map<String, Object> newItem = new HashMap<>();
                 newItem.put("productNo", product.getNo());
@@ -301,18 +336,38 @@ public class CartController {
                 newItem.put("quantity", quantity);
                 newItem.put("productImage", product.getImageUrl());
                 newItem.put("productStock", product.getStock() > 0 ? product.getStock() : 99);
+                newItem.put("category", product.getCategory());
+                
                 // 하위 호환용 기존 필드도 저장
                 newItem.put("name", product.getName());
                 newItem.put("price", product.getPrice());
                 newItem.put("imageUrl", product.getImageUrl());
-                newItem.put("category", product.getCategory());
+                
                 cartItems.add(newItem);
+                System.out.println("=== ➕ 새 상품 장바구니에 추가: " + newItem);
             }
-            return "redirect:/cart";
+            
+            session.setAttribute("cartItems", cartItems);
+            System.out.println("=== 🎯 장바구니 최종 총 개수: " + cartItems.size());
+            System.out.println("=== 🔄 장바구니 페이지로 리다이렉트 진행...");
+            
+            return "redirect:/cart?added=true";
         } catch (Exception e) {
+            System.err.println("=== ❌ 장바구니 추가 중 오류: " + e.getMessage());
             e.printStackTrace();
             return "redirect:/products/detail/" + productNo + "?error=exception";
         }
+    }
+    
+    // 테스트용 간단한 장바구니 추가 엔드포인트
+    @PostMapping("/test-add")
+    public String testAdd(
+        @RequestParam(name = "productNo", defaultValue = "3") int productNo,
+        @RequestParam(name = "quantity", defaultValue = "1") int quantity,
+        HttpSession session) {
+        System.out.println("=== 🧪 테스트 장바구니 추가 호출됨! ===");
+        System.out.println("=== 파라미터: productNo=" + productNo + ", quantity=" + quantity);
+        return addToCartForm(productNo, quantity, session);
     }
     
     // 장바구니 상품 수량 변경
@@ -376,6 +431,31 @@ public class CartController {
         }
     }
     
+    // 장바구니 전체 비우기
+    @PostMapping("/clear")
+    public Object clearAllCart(HttpSession session, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("cartItems");
+            if (cartItems != null) {
+                cartItems.clear();
+            }
+            response.put("success", true);
+            response.put("message", "장바구니가 비워졌습니다.");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "장바구니 비우기 중 오류가 발생했습니다.");
+        }
+        
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            return org.springframework.http.ResponseEntity.ok(response);
+        } else {
+            return "redirect:/cart?cleared=" + java.net.URLEncoder.encode((String)response.get("message"), java.nio.charset.StandardCharsets.UTF_8);
+        }
+    }
+
     // 결제 페이지로 이동
     @PostMapping("/checkout")
     public String checkout(

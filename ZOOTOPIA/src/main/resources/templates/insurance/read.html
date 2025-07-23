@@ -14,7 +14,6 @@
     <!-- Login CSS only -->
     <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <link rel="stylesheet" href="/assets/dist/css/login.css">
-    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
   <style>
     .highlight-circle {
       display: inline-block;
@@ -33,10 +32,11 @@
     }
   </style>
 </head>
-<body class="bg-light">
+<body class="bg-light"       
+      th:data-product-id="${product.productId}" 
+      th:data-login-user-id="${loginUserId}" 
+      th:data-is-admin="${isAdmin}">
     <div th:replace="~{fragments/header :: header}"></div>
-
-
   <div class="container bg-white p-4 rounded shadow-sm mt-5 mb-5" style="max-width: 900px;">
 
     <!-- 상단 보험명 -->
@@ -101,126 +101,247 @@
     <!-- 경계선 -->
     <hr class="my-4">
 
-      <!-- Q&A -->
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-chat-dots fs-4"></i>
-          <h5 class="mb-0 fw-bold">펫 보험 Q&A</h5>
-        </div>
-        <button class="btn1 btn-sm"
-                data-bs-toggle="modal"
-                data-bs-target="#qnaModal"
-                ssec:authorize="hasRole('USER')">
+      <!-- Q&A 등록 영역 -->
+
+    <!-- QnA 제목 영역: 모두에게 표시 -->
+    <div class="d-flex align-items-center mb-3">
+      <span class="fs-4 me-2">🐾</span>
+      <h5 class="fw-bold mb-0 text-dark">펫보험 Q&A</h5>
+    </div>
+
+    <!-- 🔐 로그인 사용자(일반 유저)만 질문 등록 가능 -->
+    <div class="mb-4" sec:authorize="hasRole('USER') and !hasRole('ADMIN')">
+      <div class="d-flex gap-2">
+        <select id="speciesInput" class="form-select" style="max-width: 150px">
+          <option value="">선택 없음</option>
+          <option value="강아지">강아지</option>
+          <option value="고양이">고양이</option>
+        </select>
+        <input type="text" id="questionInput" placeholder="질문" class="form-control">
+        <button type="button" id="registerBtn" class="btn1" style="white-space: nowrap; padding: 6px 12px; font-size: 0.9rem;">
           질문 등록
         </button>
       </div>
-
-      <!-- QnA 목록 -->
-      <div id="qnaListArea">
-        <div th:if="${#lists.isEmpty(qnaList)}" class="text-center text-muted small py-3 border rounded">
-          등록된 질문이 없습니다.
-        </div>
-        <div th:each="qna : ${qnaList}" class="border rounded p-3 mb-3 bg-light">
-          <div class="mb-2">
-            <span class="badge bg-warning me-2" th:text="${qna.species}">강아지</span>
-            <strong th:text="${qna.question}">질문 내용</strong>
-          </div>
-          <div class="small text-muted mt-1 ms-1" th:if="${qna.answer}">
-            <div th:text="${qna.answer}">답변 내용</div>
-          </div>
-          <div class="small text-muted mt-2">
-            답변 :
-            <span th:text="${qna.answer != null ? '1' : '0'}">0</span> |
-            <span th:text="${qna.userId}">작성자</span> |
-            <span th:text="${#temporals.format(qna.createdAt, 'yyyy.MM.dd')}">2025.07.04</span>
-          </div>
-          <div class="mt-2">
-            <span class="badge bg-secondary">#펫보험</span>
-          </div>
-        </div>
-      </div>
-
-    <!-- 질문 등록 모달 -->
-    <div class="modal fade" id="qnaModal" tabindex="-1">
-      <div class="modal-dialog">
-        <form id="qnaForm" class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Q&A 질문 등록</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <input type="hidden" name="productId" th:value="${product.productId}">
-            <div class="mb-3">
-              <label class="form-label">종(강아지/고양이)</label>
-              <input name="species" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">질문 내용</label>
-              <textarea name="question" class="form-control" rows="4" required></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn1" data-bs-dismiss="modal">취소</button>
-            <button type="submit" class="btn1">등록</button>
-          </div>
-        </form>
-      </div>
-    </div>
     </div>
 
+        <!-- 🔐 비로그인 사용자에게 로그인 안내 버튼 -->
+    <div sec:authorize="!isAuthenticated()" class="text-center mb-4">
+      <a th:href="@{/login}" class="btn btn1">🔐 로그인 후 이용하기</a>
+    </div>
 
+    <!-- QnA 리스트 -->
+    <div id="qnaListArea"></div>
+    </div>
+
+    <!-- 페이지네이션 영역 -->
+    <div id="qnaPagination" class="d-flex justify-content-center mt-3"></div>
   
   <div th:replace="~{fragments/footer :: footer}"></div>
     <script th:src="@{/assets/dist/js/header.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('qnaForm');
-
-  // csrf
   const csrfToken = document.querySelector('meta[name="_csrf"]').content;
   const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+  const productId = document.body.getAttribute('data-product-id');
+  let currentPage = 1;
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const formData = new FormData(form);
+  // QnA 리스트 로드
+  function loadQnaList(page = 1) {
+    fetch(`/insurance/qna/list?productId=${productId}&page=${page}`)
+      .then(res => res.json())
+      .then(data => {
+        renderQnaList(data.qnaList);
+        renderPagination(data.pagination);
+        currentPage = page;
+      });
+  }
 
+  // QnA 렌더링
+  function renderQnaList(qnaList) {
+    const container = document.getElementById('qnaListArea');
+    container.innerHTML = '';
+
+    if (qnaList.length === 0) {
+      container.innerHTML = '<div class="text-muted text-center">등록된 질문이 없습니다.</div>';
+      return;
+    }
+
+    qnaList.forEach(qna => {
+      const card = document.createElement('div');
+      card.className = 'border rounded p-3 mb-3 bg-white';
+      card.dataset.id = qna.qnaId;
+
+      let content = `
+        <div><span class="badge bg-warning">${qna.species || '기타'}</span>
+             <strong>${qna.question}</strong></div>
+        <div class="text-muted small">답변: ${qna.answer ? '1' : '0'} | 작성자 ID: ${qna.userId} | ${qna.createdAt}</div>`;
+
+      // 작성자 수정폼
+      if (qna.writer && !qna.answer) {
+        content += `
+          <div class="mt-2">
+            <select class="form-select mb-1 species-edit">
+              <option value="">선택 없음</option>
+              <option value="강아지" ${qna.species === '강아지' ? 'selected' : ''}>강아지</option>
+              <option value="고양이" ${qna.species === '고양이' ? 'selected' : ''}>고양이</option>
+            </select>
+            <input type="text" class="form-control mb-1 question-edit" value="${qna.question}">
+            <button class="btn1 btn-update">수정</button>
+          </div>
+        `;
+      }
+
+      // 작성자 또는 관리자에게 삭제 버튼
+      if (qna.writer || qna.admin) {
+        content += `
+          <div class="mt-2">
+            <button class="btn1 btn-delete">삭제</button>
+          </div>
+        `;
+      }
+
+      // 관리자 답변 등록
+      if (qna.admin) {
+        content += `
+          <div class="mt-2">
+            <textarea class="form-control my-1 answer-edit">${qna.answer || ''}</textarea>
+            <button class="btn1 btn-answer">답변 등록</button>
+          </div>
+        `;
+      }
+
+      // 일반 사용자 답변 보기
+      if (!qna.admin && qna.answer) {
+        content += `
+          <div class="mt-2">
+            <button class="btn1 btn-show-answer">답변 보기</button>
+            <div class="answer-box mt-2 text-dark d-none">${qna.answer}</div>
+          </div>`;
+      }
+
+      card.innerHTML = content;
+      container.appendChild(card);
+    });
+
+    addEventListeners();
+  }
+
+  // 페이지네이션 렌더링
+  function renderPagination(pagination) {
+    const nav = document.getElementById('qnaPaginationArea');
+    nav.innerHTML = '';
+    if (!pagination || pagination.totalPage <= 1) return;
+
+    const createPageItem = (label, page, disabled, active) => {
+      return `<li class="page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}">
+                <button class="page-link" data-page="${page}">${label}</button>
+              </li>`;
+    };
+
+    let html = '<ul class="pagination">';
+    if (pagination.hasPrev) html += createPageItem('&laquo;', pagination.startPage - 1, false, false);
+
+    for (let i = pagination.startPage; i <= pagination.endPage; i++) {
+      html += createPageItem(i, i, false, pagination.page === i);
+    }
+
+    if (pagination.hasNext) html += createPageItem('&raquo;', pagination.endPage + 1, false, false);
+    html += '</ul>';
+
+    nav.innerHTML = html;
+
+    nav.querySelectorAll('.page-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const page = btn.getAttribute('data-page');
+        loadQnaList(page);
+      });
+    });
+  }
+
+  // 이벤트 바인딩
+  function addEventListeners() {
+    document.querySelectorAll('.btn-update').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const card = e.target.closest('[data-id]');
+        const qnaId = card.dataset.id;
+        const species = card.querySelector('.species-edit')?.value;
+        const question = card.querySelector('.question-edit')?.value;
+        fetch('/insurance/qna/edit-ajax', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+          },
+          body: JSON.stringify({ qnaId, species, question, productId })
+        }).then(() => loadQnaList(currentPage));
+      });
+    });
+
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const card = e.target.closest('[data-id]');
+        const qnaId = card.dataset.id;
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        fetch(`/insurance/qna/delete-ajax/${qnaId}?productId=${productId}`, {
+          method: 'POST',
+          headers: { [csrfHeader]: csrfToken }
+        }).then(() => loadQnaList(currentPage));
+      });
+    });
+
+    document.querySelectorAll('.btn-answer').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const card = e.target.closest('[data-id]');
+        const qnaId = card.dataset.id;
+        const answer = card.querySelector('.answer-edit')?.value;
+        fetch('/insurance/qna/answer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
+          },
+          body: JSON.stringify({ qnaId, answer, productId })
+        }).then(() => loadQnaList(currentPage));
+      });
+    });
+
+    document.querySelectorAll('.btn-show-answer').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const card = e.target.closest('[data-id]');
+        const answerBox = card.querySelector('.answer-box');
+        answerBox.classList.toggle('d-none');
+      });
+    });
+  }
+
+  // 질문 등록
+  document.getElementById('registerBtn')?.addEventListener('click', () => {
+    const species = document.getElementById('speciesInput').value || null;
+    const question = document.getElementById('questionInput').value;
+    if (!question.trim()) {
+      alert('질문 내용을 입력하세요.');
+      return;
+    }
     fetch('/insurance/qna/register-ajax', {
       method: 'POST',
-      body: formData,
       headers: {
+        'Content-Type': 'application/json',
         [csrfHeader]: csrfToken
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      const qnaListArea = document.getElementById('qnaListArea');
-      qnaListArea.innerHTML = '';
-      if (data.length === 0) {
-        qnaListArea.innerHTML = `<div class="text-center text-muted small">등록된 질문이 없습니다.</div>`;
-      } else {
-        data.forEach(qna => {
-          qnaListArea.innerHTML += `
-            <div class="border p-3 rounded bg-light mb-3">
-              <span class="badge bg-warning mb-2">${qna.species}</span>
-              <p class="mb-1 small">${qna.question}</p>
-              <div class="small text-end text-muted">
-                ${qna.answer ? '1' : '0'} | ${qna.userId} | ${qna.createdAt}
-              </div>
-            </div>
-          `;
-        });
-      }
-      bootstrap.Modal.getInstance(document.getElementById('qnaModal')).hide();
-      form.reset();
-    })
-    .catch(err => {
-      console.error(err);
-      alert('등록 실패');
+      },
+      body: JSON.stringify({ species, question, productId })
+    }).then(() => {
+      document.getElementById('speciesInput').value = '';
+      document.getElementById('questionInput').value = '';
+      loadQnaList(1);
     });
   });
+
+  // 초기 로딩
+  loadQnaList(1);
 });
-  </script>
+</script>
+
 </body>
 </html>
