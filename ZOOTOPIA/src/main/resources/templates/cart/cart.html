@@ -98,6 +98,13 @@
 
     <!-- 메인 컨테이너 -->
     <div class="container mt-4">
+        <!-- 성공 메시지 -->
+        <div class="alert alert-success alert-dismissible fade show" th:if="${param.added}">
+            <i class="fas fa-check-circle me-2"></i>
+            장바구니에 상품이 추가되었습니다!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
         <!-- 브레드크럼 -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -114,6 +121,18 @@
                     <i class="fas fa-shopping-cart me-2"></i>장바구니
                     <span class="badge bg-primary ms-2" th:text="${totalQuantity}">0</span>
                 </h2>
+                
+                <!-- 디버깅 정보 (개발 완료 후 주석 처리) -->
+                <!--
+                <div class="alert alert-info mt-3" style="font-size: 0.9em;">
+                    <strong>🔍 디버깅 정보:</strong><br>
+                    - 총 상품 수: <span th:text="${cartItems != null ? cartItems.size() : 'null'}">0</span><br>
+                    - 총 수량: <span th:text="${totalQuantity}">0</span><br>
+                    - 총 금액: <span th:text="${totalAmount}">0</span>원<br>
+                    - cartItems 존재: <span th:text="${cartItems != null ? '예' : '아니오'}">아니오</span><br>
+                    - cartItems 비어있음: <span th:text="${cartItems == null or cartItems.isEmpty() ? '예' : '아니오'}">예</span>
+                </div>
+                -->
             </div>
         </div>
 
@@ -239,12 +258,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Footer Fragment -->
-    <div th:replace="fragments/footer :: footer"></div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         function updateQuantity(productNo, newQuantity) {
@@ -355,6 +368,11 @@
         }
     </script>
 
+    <!-- Footer Fragment -->
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Header JS -->
     <script src="/assets/dist/js/header.js"></script>
 </body>
