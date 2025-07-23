@@ -81,7 +81,11 @@ public class CustomUser implements UserDetails, OAuth2User {
         return this.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_" + roleName));
     }
-        
+
+    public void setProfileImg(String profileImg) {
+        this.user.setProfileImg(profileImg); // 내부 Users 객체에 위임
+    }
+            
 
 
 }
