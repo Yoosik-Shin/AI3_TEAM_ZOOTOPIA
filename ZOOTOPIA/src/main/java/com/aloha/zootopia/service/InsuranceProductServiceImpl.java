@@ -63,4 +63,9 @@ public class InsuranceProductServiceImpl implements InsuranceProductService {
     public int countFilteredProducts(Map<String, Object> filters) {
         return productMapper.countFilteredProducts(filters);
     }
+
+    @Override
+    public InsuranceProduct getProductById(int productId) {
+        return productMapper.selectProductById(productId);
+    }
 }

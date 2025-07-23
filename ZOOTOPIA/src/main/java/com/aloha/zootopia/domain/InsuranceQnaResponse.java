@@ -11,6 +11,7 @@ public class InsuranceQnaResponse {
     private String species;
     private String question;
     private String answer;
+    private String nickname;
     private long userId;
     private String createdAt;
     private boolean writer;  // 작성자인지 여부
@@ -27,6 +28,7 @@ public class InsuranceQnaResponse {
         dto.setCreatedAt(qna.getCreatedAt() != null ? qna.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) : "");
         dto.setWriter(qna.getUserId() == loginUserId);
         dto.setAdmin(isAdminUser);
+        dto.setNickname(qna.getNickname());
         return dto;
     }
 }

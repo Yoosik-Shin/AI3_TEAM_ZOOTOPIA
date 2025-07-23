@@ -10,6 +10,7 @@ public interface InsuranceProductService {
     void registerProduct(InsuranceProduct product);      // 등록
     List<InsuranceProduct> listProducts();               // 목록
     InsuranceProduct getProduct(int productId);          // 상세
+    InsuranceProduct getProductById(int productId);
     void updateProduct(InsuranceProduct product);        // 수정
     void deleteProduct(int productId);                   // 삭제
 

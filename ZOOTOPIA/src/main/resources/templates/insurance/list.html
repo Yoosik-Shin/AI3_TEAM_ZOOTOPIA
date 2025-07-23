@@ -72,7 +72,7 @@
       <!-- 보험사 선택 -->
       <div class="mb-4">
         <select name="company" class="form-select form-select-sm" onchange="document.getElementById('filterForm').submit()">
-          <option value="">보험사 선택</option>
+          <option value="">전체</option>
           <option value="삼성화재" th:selected="${param.company == '삼성화재'}">삼성화재</option>
           <option value="KB" th:selected="${param.company == 'KB'}">KB</option>
           <option value="메리츠" th:selected="${param.company == '메리츠'}">메리츠</option>

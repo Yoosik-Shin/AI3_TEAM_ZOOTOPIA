@@ -176,10 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
       let content = `
         <div><span class="badge bg-warning">${qna.species || '기타'}</span>
              <strong>${qna.question}</strong></div>
-        <div class="text-muted small">답변: ${qna.answer ? '1' : '0'} | 작성자 ID: ${qna.userId} | ${qna.createdAt}</div>`;
+        <div class="text-muted small">
+          답변: ${qna.answer ? '1' : '0'} | 작성자: ${qna.nickname} | ${qna.createdAt}
+        </div>`;
 
-      // 작성자 수정폼
-      if (qna.writer && !qna.answer) {
+      if (qna.writer === true && (qna.answer === null || qna.answer === '')) {
+        // 수정 가능할 때 (답변 없음 + 작성자)
         content += `
           <div class="mt-2">
             <select class="form-select mb-1 species-edit">
@@ -188,15 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
               <option value="고양이" ${qna.species === '고양이' ? 'selected' : ''}>고양이</option>
             </select>
             <input type="text" class="form-control mb-1 question-edit" value="${qna.question}">
-            <button class="btn1 btn-update">수정</button>
+            <div class="d-flex gap-2">
+              <button class="btn1 btn-update">수정</button>
+              <button class="btn1 btn-delete">삭제</button>
+            </div>
           </div>
         `;
-      }
-
-      // 작성자 또는 관리자에게 삭제 버튼
-      if (qna.writer || qna.admin) {
+      } else if (qna.writer || qna.admin) {
+        // 수정은 못하지만 삭제만 가능할 때
         content += `
-          <div class="mt-2">
+          <div class="mt-2 text-end">
             <button class="btn1 btn-delete">삭제</button>
           </div>
         `;
