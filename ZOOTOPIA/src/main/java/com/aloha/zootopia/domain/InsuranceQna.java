@@ -12,5 +12,6 @@ public class InsuranceQna {
     private String species;        // 종류
     private String question;       // 질문 내용
     private String answer;         // 관리자 답변
+    private String nickname;
     private LocalDateTime createdAt;  // 작성일시
 }

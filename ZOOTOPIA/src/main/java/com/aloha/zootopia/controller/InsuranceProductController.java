@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.InsuranceProduct;
@@ -128,6 +130,16 @@ public class InsuranceProductController {
         } catch (IOException e) {
             return Map.of("message", "업로드 실패: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/read/{productId}")
+    public String readProduct(@PathVariable("productId") int productId, Model model) {
+        InsuranceProduct product = insuranceProductService.getProductById(productId);
+        if (product == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 보험 상품을 찾을 수 없습니다.");
+        }
+        model.addAttribute("product", product);
+        return "insurance/read";  // 이 템플릿 파일이 반드시 존재해야 함
     }
 
 

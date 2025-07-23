@@ -48,9 +48,11 @@
     </delete>
 
     <select id="getQnaListPaged" parameterType="map" resultType="com.aloha.zootopia.domain.InsuranceQna">
-        SELECT * FROM insurance_qna
-        WHERE product_id = #{productId}
-        ORDER BY created_at DESC
+        SELECT q.*, u.nickname
+        FROM insurance_qna q
+        JOIN users u ON q.user_id = u.user_id
+        WHERE q.product_id = #{productId}
+        ORDER BY q.created_at DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
