@@ -77,8 +77,11 @@ public class MypageController {
             File saveFile = new File(uploadDir, safeFileName);
             profileFile.transferTo(saveFile);
 
+            String newProfileImgPath = "/upload/profile/" + safeFileName;
             user.setProfileImg("/upload/profile/" + safeFileName);
             userService.updateUser(user);
+
+            loginUser.setProfileImg(newProfileImgPath);
             ra.addFlashAttribute("msg", "프로필 이미지가 수정되었습니다.");
         } else {
             ra.addFlashAttribute("error", "업로드할 파일이 없습니다.");
