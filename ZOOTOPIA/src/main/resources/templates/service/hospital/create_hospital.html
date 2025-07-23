@@ -105,7 +105,7 @@
 
         <!-- 삭제 form -->
         <div sec:authorize="hasAuthority('ROLE_ADMIN')" th:if="${hospitalForm.hospitalId != null}">
-            <form id="deleteForm" th:action="@{/hospitals/delete/{id}(id=${hospitalForm.hospitalId})}" method="post" style="display: none;">
+            <form id="deleteForm" th:action="@{/service/hospitals/delete/{id}(id=${hospitalForm.hospitalId})}" method="post" style="display: none;">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
         </div>
@@ -182,7 +182,7 @@
 
 
                     // AJAX 요청
-                    fetch('/hospitals', {
+                    fetch('/service/hospitals', {
                         method: 'POST',
                         headers: {
                             [csrfHeader]: csrfToken
@@ -193,7 +193,7 @@
                     .then(data => {
                         if (data.status === 'success') {
                             alert(data.message);
-                            window.location.href = '/hospitals'; // 성공 시 병원 목록 페이지로 이동
+                            window.location.href = '/service/hospitals'; // 성공 시 병원 목록 페이지로 이동
                         } else {
                             alert('오류: ' + data.message);
                         }
@@ -209,7 +209,7 @@
                 deleteBtn.addEventListener('click', function() {
                     if (confirm('정말로 이 병원을 삭제하시겠습니까?')) {
                         const hospitalId = hospitalIdInput.value;
-                        fetch(`/hospitals/delete/${hospitalId}`, {
+                        fetch(`/service/hospitals/delete/${hospitalId}`, {
                             method: 'POST',
                             headers: {
                                 [csrfHeader]: csrfToken
@@ -218,7 +218,7 @@
                         .then(response => response.text()) // 서버에서 String으로 응답하므로 text() 사용
                         .then(message => {
                             alert(message); // 컨트롤러에서 리다이렉트하므로 이 메시지는 실제로는 안 보일 수 있음
-                            window.location.href = '/hospitals'; // 삭제 후 병원 목록 페이지로 이동
+                            window.location.href = '/service/hospitals'; // 삭제 후 병원 목록 페이지로 이동
                         })
                         .catch(error => {
                             console.error('Error:', error);
