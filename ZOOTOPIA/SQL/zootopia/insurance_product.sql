@@ -7,6 +7,7 @@ coverage_percent INT NOT NULL,                         -- 보장비율
 monthly_fee_range VARCHAR(50),                         -- 월 보험료 (범위 표기용)
 max_coverage INT,                                      -- 최대 보장 한도
 species ENUM('dog', 'cat', 'all') DEFAULT 'all',       -- 보험 대상
+company VARCHAR(50),                                   -- 보험사
 join_condition TEXT,                                   -- 가입조건
 coverage_items TEXT,                                   -- 보장항목
 precautions TEXT,                                      -- 유의사항
@@ -27,5 +28,6 @@ CREATE TABLE insurance_qna (
   FOREIGN KEY (user_id) REFERENCES users(user_id)
     ON DELETE CASCADE
 );
+
 
 ALTER TABLE insurance_qna CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

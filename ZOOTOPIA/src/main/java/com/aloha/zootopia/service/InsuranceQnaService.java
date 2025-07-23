@@ -12,4 +12,8 @@ public interface  InsuranceQnaService {
     void answerQna(InsuranceQna qna);                            // 답변 등록/수정 (관리자)
     void updateQnaQuestion(InsuranceQna qna);                    // 질문 수정 (작성자)
     void deleteQna(int qnaId);                                   // 질문 삭제
+
+    // Service 인터페이스
+    List<InsuranceQna> getQnaListPaged(int productId, int page, int pageSize);
+    int countByProduct(int productId);
 }

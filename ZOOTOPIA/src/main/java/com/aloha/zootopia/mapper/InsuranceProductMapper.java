@@ -1,6 +1,7 @@
 package com.aloha.zootopia.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -17,4 +18,7 @@ public interface InsuranceProductMapper {
 
     List<InsuranceProduct> selectProductsPaged(int offset, int size);
     int countAllProducts();
+
+    List<InsuranceProduct> selectFilteredProducts(Map<String, Object> filters);
+    int countFilteredProducts(Map<String, Object> filters);
 }
