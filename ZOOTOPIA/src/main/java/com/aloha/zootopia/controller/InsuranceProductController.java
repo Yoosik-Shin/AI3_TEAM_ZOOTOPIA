@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.aloha.zootopia.domain.InsuranceProduct;
-import com.aloha.zootopia.domain.InsuranceQna;
 import com.aloha.zootopia.service.InsuranceProductService;
 import com.aloha.zootopia.service.InsuranceQnaService;
 
@@ -42,64 +42,66 @@ public class InsuranceProductController {
     @Autowired
     private InsuranceQnaService qnaService;
 
+    @Autowired
+    private InsuranceProductService insuranceProductService;
+
     // 보험상품 목록
     @GetMapping("/list")
-    public String list(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "6") int size,
-            Model model) {
+    public String listProducts(
+        @RequestParam(value = "species", required = false) String species,
+        @RequestParam(value = "company", required = false) String company,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        Model model
+    ) {
+        int pageSize = 6;
+        int offset = (page - 1) * pageSize;
 
-        int offset = Math.max((page - 1) * size, 0);
-        List<InsuranceProduct> products = productService.getProductsPaged(offset, size);
-        int totalProducts = productService.getTotalCount();
-        int totalPages = (int) Math.ceil((double) totalProducts / size);
-        if (totalPages == 0) totalPages = 1;
+        // 필터 파라미터 Map
+        Map<String, Object> filters = new HashMap<>();
+        if (species != null && !species.isBlank()) {
+            filters.put("species", species);
+        }
+        if (company != null && !company.isBlank()) {
+            filters.put("company", company);
+        }
+
+        // 필터된 결과 가져오기
+        List<InsuranceProduct> products = insuranceProductService.getFilteredProducts(filters, offset, pageSize);
+        int totalCount = insuranceProductService.countFilteredProducts(filters);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
 
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
+
         return "insurance/list";
-    }
-
-    // 보험 상세
-    @GetMapping("/read/{productId}")
-    public String read(@PathVariable int productId, Model model) {
-    InsuranceProduct product = productService.getProduct(productId);
-    List<InsuranceQna> qnaList = qnaService.getQnaList(productId);
-
-        model.addAttribute("product", product);
-        model.addAttribute("qnaList", qnaList);
-        return "insurance/read";
     }
 
     // 등록폼 (관리자)
     @GetMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public String showRegisterForm() {
-        return "insurance/create"; 
+    public String showRegisterForm(Model model) {
+        model.addAttribute("product", new InsuranceProduct()); // 객체 주입 필수
+        return "insurance/create";
     }
 
     // 보험 상품 등록
     @PostMapping("/register")
     @PreAuthorize("hasRole('ADMIN')")
-    public String register(@ModelAttribute InsuranceProduct product, RedirectAttributes rttr) {
-        try {
-            if (product.getSpecies() == null || product.getSpecies().isBlank()) {
-                rttr.addFlashAttribute("errorMessage", "반려동물 종류를 선택하세요.");
-                return "redirect:/insurance/create";
-            }
-            if (product.getImagePath() == null || product.getImagePath().isBlank()) {
-                rttr.addFlashAttribute("errorMessage", "이미지를 먼저 업로드하세요.");
-                return "redirect:/insurance/create";
-            }
-
-            productService.registerProduct(product);
-            rttr.addFlashAttribute("successMessage", "✅ 등록 완료");
-            return "redirect:/insurance/list";
-        } catch (Exception e) {
-            rttr.addFlashAttribute("errorMessage", "❌ 오류 발생: " + e.getMessage());
-            return "redirect:/insurance/create";
+    public String register(@ModelAttribute InsuranceProduct product, Model model) {
+        if (product.getSpecies() == null || product.getSpecies().isBlank()) {
+            model.addAttribute("errorMessage", "반려동물 종류를 선택하세요.");
+            model.addAttribute("product", product); // 입력값 다시 전달
+            return "insurance/create";
         }
+        if (product.getImagePath() == null || product.getImagePath().isBlank()) {
+            model.addAttribute("errorMessage", "이미지를 먼저 업로드하세요.");
+            model.addAttribute("product", product); // 입력값 다시 전달
+            return "insurance/create";
+        }
+
+        productService.registerProduct(product);
+        return "redirect:/insurance/list";
     }
 
 

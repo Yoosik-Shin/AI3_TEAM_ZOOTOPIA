@@ -57,34 +57,36 @@
       </div>
       <div>
         
-  <form th:action="@{/insurance/list}" method="get" >
-  <div class="bg-light p-4 rounded shadow-sm mb-2 mt-2" style="width: 340px; height: 340px; border-radius: 10px;">
-  <!-- 제목 -->
-  <p class="text-center fw-bold mb-4">🐶 원하는 보험 찾기 🐱</p>
+  <form id="filterForm" th:action="@{/insurance/list}" method="get">
+    <div class="bg-light p-4 rounded shadow-sm mb-2 mt-2" style="width: 340px; height: 340px; border-radius: 10px;">
+      <!-- 제목 -->
+      <p class="text-center fw-bold mb-4">🐶 원하는 보험 찾기 🐱</p>
 
-  <!-- 동물 버튼 -->
-  <div class="d-flex justify-content-center gap-2 mb-5">
-    <button type="submit" name="species" value="dog" class="btn btn-outline-secondary btn-sm">강아지</button>
-    <button type="submit" name="species" value="cat" class="btn btn-outline-secondary btn-sm">고양이</button>
-  </div>
+      <!-- 동물 버튼 -->
+      <div class="d-flex justify-content-center gap-2 mb-5">
+        <input type="hidden" name="species" id="speciesInput" />
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="submitSpecies('dog')">강아지</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="submitSpecies('cat')">고양이</button>
+      </div>
 
-  <!-- 보험사 선택 -->
-  <div class="mb-4">
-    <select name="company" class="form-select form-select-sm">
-      <option value="">보험사 선택</option>
-      <option value="삼성화재">삼성화재</option>
-      <option value="KB">KB</option>
-      <option value="메리츠">메리츠</option>
-    </select>
-  </div>
+      <!-- 보험사 선택 -->
+      <div class="mb-4">
+        <select name="company" class="form-select form-select-sm" onchange="document.getElementById('filterForm').submit()">
+          <option value="">보험사 선택</option>
+          <option value="삼성화재" th:selected="${param.company == '삼성화재'}">삼성화재</option>
+          <option value="KB" th:selected="${param.company == 'KB'}">KB</option>
+          <option value="메리츠" th:selected="${param.company == '메리츠'}">메리츠</option>
+        </select>
+      </div>
 
-  <!-- 로고 이미지 -->
-  <div class="text-center mb-3">
-    <img src="/img/zootopialogo.png" alt="주토피아 로고" style="width: 90px;" height="70px" class="mb-1">
-    <p class="small text-muted text-center mt-2 fw-bold">🏡 펫과 함께, 더 나은 내일을</p>
-  </div>
-  </div>
-</form>
+      <!-- 로고 -->
+      <div class="text-center mb-3">
+        <img src="/img/zootopialogo.png" alt="주토피아 로고" style="width: 90px;" height="70px" class="mb-1">
+        <p class="small text-muted text-center mt-2 fw-bold">🏡 펫과 함께, 더 나은 내일을</p>
+      </div>
+    </div>
+  </form>
+
   </div>
     </div>
 
@@ -215,5 +217,11 @@
     <script th:src="@{/assets/dist/js/header.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 
+  <script>
+    function submitSpecies(species) {
+      document.getElementById('speciesInput').value = species;
+      document.getElementById('filterForm').submit();
+    }
+  </script>
 </body>
 </html>

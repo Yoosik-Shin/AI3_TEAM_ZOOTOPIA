@@ -1,6 +1,8 @@
 package com.aloha.zootopia.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,6 @@ public class InsuranceQnaController {
     @Autowired
     private InsuranceProductService productService;
 
-
     // 특정 보험상품 Q&A 목록
     @GetMapping("/read/{productId}")
     public String read(@PathVariable int productId,
@@ -58,15 +59,23 @@ public class InsuranceQnaController {
     // AJAX: QnA 리스트 조회
     @GetMapping("/list")
     @ResponseBody
-    public List<InsuranceQnaResponse> listQna(@RequestParam int productId,
-                                              @AuthenticationPrincipal CustomUser user) {
+    public Map<String, Object> listQnaPaged(@RequestParam int productId,
+                                            @RequestParam(defaultValue = "1") int page,
+                                            @AuthenticationPrincipal CustomUser user) {
+        int pageSize = 4;
         long loginUserId = user != null ? user.getUser().getUserId() : -1;
         boolean isAdmin = user != null && user.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
-        return qnaService.getQnaList(productId).stream()
+        List<InsuranceQnaResponse> qnaList = qnaService.getQnaListPaged(productId, page, pageSize).stream()
                 .map(q -> InsuranceQnaResponse.from(q, loginUserId, isAdmin))
                 .toList();
+        int totalCount = qnaService.countByProduct(productId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("qnaList", qnaList);
+        response.put("pagination", getPagination(page, totalCount, pageSize));
+        return response;
     }
 
     // 질문 등록
@@ -180,5 +189,21 @@ public class InsuranceQnaController {
         return qnaService.getQnaList(productId).stream()
                 .map(q -> InsuranceQnaResponse.from(q, loginId, isAdmin))
                 .toList();
+    }
+
+        // ✅ 페이지네이션 계산 함수
+        private Map<String, Object> getPagination(int page, int totalCount, int pageSize) {
+        int totalPage = (int) Math.ceil((double) totalCount / pageSize);
+        int startPage = Math.max(1, page - 2);
+        int endPage = Math.min(totalPage, page + 2);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("page", page);
+        map.put("totalPage", totalPage);
+        map.put("startPage", startPage);
+        map.put("endPage", endPage);
+        map.put("hasPrev", startPage > 1);
+        map.put("hasNext", endPage < totalPage);
+        return map;
     }
 }
