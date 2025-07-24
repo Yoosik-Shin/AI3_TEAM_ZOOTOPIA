@@ -164,19 +164,14 @@ public class UserServiceImpl implements UserService {
     public Users findOrCreateOAuthUser(SocialDTO dto) {
         Users user = userMapper.findByProviderAndProviderId(dto.getProvider(), dto.getProviderId());
         if (user != null) {
-            try {
-                return userMapper.select(user.getEmail());
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+            return user;
         }
         Users newUser = Users.builder()
                 .email(dto.getEmail())
                 .nickname(dto.getNickname())
                 .provider(dto.getProvider())
                 .providerId(dto.getProviderId())
-                .password(passwordEncoder.encode(UUID.randomUUID().toString())) 
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .build();
         try {
             userMapper.join(newUser);
@@ -184,7 +179,7 @@ public class UserServiceImpl implements UserService {
             userAuth.setEmail(newUser.getEmail());
             userAuth.setAuth("ROLE_USER");
             userMapper.insertAuth(userAuth);
-            return userMapper.select(newUser.getEmail());
+            return newUser;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
