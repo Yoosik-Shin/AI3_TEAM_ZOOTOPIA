@@ -20,7 +20,11 @@
         <div class="main-menu-container">
             <ul class="main-menu navbar-nav mx-auto d-none d-lg-flex">
                 <div id="horizontal-underline"></div>
-
+                <li id="main-menu-home"><a class="nav-link" href="/">홈</a></li>
+                <li id="main-menu-store"><a class="nav-link" href="/products/listp">스토어</a></li>
+                <li id="main-menu-map"><a class="nav-link" th:href="@{/map/map}">내 주변 찾기</a></li>
+                <li id="main-menu-service"><a class="nav-link" th:href="@{/insurance/list}">서비스</a></li>
+                <li id="main-menu-community"><a class="nav-link" th:href="@{/posts/list}">커뮤니티</a></li>
             </ul>
 
             <!-- 서브메뉴 -->

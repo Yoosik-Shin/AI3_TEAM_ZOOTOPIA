@@ -215,10 +215,12 @@
                                 [csrfHeader]: csrfToken
                             }
                         })
-                        .then(response => response.text()) // 서버에서 String으로 응답하므로 text() 사용
-                        .then(message => {
-                            alert(message); // 컨트롤러에서 리다이렉트하므로 이 메시지는 실제로는 안 보일 수 있음
-                            window.location.href = '/service/hospitals'; // 삭제 후 병원 목록 페이지로 이동
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message);
+                            if (data.status === 'success') {
+                                window.location.href = '/service/hospitals';
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
