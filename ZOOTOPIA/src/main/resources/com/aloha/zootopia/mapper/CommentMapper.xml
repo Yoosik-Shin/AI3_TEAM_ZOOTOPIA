@@ -79,7 +79,7 @@
   </update>
 
   <delete id="deleteLostByPostId">
-    DELETE FROM lost_post_comments WHERE post_id = #{postId}
+    DELETE FROM lost_animal_comments WHERE post_id = #{postId}
   </delete>
 
   <update id="updateLostContent">
