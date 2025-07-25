@@ -53,8 +53,22 @@
 /* Price Input Specific Styles */
 input[type="number"]#price {
     text-align: right;
-    padding-right: 20px;
+    padding-right: 50px; /* 원 표시를 위한 충분한 공간 */
     position: relative;
+}
+
+/* 가격 입력 필드의 placeholder 개선 */
+input[type="number"]#price:not(:placeholder-shown) {
+    color: #333;
+}
+
+input[type="number"]#price:placeholder-shown {
+    text-align: left;
+    color: #999;
+}
+
+input[type="number"]#price:focus {
+    text-align: right;
 }
 
 /* 가격 입력 필드의 화살표 숨기기 */
@@ -74,8 +88,11 @@ input[type="number"]#price {
 /* 가격 입력 컨테이너 스타일 */
 .price-input-container {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
+/* "원" 표시 기본 스타일 */
 .price-input-container::after {
     content: "원";
     position: absolute;
@@ -84,7 +101,16 @@ input[type="number"]#price {
     transform: translateY(-50%);
     color: #666;
     font-size: 0.9rem;
+    font-weight: 500;
     pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* 값이 있을 때 "원" 표시 */
+.price-input-container.has-value::after {
+    opacity: 1;
 }
 
 /* Textarea specific styles */

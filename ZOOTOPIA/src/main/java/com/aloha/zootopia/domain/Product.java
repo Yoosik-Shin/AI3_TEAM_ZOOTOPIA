@@ -20,7 +20,13 @@ public class Product {
     private int reviewCount;      // 리뷰 개수
 
     // 생성자
-    public Product() {}
+    public Product() {
+        this.status = "판매중";  // 기본값 설정
+        this.views = 0;
+        this.likes = 0;
+        this.dislikes = 0;
+        this.stock = 0;
+    }
 
     public Product(String name, String category, String description, int price, String imageUrl) {
         this.name = name;

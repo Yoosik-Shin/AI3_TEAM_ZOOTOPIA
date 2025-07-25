@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,16 +45,70 @@ public class ProductController {
         return "redirect:/products/listp";
     }
     
-    // 동적 기능이 포함된 상품 목록 페이지 (Bootstrap + Thymeleaf)
+    // 동적 기능이 포함된 상품 목록 페이지 (Bootstrap + Thymeleaf) - DB 연동
     @GetMapping("/listp")
     public String list(@RequestParam(value = "category", required = false) String category,
                       @RequestParam(value = "search", required = false) String search,
                       @RequestParam(value = "page", defaultValue = "1") int page,
                       @RequestParam(value = "size", defaultValue = "9") int size,
                       Model model) {
-        System.out.println("=== ProductController /listp 호출됨 ===");
+        System.out.println("=== ProductController /listp 호출됨 (DB 연동) ===");
         System.out.println("카테고리: " + category + ", 검색어: " + search + ", 페이지: " + page);
         
+        try {
+            List<Product> products;
+            int totalProducts;
+            
+            // 페이지네이션을 위한 offset 계산
+            int offset = (page - 1) * size;
+            
+            // 카테고리 및 검색 조건에 따른 상품 조회
+            if (search != null && !search.isEmpty()) {
+                // 검색어가 있는 경우
+                products = productService.searchByName(search, offset, size);
+                totalProducts = productService.getTotalByName(search);
+            } else if (category != null && !category.isEmpty() && !"전체".equals(category)) {
+                // 특정 카테고리 조회
+                products = productService.getByCategory(category, offset, size);
+                totalProducts = productService.getTotalByCategory(category);
+            } else {
+                // 전체 상품 조회
+                products = productService.getByPage(offset, size);
+                totalProducts = productService.getTotal();
+            }
+            
+            // 페이지네이션 설정
+            Pagination pagination = new Pagination(page, totalProducts);
+            pagination.setSize(size);
+            pagination.setCategory(category);
+            
+            // 카테고리 목록
+            List<String> categories = java.util.Arrays.asList("전체", "사료", "용품", "장난감", "산책");
+            
+            // 모델에 데이터 추가
+            model.addAttribute("products", products);
+            model.addAttribute("pagination", pagination);
+            model.addAttribute("categories", categories);
+            model.addAttribute("currentCategory", category != null ? category : "전체");
+            model.addAttribute("currentSearch", search != null ? search : "");
+            model.addAttribute("totalProducts", totalProducts);
+            
+            System.out.println("DB에서 조회된 상품 수: " + products.size() + " / 전체: " + totalProducts);
+            
+            return "products/listp";
+            
+        } catch (Exception e) {
+            System.err.println("상품 목록 DB 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            
+            // DB 연결 실패 시 더미 데이터로 fallback
+            System.out.println("DB 연결 실패 - 더미 데이터로 fallback");
+            return listWithDummyData(category, search, page, size, model);
+        }
+    }
+    
+    // DB 연결 실패 시 더미 데이터 사용하는 fallback 메서드
+    private String listWithDummyData(String category, String search, int page, int size, Model model) {
         try {
             // 더미 데이터 생성
             List<Product> allProducts = createDummyProducts();
@@ -86,7 +140,7 @@ public class ProductController {
             pagination.setSize(size);
             pagination.setCategory(category);
             
-            // 카테고리 목록 (실제 더미 데이터에 있는 카테고리로 수정)
+            // 카테고리 목록
             List<String> categories = java.util.Arrays.asList("전체", "사료", "용품", "장난감", "산책");
             
             // 모델에 데이터 추가
@@ -96,6 +150,7 @@ public class ProductController {
             model.addAttribute("currentCategory", category != null ? category : "전체");
             model.addAttribute("currentSearch", search != null ? search : "");
             model.addAttribute("totalProducts", totalProducts);
+            model.addAttribute("fallbackMode", true); // 더미 데이터 사용 표시
             
             return "products/listp";
             
@@ -107,33 +162,79 @@ public class ProductController {
         }
     }
     
-    // 상품 상세 페이지 - 완성된 버전
+    // 상품 상세 페이지 - DB 연동 버전
     @GetMapping("/detail/{no}")
     public String detail(@PathVariable("no") Integer productNumber, Model model) {
-        System.out.println("=== 상품 상세 페이지 호출됨: " + productNumber + " ===");
-        // 더미 상품 데이터에서 해당 상품 찾기
-        List<Product> allProducts = createDummyProducts();
-        Product product = allProducts.stream()
-            .filter(p -> p.getNo() == productNumber)
-            .findFirst()
-            .orElse(null);
-        if (product == null) {
-            model.addAttribute("error", "상품을 찾을 수 없습니다.");
-            return "error/404";
+        System.out.println("=== 상품 상세 페이지 호출됨 (DB 연동): " + productNumber + " ===");
+        
+        try {
+            // DB에서 상품 조회 (조회수도 자동 증가)
+            Product product = productService.getByNo(productNumber);
+            
+            if (product == null) {
+                System.out.println("상품을 찾을 수 없음: " + productNumber);
+                model.addAttribute("error", "상품을 찾을 수 없습니다.");
+                return "error/404";
+            }
+            
+            // 상품 정보를 모델에 추가
+            model.addAttribute("productNo", product.getNo());
+            model.addAttribute("productName", product.getName());
+            model.addAttribute("productPrice", product.getPrice());
+            model.addAttribute("productCategory", product.getCategory());
+            model.addAttribute("productDescription", product.getDescription());
+            model.addAttribute("productStock", product.getStock() > 0 ? product.getStock() : 50);
+            model.addAttribute("productRating", product.getRating() > 0 ? product.getRating() : 4.5);
+            model.addAttribute("productReviewCount", product.getReviewCount() > 0 ? product.getReviewCount() : 120);
+            model.addAttribute("productImage", product.getImageUrl());
+            model.addAttribute("quantity", 1); // 기본 수량
+            
+            System.out.println("DB에서 상품 정보 조회 완료: " + product.getName());
+            return "products/detail";
+            
+        } catch (Exception e) {
+            System.err.println("상품 상세 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            
+            // DB 연결 실패 시 더미 데이터로 fallback
+            System.out.println("DB 연결 실패 - 더미 데이터로 fallback");
+            return detailWithDummyData(productNumber, model);
         }
-        model.addAttribute("productNo", product.getNo());
-        model.addAttribute("productName", product.getName());
-        model.addAttribute("productPrice", product.getPrice());
-        model.addAttribute("productCategory", product.getCategory());
-        model.addAttribute("productDescription", product.getDescription());
-        model.addAttribute("productStock", product.getStock() > 0 ? product.getStock() : 50);
-        model.addAttribute("productRating", product.getRating() > 0 ? product.getRating() : 4.5);
-        model.addAttribute("productReviewCount", product.getReviewCount() > 0 ? product.getReviewCount() : 120);
-        model.addAttribute("productImage", product.getImageUrl());
-        // 기본 수량
-        model.addAttribute("quantity", 1);
-        System.out.println("상품 정보 설정 완료");
-        return "products/detail";
+    }
+    
+    // DB 연결 실패 시 더미 데이터 사용하는 fallback 메서드
+    private String detailWithDummyData(Integer productNumber, Model model) {
+        try {
+            List<Product> allProducts = createDummyProducts();
+            Product product = allProducts.stream()
+                .filter(p -> p.getNo() == productNumber)
+                .findFirst()
+                .orElse(null);
+            
+            if (product == null) {
+                model.addAttribute("error", "상품을 찾을 수 없습니다.");
+                return "error/404";
+            }
+            
+            model.addAttribute("productNo", product.getNo());
+            model.addAttribute("productName", product.getName());
+            model.addAttribute("productPrice", product.getPrice());
+            model.addAttribute("productCategory", product.getCategory());
+            model.addAttribute("productDescription", product.getDescription());
+            model.addAttribute("productStock", product.getStock() > 0 ? product.getStock() : 50);
+            model.addAttribute("productRating", product.getRating() > 0 ? product.getRating() : 4.5);
+            model.addAttribute("productReviewCount", product.getReviewCount() > 0 ? product.getReviewCount() : 120);
+            model.addAttribute("productImage", product.getImageUrl());
+            model.addAttribute("quantity", 1);
+            model.addAttribute("fallbackMode", true); // 더미 데이터 사용 표시
+            
+            return "products/detail";
+            
+        } catch (Exception e) {
+            System.err.println("더미 데이터 fallback 중 오류: " + e.getMessage());
+            model.addAttribute("error", "상품 정보를 불러올 수 없습니다.");
+            return "error/500";
+        }
     }
     
     // 테스트용 상품 상세 페이지
@@ -225,7 +326,6 @@ public class ProductController {
         return "products/create";
     }
     
-//     // 상품 등록 처리
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public String create(Product product, 
@@ -240,11 +340,17 @@ public class ProductController {
                 product.setImageUrl("/img/default-thumbnail.png");
             }
             
+            // 기본값 설정 (도메인에서 설정되지 않을 경우 보장)
+            if (product.getStatus() == null || product.getStatus().isEmpty()) {
+                product.setStatus("판매중");
+            }
+            
 //             // 상품 등록
             int result = productService.insert(product);
             
             if (result > 0) {
                 redirectAttributes.addFlashAttribute("success", "상품이 성공적으로 등록되었습니다.");
+                // 상품 목록 페이지로 리다이렉트 (read 페이지가 없으므로)
                 return "redirect:/products/listp";
             } else {
                 redirectAttributes.addFlashAttribute("error", "상품 등록에 실패했습니다.");
@@ -252,6 +358,7 @@ public class ProductController {
             }
             
         } catch (Exception e) {
+            e.printStackTrace(); // 디버깅을 위한 스택 트레이스 출력
             redirectAttributes.addFlashAttribute("error", "오류가 발생했습니다: " + e.getMessage());
             return "redirect:/products/create";
         }

@@ -34,7 +34,7 @@
                 <div class="product-form-container">
                     <h2 class="form-title text-center mb-4">상품 등록</h2>
                     
-                    <form th:action="@{/products/create}" method="post" enctype="multipart/form-data" 
+                    <form th:action="@{/products/create}" th:object="${product}" method="post" enctype="multipart/form-data" 
                           class="product-form" onsubmit="return validateForm()">
                         
                         <!-- CSRF 토큰 -->
@@ -44,14 +44,16 @@
                         <div class="form-group mb-3">
                             <label for="name" class="form-label">상품명 :</label>
                             <input type="text" id="name" name="name" class="form-control" 
-                                   placeholder="상품명을 입력하세요" required maxlength="100">
+                                   th:field="*{name}" placeholder="상품명을 입력하세요" 
+                                   required maxlength="100">
                         </div>
                         
                         <!-- 제품 설명 -->
                         <div class="form-group mb-3">
                             <label for="description" class="form-label">제품 설명 :</label>
                             <textarea id="description" name="description" class="form-control" 
-                                      rows="4" placeholder="제품 설명을 입력하세요" required maxlength="1000"></textarea>
+                                      th:field="*{description}" rows="4" placeholder="제품 설명을 입력하세요" 
+                                      required maxlength="1000"></textarea>
                         </div>
                         
                         <!-- 가격 -->
@@ -59,20 +61,20 @@
                             <label for="price" class="form-label">가격 :</label>
                             <div class="price-input-container">
                                 <input type="number" id="price" name="price" class="form-control" 
-                                       placeholder="가격을 입력하세요" required min="0" max="99999999" 
-                                       step="1000" value="0">
+                                       th:field="*{price}" placeholder="가격을 입력하세요" 
+                                       required min="0" max="99999999" step="1000">
                             </div>
                         </div>
                         
                         <!-- 옵션 -->
                         <div class="form-group mb-3">
                             <label for="category" class="form-label">옵션 :</label>
-                            <select id="category" name="category" class="form-control" required>
+                            <select id="category" name="category" class="form-control" th:field="*{category}" required>
                                 <option value="">카테고리를 선택</option>
-                                <option value="개">개</option>
-                                <option value="고양이">고양이</option>
-                                <option value="새">새</option>
-                                <option value="물고기">물고기</option>
+                                <option value="사료">사료</option>
+                                <option value="용품">용품</option>
+                                <option value="장난감">장난감</option>
+                                <option value="산책">산책</option>
                                 <option value="기타">기타</option>
                             </select>
                         </div>
@@ -81,7 +83,8 @@
                         <div class="form-group mb-4">
                             <label for="stock" class="form-label">재고 :</label>
                             <input type="number" id="stock" name="stock" class="form-control" 
-                                   placeholder="재고 수량을 입력하세요" required min="0" max="9999" value="1">
+                                   th:field="*{stock}" placeholder="재고 수량을 입력하세요" 
+                                   required min="0" max="9999">
                         </div>
                         
                         <!-- 이미지 설정 -->
@@ -132,13 +135,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const successAlert = document.querySelector('.alert-success');
             if (successAlert) {
-                // 3초 후 제품 목록 페이지로 이동
-                setTimeout(function() {
-                    window.location.href = '/products/listp';
-                }, 3000);
-                
                 // 성공 알림 메시지
-                alert('상품이 성공적으로 등록되었습니다!\n3초 후 제품 목록 페이지로 이동합니다.');
+                alert('상품이 성공적으로 등록되었습니다!');
+                // 컨트롤러에서 이미 적절한 페이지로 리다이렉트되므로 추가 처리 불필요
             }
         });
         
@@ -192,6 +191,52 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+        
+        // 가격 입력 필드 개선 (number 타입에서는 쉼표 포맷팅 제거)
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceInput = document.getElementById('price');
+            const priceContainer = priceInput.parentElement;
+            
+            // "원" 표시 토글 함수
+            function toggleCurrencyDisplay() {
+                if (priceInput.value && priceInput.value !== '0') {
+                    priceContainer.classList.add('has-value');
+                } else {
+                    priceContainer.classList.remove('has-value');
+                }
+            }
+            
+            // 초기 로드 시 체크
+            toggleCurrencyDisplay();
+            
+            // 입력 이벤트 리스너
+            priceInput.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+                toggleCurrencyDisplay();
+            });
+            
+            // 포커스 이벤트 리스너
+            priceInput.addEventListener('focus', function() {
+                if (this.value === '0') {
+                    this.value = '';
+                }
+            });
+            
+            // 포커스를 잃을 때 입력값 검증
+            priceInput.addEventListener('blur', function() {
+                const value = parseInt(this.value);
+                if (isNaN(value) || value < 0) {
+                    this.value = '';
+                } else if (value === 0) {
+                    this.value = '';
+                } else {
+                    this.value = value;
+                }
+                toggleCurrencyDisplay();
+            });
+        });
     </script>
     
 </body>

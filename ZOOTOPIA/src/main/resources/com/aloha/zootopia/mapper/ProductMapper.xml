@@ -17,13 +17,14 @@
         <result property="updDate" column="upd_date" />
         <result property="views" column="views" />
         <result property="likes" column="likes" />
+        <result property="dislikes" column="dislikes" />
         <result property="stock" column="stock" />
     </resultMap>
 
     <!-- 상품 목록 조회 (페이징) -->
     <select id="selectByPage" resultMap="productMap">
         SELECT no, name, category, description, price, image_url, status, 
-               reg_date, upd_date, views, likes, stock
+               reg_date, upd_date, views, likes, dislikes, stock
         FROM products 
         WHERE status = '판매중'
         ORDER BY reg_date DESC
@@ -33,7 +34,7 @@
     <!-- 카테고리별 상품 목록 조회 (페이징) -->
     <select id="selectByCategoryAndPage" resultMap="productMap">
         SELECT no, name, category, description, price, image_url, status, 
-               reg_date, upd_date, views, likes, stock
+               reg_date, upd_date, views, likes, dislikes, stock
         FROM products 
         WHERE status = '판매중' AND category = #{category}
         ORDER BY reg_date DESC
@@ -54,7 +55,7 @@
     <!-- 상품 상세 조회 -->
     <select id="selectByNo" resultMap="productMap">
         SELECT no, name, category, description, price, image_url, status, 
-               reg_date, upd_date, views, likes, stock
+               reg_date, upd_date, views, likes, dislikes, stock
         FROM products 
         WHERE no = #{no}
     </select>
@@ -62,8 +63,8 @@
     <!-- 상품 등록 -->
     <insert id="insert" parameterType="com.aloha.zootopia.domain.Product" 
             useGeneratedKeys="true" keyProperty="no">
-        INSERT INTO products (name, category, description, price, image_url, status, reg_date, upd_date, views, likes, stock)
-        VALUES (#{name}, #{category}, #{description}, #{price}, #{imageUrl}, #{status}, NOW(), NOW(), 0, 0, #{stock})
+        INSERT INTO products (name, category, description, price, image_url, status, reg_date, upd_date, views, likes, dislikes, stock)
+        VALUES (#{name}, #{category}, #{description}, #{price}, #{imageUrl}, #{status}, NOW(), NOW(), 0, 0, 0, #{stock})
     </insert>
 
     <!-- 상품 수정 -->
@@ -103,7 +104,7 @@
     <!-- 검색 (상품명) -->
     <select id="selectByNameAndPage" resultMap="productMap">
         SELECT no, name, category, description, price, image_url, status, 
-               reg_date, upd_date, views, likes, stock
+               reg_date, upd_date, views, likes, dislikes, stock
         FROM products 
         WHERE status = '판매중' AND name LIKE CONCAT('%', #{name}, '%')
         ORDER BY reg_date DESC
