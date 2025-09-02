@@ -566,7 +566,7 @@ public class ProductController {
     
     // 기본 템플릿 테스트
     @GetMapping("/template-test/{no}")
-    public String templateTest(@PathVariable int no, Model model) {
+    public String templateTest(@PathVariable("no") int no, Model model) {
         System.out.println("=== 기본 템플릿 테스트 호출됨: " + no + " ===");
         return "test_basic";
     }

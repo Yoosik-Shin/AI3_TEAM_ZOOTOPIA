@@ -153,7 +153,7 @@ public class ParttimeJobController {
     }
 
     @GetMapping("/read/{jobId}")
-    public String read(@PathVariable Long jobId,
+    public String read(@PathVariable("jobId") Long jobId,
                         @RequestParam(defaultValue = "1") int applicantPage, 
                         Model model, 
                         @AuthenticationPrincipal CustomUser user) throws Exception {
@@ -220,7 +220,7 @@ public class ParttimeJobController {
     // 수정 폼
     @GetMapping("/update/{jobId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public String showUpdateForm(@PathVariable Long jobId, Model model) {
+    public String showUpdateForm(@PathVariable("jobId") Long jobId, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUser)) {
             throw new SecurityException("인증 정보를 가져올 수 없습니다.");
@@ -259,7 +259,7 @@ public class ParttimeJobController {
     // 삭제 처리
     @PostMapping("/delete/{jobId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public String deleteJob(@PathVariable Long jobId, @AuthenticationPrincipal CustomUser user,
+    public String deleteJob(@PathVariable("jobId") Long jobId, @AuthenticationPrincipal CustomUser user,
                             RedirectAttributes redirectAttributes) {
         ParttimeJob job = jobService.getJob(jobId);
         Long userId = user.getUserId();

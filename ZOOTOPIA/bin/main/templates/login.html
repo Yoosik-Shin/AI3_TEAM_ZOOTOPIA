@@ -10,8 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/header.css}">
     <!-- Login CSS only -->
-    <link rel="stylesheet" href="/assets/dist/css/login.css">
+    <link rel="stylesheet" th:href="@{/assets/dist/css/login.css}">
 </head>
 
 <body class="login-page">
@@ -114,7 +115,30 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Inline Header JavaScript -->
+    <script th:src="@{/assets/dist/js/header.js}"></script>
+
+    <script>
+  // 페이지 로딩 시 localStorage에서 아이디 불러오기
+  window.addEventListener('DOMContentLoaded', () => {
+    const savedId = localStorage.getItem('savedEmail');
+    if (savedId) {
+      document.getElementById('email').value = savedId;
+      document.getElementById('remember-id-check').checked = true;
+    }
+  });
+
+  // 폼 제출 시 아이디 저장 여부 확인
+  document.querySelector('form').addEventListener('submit', () => {
+    const emailInput = document.getElementById('email');
+    const rememberIdCheck = document.getElementById('remember-id-check').checked;
+
+    if (rememberIdCheck) {
+      localStorage.setItem('savedEmail', emailInput.value);
+    } else {
+      localStorage.removeItem('savedEmail');
+    }
+  });
+</script>
 
 
 </body>

@@ -20,7 +20,6 @@
 
   <!-- 2. 병원 '상세' 조회를 위한 복잡한 ResultMap (분리된 쿼리 사용) -->
   <resultMap id="HospitalDetailResultMap" type="Hospital" extends="HospitalListResultMap">
-    <collection property="animals" ofType="com.aloha.zootopia.domain.Animal" column="hospital_id" select="getAnimalsByHospitalId" />
     <collection property="specialties" ofType="com.aloha.zootopia.domain.Specialty" column="hospital_id" select="getSpecialtiesByHospitalId" />
   </resultMap>
 

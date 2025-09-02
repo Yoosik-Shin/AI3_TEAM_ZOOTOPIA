@@ -1,14 +1,16 @@
-/* Header Styles */
+/* ============================= */
+/* Zootopia Header Scoped Styles */
+/* ============================= */
 .zootopia-header {
     background: #fff;
     padding: 10px 0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
-    /* z-index: 1000; */
+    z-index: 1000;
 }
 
-.zootopia-brand {
+.zootopia-header .zootopia-brand {
     color: #ff6b6b;
     font-weight: bold;
     font-size: 1.05rem;
@@ -17,24 +19,24 @@
     align-items: center;
 }
 
-.zootopia-brand:hover {
+.zootopia-header .zootopia-brand:hover {
     color: #ff5252;
     text-decoration: none;
 }
 
-.brand-icon {
+.zootopia-header .brand-icon {
     color: #ff6b6b;
     margin-right: 6px;
     font-size: 1.05rem;
 }
 
-.nav-links {
+.zootopia-header .nav-links {
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
-.nav-links a {
+.zootopia-header .nav-links a {
     color: #666;
     text-decoration: none;
     font-weight: 500;
@@ -44,18 +46,18 @@
     transition: all 0.3s ease;
 }
 
-.nav-links a:hover {
+.zootopia-header .nav-links a:hover {
     color: #ff6b6b;
     background-color: rgba(255, 107, 107, 0.1);
 }
 
-.header-actions {
+.zootopia-header .header-actions {
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.header-icon {
+.zootopia-header .header-icon {
     padding: 8px;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -67,26 +69,21 @@
     justify-content: center;
 }
 
-.header-icon:hover {
+.zootopia-header .header-icon:hover {
     background-color: #f8f9fa;
 }
 
-.header-icon:hover i {
+.zootopia-header .header-icon:hover i {
     color: #ff6b6b !important;
 }
 
-.search-icon {
+.zootopia-header .search-icon,
+.zootopia-header .cart-icon {
     color: #666;
     font-size: 1.1rem;
 }
 
-.cart-icon {
-    color: #666;
-    font-size: 1.1rem;
-    position: relative;
-}
-
-.cart-badge {
+.zootopia-header .cart-badge {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -102,12 +99,12 @@
     font-weight: bold;
 }
 
-.auth-buttons {
+.zootopia-header .auth-buttons {
     display: flex;
     gap: 8px;
 }
 
-.btn-login {
+.zootopia-header .btn-login {
     background: transparent;
     border: 1px solid #ff6b6b;
     color: #ff6b6b;
@@ -119,13 +116,13 @@
     transition: all 0.3s ease;
 }
 
-.btn-login:hover {
+.zootopia-header .btn-login:hover {
     background: #ff6b6b;
     color: white;
     text-decoration: none;
 }
 
-.btn-signup {
+.zootopia-header .btn-signup {
     background: #ff6b6b;
     border: 1px solid #ff6b6b;
     color: white;
@@ -137,17 +134,15 @@
     transition: all 0.3s ease;
 }
 
-.btn-signup:hover {
+.zootopia-header .btn-signup:hover {
     background: #ff5252;
     border-color: #ff5252;
-    color: white;
-    text-decoration: none;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
 }
 
-/* Mobile Menu Toggle */
-.mobile-menu-toggle {
+/* 모바일 메뉴 */
+.zootopia-header .mobile-menu-toggle {
     display: none;
     background: none;
     border: none;
@@ -156,7 +151,7 @@
     padding: 8px;
 }
 
-.mobile-nav {
+.zootopia-header .mobile-nav {
     display: none;
     position: absolute;
     top: 100%;
@@ -167,11 +162,11 @@
     padding: 20px 0;
 }
 
-.mobile-nav.active {
+.zootopia-header .mobile-nav.active {
     display: block;
 }
 
-.mobile-nav a {
+.zootopia-header .mobile-nav a {
     display: block;
     padding: 12px 20px;
     color: #666;
@@ -179,37 +174,52 @@
     border-bottom: 1px solid #eee;
 }
 
-.mobile-nav a:hover {
+.zootopia-header .mobile-nav a:hover {
     background: #f8f9fa;
     color: #ff6b6b;
 }
 
-/* Responsive Design */
+/* 반응형 */
 @media (max-width: 768px) {
-    .nav-links {
+    .zootopia-header .nav-links {
         display: none;
     }
 
-    .mobile-menu-toggle {
+    .zootopia-header .mobile-menu-toggle {
         display: block;
     }
 
-    .header-actions {
+    .zootopia-header .header-actions {
         gap: 10px;
     }
 
-    .auth-buttons {
+    .zootopia-header .auth-buttons {
         gap: 5px;
     }
 
-    .btn-login,
-    .btn-signup {
+    .zootopia-header .btn-login,
+    .zootopia-header .btn-signup {
         padding: 5px 12px;
         font-size: 0.8rem;
     }
 }
 
+
 /* ======================================YS 수정============================ */
+
+.header-logo-container {
+    width: 200px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+.header-logo-container img {
+    width: 200px;
+    height: 50px;
+    object-fit: contain;
+}
+
+
 .header-container {
     position: relative;
     display: flex;
@@ -217,25 +227,22 @@
 }
 
 
-
-
 .main-menu-container {
     position: relative;
     display: flex;
-    flex-grow: 1; /* Allow it to grow and take available space */
+    flex-grow: 1;
 }
 
-/* 메인 메뉴 */
 .main-menu {
     display: flex;
-    justify-content: center; /* 중앙 정렬 */
+    justify-content: center;
     list-style: none;
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: 1300px; /* Max width for large screens */
+    max-width: 1300px;
     position: relative;
-    gap: 10px; /* 메뉴 아이템 간의 간격 */
+    gap: 25px; /* 메뉴 아이템 간의 간격 */
 }
 
 .main-menu > li {
@@ -243,17 +250,18 @@
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 130px; /* 고정 너비 설정 */
+    width: 135px; /* 고정 너비 설정 */
     text-align: center;
 }
 
 .main-menu > li > a {
     display: block;
-    white-space: nowrap; /* 글씨가 줄바꿈되지 않도록 */
+    white-space: nowrap;
     height: 100%;
     text-align: center;
     text-decoration: none;
     color: inherit;
+    font-size: 18px;
 }
 
 #horizontal-underline {
@@ -266,13 +274,13 @@
     opacity: 0;
 }
 
-/* Sub Menu Panel - The container for all sub-menus */
+/* 서브메뉴 */
 .sub-menu-panel {
     position: absolute;
     left: 0;
     right: 0;
     background-color: #fff;
-    box-shadow: 0 8px 16px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px -2px #ff6b6b48;
     z-index: 1000;
     overflow: hidden;
     max-height: 0;
@@ -280,25 +288,23 @@
     visibility: hidden;
     transition: max-height 0.3s ease-out, opacity 0.3s ease-out, visibility 0.3s ease-out;
     display: flex;
-    justify-content: center; /* 중앙 정렬 */
+    justify-content: center;
     padding: 20px 0;
     width: 100%;
-    max-width: 690px;
+    max-width: 780px;
     margin: 0 auto;
-    gap: 10px; /* 메뉴 아이템 간의 간격 */
+    gap: 25px; /* 메뉴 아이템(column) 간의 간격 */
 }
-
-/* CSS hover logic removed - now handled by JavaScript */
 
 .sub-menu-column {
-    width: 130px; /* 메인 메뉴 li의 너비와 동일하게 고정 */
+    width: 135px; /* 메인 메뉴 li의 너비와 동일하게 고정 */
     text-align: center;
 }
-
 .sub-menu {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 135px; /* 서브 메뉴 li의 너비 */
 }
 
 .sub-menu li a {
@@ -311,4 +317,161 @@
 
 .sub-menu li a:hover {
     color: #ff6b6b;
+}
+
+
+
+/* 헤더 로그인 회원가입 버튼 */
+.header-login-btn-container .header-login-btn {
+    background-color: #F27A7A;
+    border: 1px solid #F27A7A;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 60px;
+}
+
+.header-login-btn-container .header-signup-btn {
+    background-color: transparent;
+    border: 1px solid #F27A7A;
+    color: #F27A7A;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 70px;
+}
+
+
+
+.user-menu {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+.user-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.user-menu ul {
+    width: 100%;
+    text-align: right;
+}
+.user-menu ul li {
+    display: inline-block;
+    list-style: none;
+    margin: 10px 20px;
+}
+.user-menu ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}   
+
+.user-sub-menu-wrap {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: -30px;
+    width: 320px;            
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    box-shadow: 0 8px 16px -4px #ff6b6b48;
+}
+.user-sub-menu-wrap.open-menu {
+    max-height: 400px;
+    /* opacity: 1; */
+    visibility: visible;
+}
+.user-sub-menu {
+    background: #fdfdfd;
+    padding: 20px;
+    margin: 10px;
+    width: 320px;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+}
+.user-info h3 {
+    font-weight: 500;
+}
+.user-info img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+.user-info hr {
+    border: 0;
+    height: 1px;
+    width: 100%;
+    background: #ccc;
+    margin: 15px 0 10px;
+}
+
+.user-sub-menu-form {
+    margin: 0;
+    padding: 0;
+}
+.user-sub-menu-link,
+.user-sub-menu-logout {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    border: none;
+    text-decoration: none;
+    background: none;
+    color: #000000;
+    font-weight: 500;
+    margin: 0;
+    padding: 0; 
+    cursor: pointer;
+    /* text-align: left; */
+    width: 100%;
+    line-height: 50px;
+}
+
+.user-sub-menu-link img,
+.user-sub-menu-logout img {
+    width: 40px;
+    height: 40px;
+    background: #e5e5e5;
+    border-radius: 50%;
+    padding: 8px;
+    /* margin-right: 15px; */
+}
+
+.user-sub-menu-link p,
+.user-sub-menu-logout p {
+    margin: 0;
+}
+
+.user-sub-menu-link span,
+.user-sub-menu-logout span {
+    font-size: 22px;
+}
+
+.user-sub-menu-link:hover span,
+.user-sub-menu-logout:hover span {
+    transform: translateX(5px);
+}
+.user-sub-menu-link:hover p,
+.user-sub-menu-logout:hover p {
+    font-weight: 600;
+}
+
+ /* Custom Gap */
+.gap-310px {
+  gap: 330px;
 }
