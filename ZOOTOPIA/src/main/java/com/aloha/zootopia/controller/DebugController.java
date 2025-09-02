@@ -24,7 +24,7 @@ public class DebugController {
     }
     
     @GetMapping("/product-test/{no}")
-    public String productTest(@PathVariable int no, Model model) {
+    public String productTest(@PathVariable("no") int no, Model model) {
         System.out.println("Debug: Product test called with no = " + no);
         
         model.addAttribute("productNo", no);

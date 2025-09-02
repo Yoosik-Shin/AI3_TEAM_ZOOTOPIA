@@ -25,12 +25,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class HospitalServiceImpl implements HospitalService {
-    @Autowired HospitalMapper hospitalMapper;
-    @Autowired AnimalMapper animalMapper;
-    @Autowired SpecialtyMapper specialtyMapper;
+    private final HospitalMapper hospitalMapper;
+    private final AnimalMapper animalMapper;
+    private final SpecialtyMapper specialtyMapper;
 
     @Value("${file.upload.path}")
     private String uploadPath;
+
+    @Autowired
+    public HospitalServiceImpl(HospitalMapper hospitalMapper, AnimalMapper animalMapper, SpecialtyMapper specialtyMapper) {
+        this.hospitalMapper = hospitalMapper;
+        this.animalMapper = animalMapper;
+        this.specialtyMapper = specialtyMapper;
+    }
 
     // 이미지 저장 헬퍼 메서드
     private String saveImage(MultipartFile file) throws Exception {
@@ -88,9 +95,7 @@ public class HospitalServiceImpl implements HospitalService {
 
 
 
-public HospitalServiceImpl(HospitalMapper hospitalMapper) {
-        this.hospitalMapper = hospitalMapper;
-    }
+
 
     @Override
     public List<Hospital> getHospitalList(List<Integer> animalIds, int pageNum, int pageSize) {

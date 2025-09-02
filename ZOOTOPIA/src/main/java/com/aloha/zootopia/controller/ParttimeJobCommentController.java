@@ -67,7 +67,7 @@ public class ParttimeJobCommentController {
     // ✅ 변경 후
     @PostMapping("/delete/{commentId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public String deleteComment(@PathVariable int commentId) {
+    public String deleteComment(@PathVariable("commentId") int commentId) {
         commentService.deleteComment(commentId);
         return "redirect:/parttime/list"; // 또는 현재 페이지 경로
     }

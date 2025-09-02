@@ -52,8 +52,8 @@ public class ParttimeJobApplicantController {
 
     @PostMapping("/delete/{applicantId}/job/{jobId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String delete(@PathVariable int applicantId,
-                        @PathVariable Long jobId,
+    public String delete(@PathVariable("applicantId") int applicantId,
+                        @PathVariable("jobId") Long jobId,
                         @AuthenticationPrincipal CustomUser user) {
 
         ParttimeJobApplicant app = applicantService.getApplicant(applicantId);
@@ -68,7 +68,7 @@ public class ParttimeJobApplicantController {
 
     @GetMapping("/list/{jobId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public String listApplicants(@PathVariable Long jobId, Model model) {
+    public String listApplicants(@PathVariable("jobId") Long jobId, Model model) {
         model.addAttribute("applicants", applicantService.listApplicants(jobId));
         return "parttime/applicants";
     }

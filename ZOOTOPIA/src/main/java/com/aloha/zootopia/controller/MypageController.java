@@ -158,7 +158,7 @@ public class MypageController {
 
 
     @GetMapping("/{userId}")
-    public String viewOtherUserMypage(@PathVariable Long userId, Model model) throws Exception {
+    public String viewOtherUserMypage(@PathVariable("userId") Long userId, Model model) throws Exception {
         Users user = userService.findUserById(userId);
         if (user == null) return "error/404"; 
 

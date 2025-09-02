@@ -64,7 +64,7 @@ public class HospitalController {
     // 병원 목록 페이지
     @GetMapping
     public String list(
-        @RequestParam(required = false) List<Integer> animal,
+        @RequestParam(value = "animal", required = false) List<Integer> animal,
         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
         Model model) {
 
@@ -107,7 +107,7 @@ public class HospitalController {
 
     // 병원 상세 페이지
     @GetMapping("/detail/{id}")
-    public String details(@PathVariable Integer id, Model model, Principal principal) {
+    public String details(@PathVariable("id") Integer id, Model model, Principal principal) {
         log.info("############################################################");
         log.info("HospitalController - details() 진입");
         log.info("로그인 사용자: {}", principal != null ? principal.getName() : "ANONYMOUS");
@@ -141,7 +141,7 @@ public class HospitalController {
 
     // 병원 수정 폼 페이지
     @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable Integer id, Model model) {
+    public String editForm(@PathVariable("id") Integer id, Model model) {
         try {
             Hospital hospital = hospitalService.getHospital(id);
             HospitalForm hospitalForm = new HospitalForm();
@@ -231,7 +231,7 @@ public class HospitalController {
     // 병원 리뷰 목록
     @GetMapping("/{hospitalId}/reviews")
     @ResponseBody
-    public ResponseEntity<List<HospReview>> getReviews(@PathVariable int hospitalId) {
+    public ResponseEntity<List<HospReview>> getReviews(@PathVariable("hospitalId") int hospitalId) {
         log.info("HospitalController - getReviews() 진입. hospitalId: {}", hospitalId); // 추가
         List<HospReview> reviews = hospReviewService.listByHospital(hospitalId);
         log.info("HospitalController - getReviews() 반환 리뷰 수: {}", reviews.size()); // 추가
@@ -241,7 +241,7 @@ public class HospitalController {
     // 리뷰 등록
     @PostMapping("/{hospitalId}/reviews")
     @ResponseBody
-    public ResponseEntity<String> addReview(@PathVariable int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
+    public ResponseEntity<String> addReview(@PathVariable("hospitalId") int hospitalId, @RequestBody HospReview hospReview, @AuthenticationPrincipal CustomUser customUser) {
         log.info("HospitalController - addReview() 진입. hospitalId: {}, hospReview: {}", hospitalId, hospReview); // 추가
         if (customUser == null) {
             log.warn("HospitalController - addReview() : Unauthorized access - customUser is null"); // 추가
@@ -307,8 +307,8 @@ public class HospitalController {
 @PutMapping("/{hospitalId}/reviews/{reviewId}")
 @ResponseBody
 public ResponseEntity<String> updateReview(
-    @PathVariable int hospitalId,
-    @PathVariable int reviewId,
+    @PathVariable("hospitalId") int hospitalId,
+    @PathVariable("reviewId") int reviewId,
     @RequestBody HospReview hospReview,
     @AuthenticationPrincipal CustomUser customUser
 ) {
@@ -343,8 +343,8 @@ public ResponseEntity<String> updateReview(
 @DeleteMapping("/{hospitalId}/reviews/{reviewId}")
 @ResponseBody
 public ResponseEntity<String> deleteReview(
-    @PathVariable int hospitalId,
-    @PathVariable int reviewId,
+    @PathVariable("hospitalId") int hospitalId,
+    @PathVariable("reviewId") int reviewId,
     @AuthenticationPrincipal CustomUser customUser
 ) {
     log.info("HospitalController - deleteReview() 진입. hospitalId: {}, reviewId: {}", hospitalId, reviewId);

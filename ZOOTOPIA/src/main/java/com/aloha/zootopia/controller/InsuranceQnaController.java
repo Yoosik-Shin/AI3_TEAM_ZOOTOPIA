@@ -38,7 +38,7 @@ public class InsuranceQnaController {
 
     // 특정 보험상품 Q&A 목록
     @GetMapping("/read/{productId}")
-    public String read(@PathVariable int productId,
+    public String read(@PathVariable("productId") int productId,
                        @AuthenticationPrincipal CustomUser customUser,
                        Model model) {
 
@@ -119,7 +119,7 @@ public class InsuranceQnaController {
     // 질문 수정 폼
     @GetMapping("/edit/{qnaId}")
     @PreAuthorize("hasRole('USER')")
-    public String showUpdateQuestion(@PathVariable int qnaId,
+    public String showUpdateQuestion(@PathVariable("qnaId") int qnaId,
                                      @AuthenticationPrincipal User user,
                                      Model model) {
         InsuranceQna qna = qnaService.getQna(qnaId);
@@ -170,7 +170,7 @@ public class InsuranceQnaController {
     @PostMapping("/delete-ajax/{qnaId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @ResponseBody
-    public List<InsuranceQnaResponse> deleteAjax(@PathVariable int qnaId,
+    public List<InsuranceQnaResponse> deleteAjax(@PathVariable("qnaId") int qnaId,
                                                  @RequestParam int productId,
                                                  @AuthenticationPrincipal CustomUser user) {
         InsuranceQna qna = qnaService.getQna(qnaId);

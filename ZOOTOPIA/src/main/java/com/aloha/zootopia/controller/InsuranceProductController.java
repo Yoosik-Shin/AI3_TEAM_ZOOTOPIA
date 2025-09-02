@@ -146,7 +146,7 @@ public class InsuranceProductController {
     // 수정폼 (관리자)
     @GetMapping("/update/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String showUpdateForm(@PathVariable int productId, Model model) {
+    public String showUpdateForm(@PathVariable("productId") int productId, Model model) {
         model.addAttribute("product", productService.getProduct(productId));
         return "insurance/update"; // ex) update.jsp
     }
@@ -168,7 +168,7 @@ public class InsuranceProductController {
     // 삭제 (관리자)
     @PostMapping("/delete/{productId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public String delete(@PathVariable int productId, RedirectAttributes rttr) {
+    public String delete(@PathVariable("productId") int productId, RedirectAttributes rttr) {
         try {
             productService.deleteProduct(productId);
             rttr.addFlashAttribute("successMessage", "✅ 보험 상품이 삭제되었습니다.");
