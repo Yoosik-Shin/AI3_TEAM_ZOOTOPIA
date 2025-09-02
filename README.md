@@ -6,6 +6,8 @@
 <details>
   <summary>전체 슬라이드 펼쳐보기</summary>
 ## 📑 발표 자료
+
+  <img src="./slides/0.png" width="900" />
 ![슬라이드 1](./slides/0.png)
 ![슬라이드 2](./slides/1.png)
 ![슬라이드 3](./slides/2.png)
