@@ -2,7 +2,10 @@
 ## 정규 1차 프로젝트
 ### 반려 동물 커뮤니티 - ZOOTOPIA
 
-## 📑 발표 자료 (이미지 미리보기)
+
+<details>
+  <summary>전체 슬라이드 펼쳐보기</summary>
+## 📑 발표 자료
 ![슬라이드 1](./slides/0.png)
 ![슬라이드 2](./slides/1.png)
 ![슬라이드 3](./slides/2.png)
@@ -23,4 +26,4 @@
 ![슬라이드 3](./slides/17.png)
 ![슬라이드 3](./slides/18.png)
 ![슬라이드 3](./slides/19.png)
-
+</details>
