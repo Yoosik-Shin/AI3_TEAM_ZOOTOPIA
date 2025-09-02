@@ -2,13 +2,11 @@
 ## 정규 1차 프로젝트
 ### 반려 동물 커뮤니티 - ZOOTOPIA
 
-[![슬라이드 미리보기](./slides/0.png)](./zootopia 프로젝트.pdf)
+![슬라이드 미리보기](./slides/0.png)
 
 
 <details>
-  <summary>📑 발표 자료 펼쳐보기</summary>
-  
-  <img src="./slides/0.png" width="900" />
+  <summary>##📑 발표 자료 펼쳐보기</summary>
   <img src="./slides/1.png" width="900" />
   <img src="./slides/2.png" width="900" />
   <img src="./slides/3.png" width="900" />
