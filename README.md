@@ -2,30 +2,30 @@
 ## 정규 1차 프로젝트
 ### 반려 동물 커뮤니티 - ZOOTOPIA
 
+[![슬라이드 미리보기](./slides/0.png)](./zootopia 프로젝트.pdf)
+
 
 <details>
-  <summary>전체 슬라이드 펼쳐보기</summary>
-## 📑 발표 자료
-
+  <summary>📑 발표 자료 펼쳐보기</summary>
+  
   <img src="./slides/0.png" width="900" />
-![슬라이드 1](./slides/0.png)
-![슬라이드 2](./slides/1.png)
-![슬라이드 3](./slides/2.png)
-![슬라이드 3](./slides/3.png)
-![슬라이드 3](./slides/4.png)
-![슬라이드 3](./slides/5.png)
-![슬라이드 3](./slides/6.png)
-![슬라이드 3](./slides/7.png)
-![슬라이드 3](./slides/8.png)
-![슬라이드 3](./slides/9.png)
-![슬라이드 3](./slides/10.png)
-![슬라이드 3](./slides/11.png)
-![슬라이드 3](./slides/12.png)
-![슬라이드 3](./slides/13.png)
-![슬라이드 3](./slides/14.png)
-![슬라이드 3](./slides/15.png)
-![슬라이드 3](./slides/16.png)
-![슬라이드 3](./slides/17.png)
-![슬라이드 3](./slides/18.png)
-![슬라이드 3](./slides/19.png)
+  <img src="./slides/1.png" width="900" />
+  <img src="./slides/2.png" width="900" />
+  <img src="./slides/3.png" width="900" />
+  <img src="./slides/4.png" width="900" />
+  <img src="./slides/5.png" width="900" />
+  <img src="./slides/6.png" width="900" />
+  <img src="./slides/7.png" width="900" />
+  <img src="./slides/8.png" width="900" />
+  <img src="./slides/9.png" width="900" />
+  <img src="./slides/10.png" width="900" />
+  <img src="./slides/11.png" width="900" />
+  <img src="./slides/12.png" width="900" />
+  <img src="./slides/13.png" width="900" />
+  <img src="./slides/14.png" width="900" />
+  <img src="./slides/15.png" width="900" />
+  <img src="./slides/16.png" width="900" />
+  <img src="./slides/17.png" width="900" />
+  <img src="./slides/18.png" width="900" />
+  <img src="./slides/19.png" width="900" />
 </details>
