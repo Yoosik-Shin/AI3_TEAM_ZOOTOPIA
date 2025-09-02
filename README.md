@@ -6,7 +6,7 @@
 
 
 <details>
-  <summary>##📑 발표 자료 펼쳐보기</summary>
+  <summary>📑 발표 자료 펼쳐보기</summary>
   <img src="./slides/1.png" width="900" />
   <img src="./slides/2.png" width="900" />
   <img src="./slides/3.png" width="900" />
