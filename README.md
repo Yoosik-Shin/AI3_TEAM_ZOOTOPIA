@@ -1,7 +1,7 @@
 # AI3_SPRINGZOOTOPIA
 ## 정규 1차 프로젝트
 ### 반려 동물 커뮤니티 - ZOOTOPIA
-[슬라이드 쇼로 보기](https://yoosik-shin.github.io/AI3_TEAM_ZOOTOPIA/)
+[PPT 슬라이드 쇼](https://yoosik-shin.github.io/AI3_TEAM_ZOOTOPIA/)
 
 ## 슬라이드 펼쳐보기
 ![슬라이드 미리보기](./slides/0.png)
